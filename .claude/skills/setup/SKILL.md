@@ -7,7 +7,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, WebSearch, 
 # Setup
 
 Turn `.idea/SPECS.md` into a working repository, one roadmap phase at a time.
-Read `.claude/skills/shared/vault-contract.md` before writing anything to `.idea/`.
+Read `.claude/skills/shared/vault-contract.md` before writing anything to `.idea/`, and
+`.claude/skills/shared/quality-bar.md` before any structural or technology decision — including the
+ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 
 **Write no project code before Phase 3 of this skill is confirmed.**
 
@@ -41,6 +43,12 @@ Produce a concrete ordered list of exactly what you will create and run: scaffol
 dependencies, directory tree, config files, env files, database setup, scripts, CI, git hooks, docs,
 and the `.management/` tracker.
 
+Structure is a decision, not a default. Per `quality-bar.md`, state your reasoning for the module
+boundaries, the data-access approach, and the rendering or data-fetching strategy — including where
+you are keeping what the scaffolder generated and where you are overriding it. Where a choice
+resolves toward quality at a visible cost in setup effort or added concepts, say so in this list so
+the user can disagree before you execute rather than after.
+
 Flag anything that touches the network, installs globally, or creates cloud resources.
 **Get explicit confirmation before executing.**
 
@@ -63,6 +71,12 @@ Non-negotiables:
 
 Actually run install, lint, typecheck, test, and build, and show the real output. Then walk the
 target phase's **Exit criteria** one at a time and mark each met or not met with the evidence.
+
+**Measure the `SPECS.md` performance budget and report the real numbers**, against the target device
+and network it names. On Phase 0 this is what converts the stack from a belief into a fact; on later
+phases it catches the drift that makes a project slow one commit at a time. A missed budget is
+reported as missed — fix it, or record it as an accepted regression with a reason. Never round it,
+and never omit it because the phase was otherwise green.
 
 If something fails: fix it. If you cannot, say so plainly and leave the criterion unmet. A phase
 reported as complete with a failing check is worse than an honest partial.
@@ -105,7 +119,7 @@ frontmatter with `name`, a trigger-rich `description`, `tools`, and `model`.
 
 Its write scope is deliberately narrow, and the definition must say so:
 
-- **May** create epics at `status: suggested` through the Obsidian MCP, and set task status in
+- **May** create epics at `status: suggested` in `.idea/epics/`, and set task status in
   `board.db` from commit evidence — the latter always carrying a note, the commit SHAs, and the PR
   where one exists, with `confirmed_by` left null for a person to confirm.
 - **May not** edit `SPECS.md`, `ROADMAP.md`, an accepted epic, an idea note, any `.management/`

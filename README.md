@@ -50,6 +50,10 @@ These are the parts that make it work. They will occasionally annoy you. That's 
 
 **Verification means running the thing.** Install, lint, typecheck, test, build — with the actual output. A phase reported as done with a failing check is worse than an honest partial.
 
+**Quality wins the tiebreak, and the bill is itemised.** When the convenient choice and the good one disagree, the workflow takes the good one and tells you what it cost — in setup time, in extra concepts, in a slower first commit. It refuses to let a passing "we could just..." quietly become the architecture. It also won't let you gild a form with four fields: the bar is the best result for what you are actually building.
+
+**Performance is a number in the spec, not a hope.** `/shape` writes a budget — time to interactive on a real device, the p95 of your most frequent interaction, a bundle ceiling. Phase 0 measures it while changing your mind still costs an afternoon, and every phase after re-checks it. A missed budget gets reported as missed.
+
 **Nothing gets invented.** Not a version number, not a CLI flag, not a secret, not a task nobody wrote down.
 
 ---
@@ -64,9 +68,12 @@ These are the parts that make it work. They will occasionally annoy you. That's 
                 Board, progress, blockers, changelog, dashboard design.
 
 .claude/        The machinery. Commands, skills, hooks, and the PM agent.
+                skills/shared/ holds the two contracts every skill obeys:
+                vault-contract.md (how notes are written) and
+                quality-bar.md (how stack and structure get decided).
 ```
 
-Both folders are [Obsidian](https://obsidian.md) vaults — open either one directly and the whole thing is a linked graph you can wander through. Every note has proper frontmatter, real wikilinks, and callouts. Four hooks make sure it stays that way, including one that audits every note at session start and catches files you edited by hand.
+Both folders are [Obsidian](https://obsidian.md) vaults — open either one directly and the whole thing is a linked graph you can wander through. Every note has proper frontmatter, real wikilinks, and callouts. Three hooks make sure it stays that way, including one that audits every note at session start and catches files you edited by hand.
 
 ---
 
@@ -110,7 +117,6 @@ Follow where it goes. `/shape` when you have ideas worth planning, `/setup` when
 
 | | For | Install |
 |---|---|---|
-| **Obsidian MCP** | Writing notes through the vault index. Required for editing anything in `.idea/` or `.management/`. | `claude mcp add obsidian -s user -- npx -y obsidian-mcp@2 serve --vault idea=<path>/.idea --vault management=<path>/.management` |
 | **GitHub MCP** | Pull request status in the dashboard. Everything else works without it. | `claude mcp add github -s user -- npx -y @modelcontextprotocol/server-github` |
 
 `/setup` tells you at session start if either is missing, with the exact command. It won't quietly work around them.

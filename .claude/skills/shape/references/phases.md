@@ -18,7 +18,12 @@ the cost of being wrong is one afternoon. Discovering the ORM does not work with
 Phase 3 costs a rewrite.
 
 Exit criteria are always roughly: it runs locally with one command · it is deployed and reachable ·
-CI is green on a real test · a new contributor can get from clone to running in under 15 minutes.
+CI is green on a real test · **the `SPECS.md` performance budget is measured on the real target and
+the numbers recorded** · a new contributor can get from clone to running in under 15 minutes.
+
+That budget measurement is the point of doing this early. A skeleton proves the stack works;
+measuring proves it works fast enough, while changing course still costs an afternoon rather than a
+rewrite. See `.claude/skills/shared/quality-bar.md`.
 
 ## Ordering
 

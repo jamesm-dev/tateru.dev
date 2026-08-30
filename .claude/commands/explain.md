@@ -51,7 +51,11 @@ the rest. Ask nothing else — one question, then stop and wait.
 ## Stage 2 — One command, in depth
 
 Only the command they picked. Now read everything: the command file, its skill, and every
-`references/` file that skill loads. Explain what actually happens when you run it — the command's
+`references/` file that skill loads, plus any `.claude/skills/shared/` contract it reads — such as
+`quality-bar.md`, which decides how `/shape` and `/setup` pick a stack. Those shared files are not
+commands and never appear in the stage 1 menu, but they are half of what a skill actually does, so a
+walkthrough that skips them describes the wrong thing. Explain what really happens when you run it —
+the command's
 job *plus* the skill's method — never the ten-line handoff.
 
 Use this shape:

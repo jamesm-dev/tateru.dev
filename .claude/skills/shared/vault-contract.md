@@ -97,17 +97,18 @@ Obsidian ignores any folder whose name starts with a dot, so `.idea/` and `.mana
 invisible as folders *inside* a vault. Each is therefore opened as its **own vault root**, where the
 rule does not apply.
 
-Two consequences, both enforced by hooks:
+Two consequences:
 
 1. **Wikilinks cannot cross between the two vaults.** `[[Some Epic]]` written in `.management/` will
    never resolve to `.idea/epics/`. Use a relative Markdown link for anything crossing over — it
    works in VS Code and on GitHub, and degrades to plain text rather than a broken link in Obsidian.
    Wikilinks are for links *within* one vault.
-2. **All Markdown in these folders is written through the Obsidian MCP**, never with a raw Write or
-   Edit, so the vault index stays consistent. Use `obsidian_create_note` and `obsidian_edit_note`;
-   read first and pass the etag when editing. If the MCP is not installed, or no vault covers the
-   folder, **stop and ask the user to set it up** — do not fall back to Write, and do not work
-   around it.
+2. **Write notes with ordinary `Write` and `Edit`.** Both folders are always writable and nothing
+   gates that. What is enforced is the **format**: every note must satisfy this contract so each
+   folder stays a valid Obsidian vault. The `PostToolUse` validator checks every write and blocks on
+   violations; the `SessionStart` audit catches notes changed outside Claude. An Obsidian MCP server
+   is optional — if one is configured and covers the folder its `obsidian_*` tools work too, and are
+   validated identically.
 
 ### `suggested` epics are proposals, not plan
 

@@ -63,6 +63,24 @@ Named explicitly. Each with the reason it is out.
 
 Pin versions where the choice is version-sensitive. `setup` consumes this table literally.
 
+Every `Why` names the demand it serves, what it costs, and what it beat. See
+`.claude/skills/shared/quality-bar.md`.
+
+## Performance budget
+
+Two to five numbers this product must hold, each measurable by someone else. Phase 0 measures them
+and they become its exit criteria.
+
+| Budget | Target | Measured on | Status |
+|---|---|---|---|
+| Time to interactive | | target device / network | not yet measured |
+| p95 of the most frequent interaction | | | not yet measured |
+| Bundle or payload ceiling | | | not yet measured |
+
+If this product has no meaningful performance surface — a small CLI, a library — delete the table and
+say so in one sentence with the reason. An empty budget with a reason is honest; invented numbers are
+not.
+
 ## Data model sketch
 
 ```mermaid

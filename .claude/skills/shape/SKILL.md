@@ -8,7 +8,9 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, WebSearch, 
 
 The bridge between `brainstorm` and `setup`. Ideas go in; a spec, a phased roadmap, and broken-down
 epics come out — with traceability in both directions. Read
-`.claude/skills/shared/vault-contract.md` before writing anything.
+`.claude/skills/shared/vault-contract.md` before writing anything, and
+`.claude/skills/shared/quality-bar.md` before choosing any technology — it governs how stack and
+structure decisions are resolved, and requires a performance budget in `SPECS.md`.
 
 ## Phase 1 — Read the vault
 
@@ -33,7 +35,9 @@ ADR, and move on — do not re-ask.
 
 Gaps worth closing before planning: the primary user and the job they hire this for; the one metric
 that says it worked; the hard constraints (deadline, budget, team size, must-use tech); what is
-explicitly out of scope for v1.
+explicitly out of scope for v1; and the **performance budget** — the target device and network, and
+the interaction that has to stay fast. Per `quality-bar.md` those numbers become Phase 0 exit
+criteria, so ask for them here rather than inventing them later.
 
 ## Phase 3 — Break ideas down into epics
 
@@ -79,7 +83,9 @@ Load `references/phases.md`. The rules that matter:
 Per `references/templates.md`:
 
 - `.idea/SPECS.md` — the contract `setup` consumes: identity, users, scope and non-goals, the stack
-  with a rationale per choice, data model sketch, decisions table, open questions, success metrics.
+  with a rationale per choice, the **performance budget**, data model sketch, decisions table, open
+  questions, success metrics. Every stack rationale must name the demand it serves, what it costs,
+  and what it beat — see `quality-bar.md`. Familiarity is a legitimate reason, but record it as one.
 - `.idea/ROADMAP.md` — the phases, plus a mermaid dependency graph.
 - `.idea/decisions/ADR-NNNN <Decision>.md` — one per consequential or hard-to-reverse choice.
 - Update every touched idea note, every theme MoC, and regenerate `INDEX.md`.
@@ -93,7 +99,11 @@ Before reporting, check and state the result of each:
 - [ ] Every epic has ≥1 source idea note, and that note's `epic:` points back.
 - [ ] Every committed idea appears in exactly one phase.
 - [ ] Every phase has a goal, checkable exit criteria, and a demo.
-- [ ] Every `SPECS.md` stack choice has a rationale and an ADR if it was contested.
+- [ ] Every `SPECS.md` stack choice has a rationale that names its cost and its rejected
+      alternative, and an ADR if it was contested.
+- [ ] `SPECS.md` has a performance budget whose entries someone else could measure — or an explicit
+      statement of why this product has no meaningful performance surface.
+- [ ] Phase 0's exit criteria include measuring that budget.
 - [ ] No orphan notes; `INDEX.md` matches disk.
 
 Then present the phase table, the assumptions the plan rests on, and: **"Run `/setup` to build

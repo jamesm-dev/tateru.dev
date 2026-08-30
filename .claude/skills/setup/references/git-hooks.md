@@ -21,8 +21,8 @@ purely to run a shell script. Use the ecosystem's runner and say which you chose
 ## The hard rule
 
 > [!warning] Hooks never write Markdown in `.idea/` or `.management/`
-> A git hook is a shell script. It cannot call Claude or the Obsidian MCP, so anything it wrote to
-> the vault would bypass the contract that keeps those notes valid.
+> A git hook is a shell script running outside Claude, so anything it wrote to the vault would skip
+> the `PostToolUse` validator and could silently break the contract that keeps those notes valid.
 >
 > Hooks write to **`.management/board.db`** and **`.management/commits.jsonl`** only. Both are data,
 > not notes. `/setup` reads them and regenerates the Markdown properly.

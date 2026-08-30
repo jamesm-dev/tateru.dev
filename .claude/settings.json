@@ -8,7 +8,7 @@
             "type": "command",
             "shell": "bash",
             "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/vault-preflight.sh\"",
-            "timeout": 30
+            "timeout": 60
           }
         ]
       }
@@ -21,20 +21,6 @@
             "shell": "bash",
             "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/idea-context.sh\"",
             "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "shell": "bash",
-            "command": "bash \"${CLAUDE_PROJECT_DIR:-.}/.claude/hooks/require-obsidian-mcp.sh\"",
-            "timeout": 15,
-            "statusMessage": "Routing vault notes through the Obsidian MCP"
           }
         ]
       }

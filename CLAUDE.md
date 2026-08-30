@@ -20,21 +20,28 @@ The format contract for everything in `.idea/` is
 [.claude/skills/shared/vault-contract.md](.claude/skills/shared/vault-contract.md). It is
 authoritative; obey it when writing any note.
 
+The decision contract for what gets built is
+[.claude/skills/shared/quality-bar.md](.claude/skills/shared/quality-bar.md). It governs stack and
+structure choices in `/shape` and `/setup`, and defines the performance budget that Phase 0 must
+measure. Read it before choosing any technology.
+
 ## Hooks
 
-Four hooks in [.claude/settings.json](.claude/settings.json) enforce the above rather than trusting
+Three hooks in [.claude/settings.json](.claude/settings.json) enforce the above rather than trusting
 it to be remembered:
 
 | Event | Script | Does |
 |---|---|---|
-| `SessionStart` | [vault-preflight.sh](.claude/hooks/vault-preflight.sh) | Reports whether the Obsidian MCP is installed and has a vault covering each folder, with the exact fix command; then audits every existing note and names any that drifted |
+| `SessionStart` | [vault-preflight.sh](.claude/hooks/vault-preflight.sh) | Audits every existing note against the vault contract and names any that drifted |
 | `UserPromptSubmit` | [idea-context.sh](.claude/hooks/idea-context.sh) | Injects a snapshot of `.idea/` and whether `CLAUDE.md` exists |
-| `PreToolUse` on `Write\|Edit` | [require-obsidian-mcp.sh](.claude/hooks/require-obsidian-mcp.sh) | Denies raw writes to Markdown in `.idea/` and `.management/`, returning the exact setup step if the MCP or its vault is missing |
-| `PostToolUse` | [validate-vault-note.sh](.claude/hooks/validate-vault-note.sh) | Checks any vault note — from Write, Edit, or the Obsidian MCP — against the vault contract, blocking with the specific violations |
+| `PostToolUse` | [validate-vault-note.sh](.claude/hooks/validate-vault-note.sh) | Checks any vault note — from Write, Edit, or an optional Obsidian MCP — against the vault contract, blocking with the specific violations |
 
-Together they cover the three ways a note can go wrong: written by a tool (`PreToolUse` +
-`PostToolUse`), edited by hand outside Claude (`SessionStart` audit), or written before the MCP was
-set up (`SessionStart` readiness check).
+Together they cover the two ways a note can go wrong: written badly by a tool (`PostToolUse`
+validation) or edited by hand outside Claude (`SessionStart` audit).
+
+`.idea/` and `.management/` are **always writable** with plain `Write` and `Edit`. No hook gates the
+write itself. What is enforced is that the Markdown stays Obsidian-compatible — valid frontmatter,
+one H1, real wikilinks, no illegal filename characters.
 
 The validator doubles as a CLI:
 
@@ -96,3 +103,5 @@ active. Preserve that split: depth added to a command file rather than its skill
 - Never delete or overwrite a note in `.idea/`. Supersede it and link the replacement.
 - Never fabricate a version number, a CLI flag, or a command's output. Verify it.
 - Never invent or commit a secret. `.env.example` documents keys with empty values.
+- When convenience and quality conflict in a stack or structure decision, resolve toward quality and
+  state what it cost. This is a tiebreaker, not a licence to over-build — see `quality-bar.md`.
