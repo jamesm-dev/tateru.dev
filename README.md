@@ -71,9 +71,15 @@ These are the parts that make it work. They will occasionally annoy you. That's 
                 skills/shared/ holds the two contracts every skill obeys:
                 vault-contract.md (how notes are written) and
                 quality-bar.md (how stack and structure get decided).
+
+app/            Your actual project. Everything /setup scaffolds lands here.
 ```
 
-Both folders are [Obsidian](https://obsidian.md) vaults — open either one directly and the whole thing is a linked graph you can wander through. Every note has proper frontmatter, real wikilinks, and callouts. Three hooks make sure it stays that way, including one that audits every note at session start and catches files you edited by hand.
+The root is the workflow's; `app/` is yours. That split is why you can clone this, build in it, and
+still have the boilerplate's own documentation intact afterwards — and why `.idea/` stays where
+every command expects to find it.
+
+`.idea/` and `.management/` are each [Obsidian](https://obsidian.md) vaults — open either one directly and the whole thing is a linked graph you can wander through. Every note has proper frontmatter, real wikilinks, and callouts. Three hooks make sure it stays that way, including one that audits every note at session start and catches files you edited by hand.
 
 ---
 
@@ -119,7 +125,7 @@ Follow where it goes. `/shape` when you have ideas worth planning, `/setup` when
 |---|---|---|
 | **GitHub MCP** | Pull request status in the dashboard. Everything else works without it. | `claude mcp add github -s user -- npx -y @modelcontextprotocol/server-github` |
 
-`/setup` tells you at session start if either is missing, with the exact command. It won't quietly work around them.
+`/setup` tells you if it is missing, with the exact command. It won't quietly work around it.
 
 ---
 

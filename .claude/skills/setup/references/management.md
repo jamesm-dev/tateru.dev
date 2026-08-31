@@ -162,9 +162,9 @@ Charts on Status are inline SVG, no chart library, and follow the `dataviz` skil
 | Next.js (app router) | `app/management/page.tsx` |
 | Next.js (pages router) | `pages/management.tsx` |
 | Nuxt | `pages/management.vue` |
-| SvelteKit | `src/routes/management/+page.svelte` |
+| SvelteKit | `app/src/routes/management/+page.svelte` |
 | Remix / React Router | `app/routes/management.tsx` |
-| Astro | `src/pages/management.astro` |
+| Astro | `app/src/pages/management.astro` |
 | Vite SPA | A route in the existing router, importing `state.json` |
 | Express / Fastify / Hono | A `GET /management` handler rendering server-side |
 | Django / Rails / Laravel | A route plus template, following the project's own conventions |

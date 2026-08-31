@@ -1,0 +1,11 @@
+# Dashboard-authored data: assignees, points, notes. Regenerable state, not
+# source, and it holds names — so it is not committed by default. Sharing it is
+# a deliberate decision to record in an ADR.
+.management/board.db
+.management/board.db-journal
+
+# Commit log written by the post-commit hook. Append-only local evidence.
+.management/commits.jsonl
+
+# NOTE: .idea/ is deliberately NOT ignored. In this repo it is the idea vault,
+# not JetBrains config, and it must be committed.

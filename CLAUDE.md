@@ -95,9 +95,28 @@ Commands stay thin — they name the skill, pass `$ARGUMENTS`, and handle invoca
 Method and detail live in the skill and its `references/`, which load only when that phase is
 active. Preserve that split: depth added to a command file rather than its skill is a regression.
 
+## The app in this repository
+
+This clone is building **Gastos** — a phone-first, offline, single-user budget tracker. It lives in
+[app/](app/) and is documented in [app/README.md](app/README.md); the plan behind it is in
+[.idea/](.idea/).
+
+Run every project command from `app/`, never the root:
+
+```bash
+cd app && pnpm verify     # lint, typecheck, test, build, bundle ceiling
+```
+
+Git hooks live in [.githooks/](.githooks/) and are wired by `pnpm install` in `app/` setting
+`core.hooksPath`. Husky is deliberately not used: it installs beside the manifest in `app/`, cannot
+find `.git` at the root, and would be a dependency that does nothing.
+
 ## Conventions
 
 - Windows host. Prefer cross-platform scripts; watch path separators and CRLF.
+- Application code lives in `app/`. The root belongs to the workflow — `.idea/`, `.management/`,
+  `.claude/`, and this project's own `README.md`. Any command in a doc names the directory it runs
+  in.
 - `.idea/` is intent; `.management/` is execution state, derived from it. Never let `.management/`
   become a second source of truth, and never edit `.idea/` from it silently.
 - Never delete or overwrite a note in `.idea/`. Supersede it and link the replacement.

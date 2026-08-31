@@ -8,7 +8,14 @@ Prefer the ecosystem's official scaffolder over a hand-rolled tree: `create-*`, 
 `uv init`, `dotnet new`, `rails new`. Check its *current* recommended invocation — flags churn, and
 a remembered command line from an old version is the most common failure here.
 
-Scaffold into a temp dir and merge if the repo already has files worth keeping.
+**Scaffold into `app/`**, never the repository root — the root is the workflow's
+(`.idea/`, `.management/`, `.claude/`). Most scaffolders take the target directory as an argument,
+so pass `app`; where one insists on the current directory, scaffold into a temp dir and move the
+result. Merge rather than overwrite if `app/` already has files worth keeping.
+
+Watch the generated `.gitignore`. Several scaffolders ignore `.idea` for JetBrains, which in this
+workflow is the **idea vault**. Inside `app/` that entry is merely wrong; at the root it would erase
+the project's whole record from version control. Remove it and say why in a comment.
 
 ## 2. Dependencies
 
@@ -73,6 +80,9 @@ Run each in turn and show real output:
 ```
 <install>  <lint>  <typecheck>  <test>  <build>  <dev — confirm it boots, then stop it>
 ```
+
+Run these from `app/`. Any command promised in `CLAUDE.md` or a README must name the directory it
+runs in, or the first person to try it from the root will conclude the project is broken.
 
 Then check the phase's exit criteria one at a time, with evidence per criterion.
 

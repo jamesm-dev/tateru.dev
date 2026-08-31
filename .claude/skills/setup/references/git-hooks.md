@@ -18,6 +18,22 @@ the ecosystem's equivalent, with the same three hooks and the same scripts:
 Do not install Husky into a non-Node project just to satisfy the word "Husky". It would drag in Node
 purely to run a shell script. Use the ecosystem's runner and say which you chose and why.
 
+> [!warning] The runner installs in `app/`, so point git at it
+> Application code lives in `app/`, so the hook runner installs beside the manifest — `app/.husky`,
+> not `.husky`. Git looks in `.git/hooks` by default and will find nothing there, so the hooks
+> silently never fire, which looks exactly like a project where nobody commits.
+>
+> Set the path explicitly and verify it:
+>
+> ```bash
+> git config core.hooksPath app/.husky
+> git config core.hooksPath          # must echo the path back
+> ```
+>
+> Hook scripts run with the working directory at the repository root, so paths to
+> `.management/commits.jsonl` stay root-relative while commands that need the manifest must
+> `cd app` first.
+
 ## The hard rule
 
 > [!warning] Hooks never write Markdown in `.idea/` or `.management/`

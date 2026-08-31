@@ -7,6 +7,16 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, WebSearch, 
 # Setup
 
 Turn `.idea/SPECS.md` into a working repository, one roadmap phase at a time.
+
+> [!important] Application code lives in `app/`
+> The repository root belongs to the workflow — `.idea/`, `.management/`, `.claude/`, and the
+> project's own `README.md`. Everything you scaffold goes in **`app/`**: the manifest, the source
+> tree, the lockfile, the test config, the build output.
+>
+> This keeps the product and the workflow from colliding. A clone can be built in without
+> overwriting the boilerplate's own documentation, `.idea/` stays at the root where every skill
+> expects it, and "what is the project" never becomes ambiguous. A monorepo later adds
+> `app/`-siblings; it does not move `app/`.
 Read `.claude/skills/shared/vault-contract.md` before writing anything to `.idea/`, and
 `.claude/skills/shared/quality-bar.md` before any structural or technology decision — including the
 ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
@@ -26,8 +36,10 @@ ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 | No `.idea/` at all, or nearly empty | Say so and offer `/brainstorm`. If the user wants to skip straight to code, run the shape interview to produce a minimal SPECS.md first — never scaffold from an unrecorded stack decision. |
 
 3. Read the repo for signals that **override** the spec: existing lockfile, `package.json`,
-   `pyproject.toml`, `go.mod`, `Cargo.toml`, `Dockerfile`, CI config, `.env.example`. A lockfile on
-   disk beats a spec table. On genuine conflict, ask — never silently pick one.
+   `pyproject.toml`, `go.mod`, `Cargo.toml`, `Dockerfile`, CI config, `.env.example`. Look in
+   **`app/`** first, then the root — a project set up by an earlier run keeps all of these in
+   `app/`. A lockfile on disk beats a spec table. On genuine conflict, ask — never silently pick
+   one.
 
 ## Phase 2 — Pick the phase
 
@@ -41,7 +53,8 @@ the skeleton is what makes later phases safe. Say why if you have to override an
 
 Produce a concrete ordered list of exactly what you will create and run: scaffolder invocation,
 dependencies, directory tree, config files, env files, database setup, scripts, CI, git hooks, docs,
-and the `.management/` tracker.
+and the `.management/` tracker. Every path in that list is under `app/`, except `.management/`,
+`.claude/`, and the root `README.md`.
 
 Structure is a decision, not a default. Per `quality-bar.md`, state your reasoning for the module
 boundaries, the data-access approach, and the rendering or data-fetching strategy — including where
