@@ -22,6 +22,7 @@ Gather before judging. Run things; do not trust status files.
 | CI | Green? When did it last run? A pipeline nobody triggers is not a pipeline. |
 | Deploy | When was the last release? Does the deploy path still work? |
 | Activity | Commits since the last release, and what they touched. |
+| Dashboard | If one was built: `bash .claude/scripts/dashboard-conformance.sh`, plus the derivation goldens. Drift here is silent by nature — nobody notices a reworded button or a reordered column until two builds disagree. |
 
 ## Phase 2 — Read the record against reality
 
@@ -35,6 +36,9 @@ This is what makes this skill different from running `npm outdated`.
   marked done by the agent that no person ever confirmed.
 - **The gap** — code with no epic behind it. Some is fine; a lot means the plan stopped describing
   the project, which is worth naming.
+- **`.management/design/` against the running dashboard** — a note describing a page that no longer
+  exists is worse than no note, because the next `/setup` rebuilds from it. If the conformance check
+  passes but a note contradicts the page, the note is the finding.
 
 ## Phase 3 — Report, ranked by cost of delay
 

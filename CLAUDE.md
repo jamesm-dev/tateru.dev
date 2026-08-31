@@ -11,7 +11,9 @@ on every prompt; that snapshot is a pointer, not a substitute for reading the fi
 
 Priority order when the prompt concerns what to build or how:
 `.idea/SPECS.md` → `.idea/ROADMAP.md` → the relevant `.idea/epics/` and `.idea/notes/` → this file.
-For "where does the work stand", read `.management/BOARD.md` and `.management/PROGRESS.md` instead.
+For "where does the work stand", read `.management/BOARD.md` and `.management/PROGRESS.md` instead —
+but only once `/setup` has generated them. Before that they do not exist, and the roadmap is the
+only answer available.
 
 The repo is the source of truth for what exists; `.idea/` is the source of truth for what was
 intended. On conflict, ask — do not silently pick one.
@@ -52,6 +54,22 @@ bash .claude/hooks/validate-vault-note.sh --check ".idea/notes/Some Idea.md"
 All four fail open and never block on their own error. Everything outside those two folders passes
 through untouched. If you change the vault contract, change the validator in the same edit — a rule
 that only exists in prose is not a rule.
+
+## Scripts
+
+[.claude/scripts/](.claude/scripts/) holds runnable checks that are not hooks — nothing triggers
+them automatically; a skill or a person runs them by name.
+
+| Script | Checks |
+|---|---|
+| [dashboard-conformance.sh](.claude/scripts/dashboard-conformance.sh) | A built `/management` dashboard against the machine-readable contract in `.management/contract/` — strings, measurements, and order |
+
+It needs only `bash`, `find`, `sed`, `tr` and `awk`, deliberately: it has to run in any project in
+any language, including one whose package manager is not installed yet. Exit `2` means it could not
+run — including "nothing has been built yet", which is the right answer in a fresh clone.
+
+Why it exists: prose read by a model is not reproducible, so the checkable half of a design has to
+be data. See [.management/design/Conformance.md](.management/design/Conformance.md).
 
 ## Keep `/explain` current
 
@@ -95,28 +113,39 @@ Commands stay thin — they name the skill, pass `$ARGUMENTS`, and handle invoca
 Method and detail live in the skill and its `references/`, which load only when that phase is
 active. Preserve that split: depth added to a command file rather than its skill is a regression.
 
-## The app in this repository
+## No app exists yet
 
-This clone is building **Gastos** — a phone-first, offline, single-user budget tracker. It lives in
-[app/](app/) and is documented in [app/README.md](app/README.md); the plan behind it is in
-[.idea/](.idea/).
+**Assume nothing has been built.** There is no `app/` directory, `/setup` has not run, and no stack
+has been installed. This repository currently holds the workflow (`.claude/`, `.githooks/`) and the
+plan (`.idea/`, `.management/`) — nothing else. Never refer to a source file, package manifest,
+script, or dependency as if it exists; check first, and if it is missing, say so.
 
-Run every project command from `app/`, never the root:
+`/setup` is what creates `app/`. Until it has run:
+
+- Write plans into `.idea/`, not code into `app/`.
+- `.management/` holds only `README.md`, `DESIGN.md`, and `design/`. `BOARD.md`, `PROGRESS.md`,
+  `BLOCKERS.md`, `CHANGELOG.md`, `state.json`, and `board.db` are generated later.
+- There is no chosen language, framework, or package manager. The stack is decided during `/shape`
+  and `/setup` against [quality-bar.md](.claude/skills/shared/quality-bar.md) and recorded as an
+  ADR — never assumed from this file, and never inferred from an example command.
+
+Once `/setup` has created it, application code lives in `app/` and every project command runs from
+there, never the root:
 
 ```bash
-cd app && pnpm verify     # lint, typecheck, test, build, bundle ceiling
+cd app && <the verify command /setup wired up>
 ```
 
-Git hooks live in [.githooks/](.githooks/) and are wired by `pnpm install` in `app/` setting
-`core.hooksPath`. Husky is deliberately not used: it installs beside the manifest in `app/`, cannot
-find `.git` at the root, and would be a dependency that does nothing.
+Git hooks live in [.githooks/](.githooks/) and are wired by the install step `/setup` runs inside
+`app/`, which sets `core.hooksPath`. Husky is deliberately not used: it installs beside the manifest
+in `app/`, cannot find `.git` at the root, and would be a dependency that does nothing.
 
 ## Conventions
 
 - Windows host. Prefer cross-platform scripts; watch path separators and CRLF.
-- Application code lives in `app/`. The root belongs to the workflow — `.idea/`, `.management/`,
-  `.claude/`, and this project's own `README.md`. Any command in a doc names the directory it runs
-  in.
+- Application code will live in `app/`, once `/setup` creates it. The root belongs to the workflow
+  — `.idea/`, `.management/`, `.claude/`, and this project's own `README.md`. Any command in a doc
+  names the directory it runs in.
 - `.idea/` is intent; `.management/` is execution state, derived from it. Never let `.management/`
   become a second source of truth, and never edit `.idea/` from it silently.
 - Never delete or overwrite a note in `.idea/`. Supersede it and link the replacement.

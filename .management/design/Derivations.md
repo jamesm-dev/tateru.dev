@@ -249,7 +249,8 @@ entries**, never a typed-in total.
 |---|---|
 | Board cards, within a column | priority rank, then phase, then epic title |
 | Epics, for colour assignment | phase, then title |
-| Attention items | severity (critical first), then as written |
+| Phase groups, and phases on Status | roadmap order, every phase, never by completion |
+| Attention items | **as `/setup` wrote them.** The page does not re-sort by severity — the writer decides the order, and a second opinion here would reorder the list every time a rule's severity changed |
 
 ```
 PRIORITY_RANK = { high: 0, normal: 1, low: 2 }

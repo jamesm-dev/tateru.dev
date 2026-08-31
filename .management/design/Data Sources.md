@@ -1,7 +1,7 @@
 ---
 title: Data Sources
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management, data]
 status: active
 ---
@@ -44,9 +44,10 @@ Obsidian block refs are lowercase by convention. Compare case-insensitively.
 ## Two kinds of task
 
 Structure is derived, with one deliberate exception: tasks created on the board. They live only in
-`board.db` with `origin = 'authored'` and an `ADH-` id, are marked as ad-hoc in the UI, and are
-invisible to `/shape` and `/setup` until promoted into their epic. [[Board]] covers the flow and why
-the distinction is not cosmetic.
+`board.db` with `origin = 'authored'` and an `ADH-` id, are identified by that id in the UI, and are
+invisible to `/shape` and `/setup`. Promoting one into its epic means writing an acceptance criterion
+into `.idea/`, which is `/shape`'s job and not this page's. [[Board]] covers why the distinction is
+not cosmetic.
 
 Sprints, team members, and their contribution are authored in full — `.idea/` has phases, not
 sprints, and no opinion about people. See [[Sprints]] and [[Team]].
@@ -58,8 +59,9 @@ task ids in the message. Hooks are shell scripts: they write data, **never vault
 they cannot go through the Obsidian MCP.
 
 A commit is evidence that work happened. It never marks a task done — completion comes from a
-verified exit criterion. Commits referencing no task become the *untracked* rows in the delivery
-log, so unplanned work is still counted. See `.claude/skills/setup/references/git-hooks.md`.
+verified exit criterion. Commits referencing no task are the record that unplanned work happened at
+all; `commits.jsonl` keeps them, and **no page reads it yet**. See
+`.claude/skills/setup/references/git-hooks.md`.
 
 ## Sync, not live fetch
 

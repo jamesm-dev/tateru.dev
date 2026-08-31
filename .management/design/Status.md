@@ -1,242 +1,247 @@
 ---
 title: Status
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management, ui, dataviz]
 status: active
 ---
 
 # Status
 
-Insights across `.idea/` and `.management/`: how the work is going, what needs attention, and where
-the sprint stands. The only section that charts anything.
+How the work is going, what is in the way, and whether the phase can move on. It is also the only
+section that **writes to the plan's own timeline** — by recording a phase advance that `/setup`
+later applies.
 
-> [!warning] Before writing a single chart
-> Load the **dataviz** skill and follow its procedure — form first, colour last, then run its palette
-> validator. The rules below are this page's application of it, not a replacement for it.
+> [!warning] Record and measure, but never forecast
+> Points, estimates and actuals are shown because someone entered them. This page charts nothing,
+> draws no burndown, computes no velocity, and projects no completion date. A handful of sprints
+> cannot support one, and a projection dressed in the same UI as a measurement is not honest.
 
 ## Sections, in order
 
-1. **Headline row** — a few stat tiles.
-2. **Needs attention** — the risk list, and what is in the way.
-3. **Deployment readiness** — how much more before this can ship.
-4. **Delivered** — the milestone log: everything done, with or without a task.
-5. **Sprint progress** — the active sprint, and sprint management.
-6. **Delivery history** — measured, per sprint.
-7. **Effort accuracy** — estimate against actual.
-8. **Team contribution** — who shipped what.
+1. **Headline tiles** — four numbers.
+2. **Needs attention** — what is in the way.
+3. **Deployment readiness** — the gate checklist.
+4. **Sprint progress** — the table, then the create form.
+5. **Phases** — one collapsed disclosure each, carrying what that phase delivered.
+6. **The advance panel** — park, step back, advance.
+7. **The closing note** — what this page will never show.
 
-**Needs attention comes first.** Readiness answers *can we ship yet*, but the risk list is *why not* —
-and a reader who sees the gates before the reasons has to scroll back up to act on anything. Put the
+**Needs attention comes before readiness.** Readiness answers *can we ship yet*; the attention list
+is *why not*. A reader who meets the gates first has to scroll back up to act on anything. Put the
 obstacles above the score.
+
+The lede under the title names the snapshot: `Derived from state.json, generated {timestamp}`.
+Nothing on this page is shown without saying when it was known.
+
+## 1. Headline tiles
+
+Four, and they are **stat tiles, not charts**. A single current number is a tile; a one-bar bar
+chart is a mistake.
+
+| Tile | Value | Label | Detail line |
+|---|---|---|---|
+| Tasks | `{done} / {counted}` | `Tasks done` | `across {n} epics`, plus `, {n} parked` only when something is |
+| Blocked | `{n}` — in `warn` **only when above zero** | `Blocked` | `waiting on the user` or `nothing stuck` |
+| Phase | `Phase {n} of {m}` | the phase name | `{met} of {total} exit criteria met` |
+| Accuracy | `not enough data` | `Estimate accuracy` | `needs ten completed tasks; {n} so far` |
+
+The counted denominator **excludes parked work**, and says so in the same tile. The accuracy tile
+shows a number only once ten tasks have been completed; until then it names exactly what is missing
+rather than hedging or hiding.
+
+## 2. Needs attention
+
+A rules list, not a prediction. Every entry names what fired, since when, what it holds up, and one
+concrete next action. Nothing here is statistical and nothing carries a probability.
+
+Empty reads `No rules firing.` — the heading stays. A section that vanishes when empty teaches the
+reader it does not exist.
 
 ### Every item is actionable by reference
 
-Each attention item carries a stable reference — `ATT-3C81F0` — derived from its title, so it
-survives `/setup` runs and a link to it does not rot. The card shows the reference and the exact
-command:
+Each item carries a stable reference — `ATT-3C81F0` — written by `/setup` where it can, and
+otherwise derived from the item's own title so it survives across runs and a link to it does not
+rot. See [[Derivations]].
 
 ```
-/epic ATT-3C81F0
+!  warning   Storage adapter undecided                    [ ATT-3C81F0 ]
+Since 2026-08-28 · holds up Expense Ledger Store
+Spike both options and record an ADR by Friday.
+/epic ATT-3C81F0   creates the epic and tasks that address this
 ```
 
-That turns the warning into an epic with tasks. Clicking the reference copies the command.
-
-A `critical` item is one holding the current phase's exit criteria; a `warning` is not. Severity
-carries **its word and an icon**, never colour alone.
+- The reference is a **button**: clicking it copies `/epic ATT-3C81F0` to the clipboard and the
+  label reads ` copied` for about 1.4 seconds.
+- Severity carries **its word** — `critical` or `warning` — never colour alone. A critical item
+  takes a `fail` leading edge; a warning takes `warn`.
+- The command is shown in full beneath, with one muted line saying what it does.
 
 > [!warning] A risk list you cannot act on is decoration
 > An item that names a problem and offers no way to start on it trains people to scroll past the
 > section. The reference and the command are what make it a queue rather than a lament.
 
-## Phases
+## 3. Deployment readiness
 
-The phase list carries what each phase delivered, rather than repeating it as a separate section
-that grows without bound.
+A **checklist, never a percentage**. The heading reads `{n} of {m} gates met` — a percentage of a
+checklist invites rounding up, and shipping is not a rounding decision.
 
-**Every phase is collapsed by default**, including the current one. The summary already carries the
-phase, its status, its done-over-required count and anything parked — enough to scan four phases at a
-glance. Opening one is a deliberate look, not the page unfolding itself at you.
+```
+[x] Exit criteria    4 of 7 met, 3 parked
+[x] Tasks            none blocked or in progress
+[ ] Risks            1 critical rule firing
+```
 
-Inside, work is grouped by epic in the epic's own colour, with done, parked and outstanding items
-distinguished by their glyph and word.
+Each row is a monospace `[x]`/`[ ]` marker in `ok` or `fail`, the gate's name, and its reason
+right-aligned and muted. No partial states, no weighting.
 
-## 1. Headline row
+### Only two gates are computed live
 
-Stat tiles, not charts. A single current number is a stat tile; a one-bar bar chart is a mistake.
+```
+LIVE_GATES = { Exit criteria, Tasks }
+```
 
-| Tile | Value | Note |
+| Gate | Met when | Reason reads |
 |---|---|---|
-| Sprint | `8 / 21 pts` | Completed over committed, plus days remaining |
-| Blocked | `3 tasks` | Warning colour only when above zero |
-| Phase | `Phase 1 of 4` | With its task count |
-| Estimate accuracy | `+38%` | Median overrun across completed tasks. Omit under ten completed tasks — say `not enough data` |
+| **Exit criteria** | The phase has criteria and none is outstanding | `{met} of {total} met`, plus `, {n} parked` when any is |
+| **Tasks** | Nothing is blocked or in progress | `{n} blocked or in progress`, or `none blocked or in progress`, plus `, {n} parked` |
 
-Each tile is a number, a label, and at most a one-line delta. No sparkline unless there are at least
-six real points behind it.
+Every other gate comes from `state.json` exactly as `/setup` wrote it, and the note beneath the list
+says which ones and when they were computed. A browser cannot see a test run, a pull request, or
+whether a deploy happened; guessing would be worse than deferring. **A gate with no evidence stays
+unmet, never assumed green.**
 
-## 2. Deployment readiness
+> [!danger] Do not widen the live set on instinct
+> Both live gates were wrong the first time. **Tasks** was computed more strictly than its own
+> definition — "nothing left to do" rather than "nothing in flight" — and **Risks** was derived from
+> blockers, which are not the risk rules. A gate that computes something adjacent to its name is
+> worse than one that admits it is stale, because it looks fresh.
+>
+> With no readiness written yet, the list falls back to the three gate names, all unmet.
 
-The answer to "how much more before this ships", as a **checklist, never a percentage**. Gates and
-their rules live in `.claude/skills/setup/references/git-hooks.md`.
+## 4. Sprint progress
 
-```
-DEPLOYMENT READINESS - Phase 1                     5 of 7 gates met
-[x] Exit criteria      4/4 met
-[x] Tasks              no blocked or in-flight work
-[x] Tests              latest run passed, every epic covered
-[x] Checks             lint, typecheck, build pass
-[ ] Pull requests      2 open against Editor Core
-[x] Deploy path        exercised in Phase 0
-[ ] Risks              1 critical rule firing
-```
+With no sprints: `No sprints yet. A project without them is perfectly normal — create one below when
+a dated window is useful.` No empty table, and no implication that something is missing.
 
-- Each gate is met or not met. No partial states, no weighting.
-- Agent-completed tasks awaiting confirmation do **not** satisfy the Tasks gate on their own; they
-  are listed under it so a person can confirm and clear it.
-- An unmet gate names what is blocking it and links there.
-- The heading reads `5 of 7 gates met`, never `71% ready` — a percentage of a checklist invites
-  rounding up, and shipping is not a rounding decision.
-- When every gate is met, the panel says so plainly and names the next phase.
+Otherwise a table — Sprint (with its goal beneath), Dates, Status, Tasks, Points, and a **Remove**
+link — followed by one muted line: *completed over committed points; a task with no points still
+counts as a task, because points alone would hide the unestimated work*.
 
-## 3. Delivered
+- **Status is derived from the dates**, never stored: `planned` before the start, `active` between,
+  `closed` after. See [[Sprints]].
+- **Points read `{completed} / {committed}`**, both from the shared task index.
+- **Remove** refuses while the sprint holds tasks, with the server's own sentence naming how many.
 
-The milestone log: **everything completed, whether or not it had a task**. Reverse chronological, one
-row each, with a badge saying where it came from.
+Beneath it, the **New sprint** form: Name, Starts, Ends on one row; Goal and **Create sprint** on
+the next. Errors render in `fail` and success in `ok`, in place. Rules are enforced on the server —
+end after start, no overlap, unique name — so the form cannot be the only thing standing between a
+bad sprint and the database.
 
-| Source | Row is | Comes from |
-|---|---|---|
-| Task | A completed derived task | `.idea/` acceptance criterion, verified |
-| Ad-hoc | A completed authored task | Created on the Board |
-| Phase | A phase reaching all its exit criteria | `ROADMAP.md` |
-| Sprint | A sprint closing, with its completed points | `board.db` |
-| Release | A changelog entry | `CHANGELOG.md` |
-| Untracked | A commit that referenced no task | `commits.jsonl` |
-| Agent | A task the agent completed from commits, still unconfirmed | `task_status` |
+## 5. Phases
+
+Phases come from the roadmap and are **read-only here** — `/shape` adds them, and the lede says so.
+What this page can do is advance past one.
+
+One `<details>` per phase, **closed by default, including the current one**. The summary already
+carries everything a scan needs, so opening one is a deliberate look rather than the page unfolding
+itself at you:
 
 ```
-2026-08-30  [phase]      Phase 0 complete - walking skeleton deployed
-2026-08-29  [task]       Persist documents across restart      Editor Core   3 pts
-2026-08-29  [untracked]  Bump dependencies, fix lint drift     4 commits
-2026-08-28  [ad-hoc]     Add seed data for local dev           Editor Core
-2026-08-26  [sprint]     Sprint 3 closed - 18 pts completed
+> Phase 1 — Core loop        current      12/19      2 parked
 ```
 
-The **untracked** row is the point of this section. Work that never had a task still happened, and a
-progress view that only counts planned work will always overstate how much is left. Untracked
-commits are grouped by day and summarised, not listed individually.
-
-Filters: source, sprint, epic, person. Default is the current phase, with an option for all time.
-
-> [!warning] A commit is evidence, not completion
-> A commit referencing a task links them; it never marks the task done. Completion comes from a
-> verified exit criterion. Otherwise "done" means "someone typed the id in a commit message".
-
-## 4. Needs attention
-
-**This is a rules list, not a prediction.** Every entry names the rule that fired, the evidence, and
-a suggested action. Nothing here is statistical, and nothing carries a probability.
-
-| Rule | Fires when | Severity |
-|---|---|---|
-| Long-blocked task | Blocked more than 3 days | serious |
-| Stalled epic | In the active sprint, sprint over half elapsed, nothing done | serious |
-| Sprint overcommitted | Committed points exceed the last closed sprint's completed, with under a third of time left | warning |
-| Chronic underestimate | 3+ completed tasks in one epic where actual exceeded estimate by over 50% | warning |
-| Untested epic | Epic has completed tasks and no linked test runs | serious |
-| Failing tests on done work | Latest run failed on a task marked done | critical |
-| Stale pull request | Open more than 5 days, or changes requested more than 2 days | warning |
-| Unresolved spike | A spike epic is blocking a later phase and has no decision recorded | critical |
-| Uncovered exit criterion | A phase criterion has no task that would satisfy it | serious |
-| Unestimated sprint work | Active-sprint tasks with no points, over a quarter of the sprint | warning |
-| Unassigned in-flight work | In-progress task with no assignee | warning |
-| Carry-over accumulating | Tasks carried across 3+ sprints | warning |
-| Orphaned board data | Authored data whose task has left `.idea/` | warning |
-| Unconfirmed completions | Tasks the agent marked done that no person has confirmed, older than 2 days | warning |
-| Suggested epics waiting | Suggested epics untriaged for more than a week | warning |
-
-Each row shows: the rule's plain-English name, the specific items, since when, and one suggested
-action. Rows link to the task, epic, or sprint concerned.
-
-Severity uses the **reserved status palette** — good, warning, serious, critical — never the
-categorical series colours, and each carries an icon and its word, never colour alone.
-
-> [!warning] What this section must never do
-> Forecast a completion date, project a burndown line, or state a percentage likelihood. The
-> evidence is a handful of tasks. A rule that fires on observable facts is honest; a projection
-> dressed in the same UI is not.
-
-## 5. Sprint progress
-
-The active sprint, plus sprint management.
-
-- **Sprint meter** — completed against committed points, as a single ratio against a limit. A meter
-  on the same ramp, not a two-slice pie.
-- **Composition** — one stacked bar: done, in progress, blocked, not started. Part-to-whole is a
-  stacked bar, horizontal so long status labels fit. Categorical colours in fixed order, 2px surface
-  gap between segments.
-- **Days elapsed** against points completed, as two plain numbers side by side. **Not** a dual-axis
-  chart — never two y-scales on one plot.
-- **Unfinished work from the last closed sprint**, if any, with the explicit carry-forward action
-  from [[Sprints]].
-- **Create sprint** — the form described in [[Sprints]].
-
-## 6. Delivery history
-
-Measured history only.
-
-- **Completed points per sprint** — a column chart, one column per closed sprint plus the active one
-  in a lighter step. Sequential, one hue. **No trend line, no average line, no projection.**
-- **Tasks completed per sprint** — the same chart, second tab or small multiple. Two measures of
-  different scale never share an axis.
-- Under three closed sprints, show a table instead of a chart and say why. Three columns is not a
-  trend, and drawing it like one invites reading it as one.
-
-## 7. Effort accuracy
-
-- **Estimate against actual, per epic** — a dumbbell chart: two dots joined by a line, one hue in
-  two shades. Before-and-after per item is exactly what dumbbells are for.
-- Sorted by the size of the gap, worst first. Direct-label the top few only.
-- Epics with no estimates are excluded and counted in a line beneath: `6 epics have no estimates`.
-
-## 8. Team contribution
-
-- **Points completed per member, this sprint** — horizontal bars, sequential, one hue. Horizontal
-  because names are long.
-- **Overall** — the same, second view.
-- Never a pie. Never a leaderboard framing — the section is titled contribution, and the ordering is
-  by name unless the reader sorts it. A dashboard that ranks people by points will get people
-  gaming points.
-
-## Chart rules for this page
-
-Drawn from the dataviz procedure, and non-negotiable here:
-
-- **Inline SVG. No chart library.** These forms are bars, columns, lines, dots, and a meter — all
-  are a handful of elements. This keeps the no-new-dependencies rule intact.
-- **One axis, always.** No dual-scale plot anywhere on this page.
-- **Categorical hues in fixed order, never cycled.** A ninth series folds into `Other`.
-- **Sequential is the default** — one hue, more-is-darker — unless the job is genuinely identity.
-- **Legend for two or more series**; four or fewer are also direct-labelled. One series needs no
-  legend: the title names it.
-- **Status colours are reserved** for severity and never reused as a series colour.
-- **Every chart has a table view**, reachable from the chart, carrying the same numbers.
-- **Hover layer by default** — crosshair and tooltip on line and column, per-mark tooltip on bars
-  and dots.
-- **Dark mode is chosen, not flipped** — its own steps from the same ramps, validated against the
-  dark surface.
-- Colours come from the project's palette. Run the dataviz validator against them before shipping;
-  do not eyeball whether they are colourblind-safe.
-
-## Empty states
-
-| State | What to show |
+| Phase | Pill |
 |---|---|
-| No sprints yet | The headline row without sprint tiles, and a `Create sprint` prompt |
-| No closed sprints | Delivery shows the active sprint only, with a line saying history begins after the first close |
-| Fewer than 10 completed tasks | Estimate accuracy shows `not enough data`, not a number |
-| Nothing needs attention | A single positive line. Do not render an empty panel, and do not invent a low-severity item to fill it |
-| No team members | Contribution is replaced by a link to [[Team]] |
-| No commits yet | Delivered shows planned work only, with a line saying commit tracking starts at the first commit |
-| Git hooks not installed | A one-line note that untracked work cannot be counted until they are, with the install command |
-| Readiness gates all met | The panel says so plainly and names the next phase |
+| Before the current one | `advanced past` in `ok`, or `advanced past, roadmap pending` |
+| The current one | `current` in `accent` |
+| Later | Its own status from the roadmap |
+
+Then `{done}/{required}` and, only when there is one, `{n} parked` in `warn`. The current phase
+takes an accent border and inset edge; a past phase takes an `ok` inset edge.
+
+Inside: the phase goal, then **what it delivered, grouped by epic in the epic's own colour** — done
+tasks with `✓`, parked with `⏸` at reduced opacity, open with a muted `·`. A done task shows
+`/setup`'s note about it where it carries one. Where a phase has no epics: `No epics in this phase.`
+
+> [!note] There is no separate "Delivered" section
+> One existed, and it repeated the same work grouped the same way while growing without bound. One
+> collapsible list per phase says the same thing and stays readable at forty epics.
+
+## 6. The advance panel
+
+One card, carrying whichever of these apply:
+
+**A pending advance** — the project is on a phase the roadmap has not caught up with. It names both
+numbers, says the roadmap is written by `/setup` because the plan has one writer, and offers **Step
+back to Phase {n}**. When the advance was forced, it says which phase was left and with what
+outstanding, and takes a `fail` edge instead of `warn`.
+
+**What is parked** — `{n} tasks and {n} criteria parked ({n} pts)`, then the sentence that keeps the
+word honest: parked is never counted as met; it records that you chose to skip something, which is a
+different claim from having done it. Parked criteria are listed in a disclosure, each with
+**Unpark**.
+
+**Then exactly one of three states:**
+
+| State | Shows |
+|---|---|
+| Last phase | `This is the last phase in the roadmap.` and that `/shape` adds more |
+| Gate open | One sentence saying the phase is finished — every criterion met or parked, every task done or parked, nothing in flight — and **Advance to Phase {n} — {name}** |
+| Gate closed | `Cannot advance yet.` and **why**, itemised |
+
+The closed state lists the specific unmet criteria, **each with its own Park control**, then the
+outstanding task count, the in-flight count, and the parked count as a muted line. Beneath it, the
+rule in one sentence: exit criteria are the definition of a phase, tasks are the means; parking a
+criterion moves the phase on without it and records that you did.
+
+**Advance anyway** stays available throughout, behind a confirmation box in `warn` that names
+exactly what will be left behind and says it will be recorded rather than quietly dropped. The
+confirm is destructive-styled; Cancel sits beside it.
+
+> [!warning] A disabled control must say why
+> Never a greyed-out button with no explanation. When the gate refuses, the reason is the list.
+
+### A finished phase moves on by itself
+
+When every task in a phase is done or parked and nothing is blocked or in progress, the project
+advances on its own, cascading across a run of finished phases and stopping at the first with work
+left — never past the last phase.
+
+It is **announced, never slipped through**: a banner at the top of the content area names which
+phases were crossed, says every task was done or parked, names anything it moved past, notes that
+`.idea/ROADMAP.md` catches up on the next `/setup`, and carries **Dismiss**. A cascade announces
+**once**, from the earliest phase it started at. The algorithm and its three easy-to-lose details
+are in [[Derivations]]; the reasoning is in [[Sprints]].
+
+## 7. The closing note
+
+The page ends by saying what it will not do: no burndown, no velocity, no projected completion date
+— because four phases and a handful of completed tasks cannot support a forecast, and a projection
+drawn in the same style as a measurement is not honest.
+
+Keep it. It is the sentence that stops the next build adding a chart.
+
+## Charts
+
+**None are built.** If one is ever added, it is bound by all of this:
+
+> [!warning] Load the dataviz skill first
+> Form before colour, then run its palette validator. The rules below are this page's application of
+> it, not a replacement for it.
+
+- **Inline SVG. No chart library** — the no-new-dependency rule holds here too.
+- **One axis, always.** No dual-scale plot anywhere on this page.
+- **Sequential by default** — one hue, more-is-darker — unless the job is genuinely identity.
+- **Status colours are reserved** for severity and never reused as a series colour.
+- **Every chart carries a table view** with the same numbers, and no chart is the only way to read a
+  figure.
+- Under three closed sprints, show a table and say why. Three columns is not a trend, and drawing it
+  like one invites reading it as one.
+- **Never** a trend line, an average line, a projection, a dual axis, a pie of two slices, or a
+  ranking of people.
+
+## Related
+
+[[Sprints]] · [[Derivations]] · [[Board]] · [[Specs]] · [[Copy Deck]] ·
+[[Accessibility And Anti-Patterns]] · [[Components]]

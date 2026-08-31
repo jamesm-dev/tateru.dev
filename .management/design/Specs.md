@@ -1,77 +1,96 @@
 ---
 title: Specs
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management, ui]
 status: active
 ---
 
 # Specs
 
-The epics, as agreed in `.idea/`. This section is the plan's face on the dashboard: almost entirely
-derived, and almost entirely read-only.
+The epics, as agreed in `.idea/`. This section is the plan's face on the dashboard: entirely
+derived, and **entirely read-only**.
 
-## List
+> [!important] Nothing on this page is editable. Not one field.
+> Changing an epic is `/shape`. The lede says so in the first two lines, so nobody hunts for a
+> control that should not exist. A page that is read-only by design says it out loud rather than
+> greying things out.
 
-Epics grouped by phase, current phase first and expanded, later phases collapsed. Cut phases are
-last, dimmed.
+## Layout, top to bottom
 
-Each row:
+1. **`h2` — Specs.**
+2. **Lede** — every epic is derived from `.idea/epics/`; structure is never editable here; counts
+   read **done / still required**, because parked work leaves the denominator and is shown
+   separately rather than vanishing.
+3. **A search box** on its own URL key, `?sq=` — see [[Navigation]].
+4. **One group per phase**, every phase, in roadmap order.
 
-```
-+----------------------------------------------------------+
-|  Editor Core                        Sprint 4    8/12      |
-|  Save, restore, and reopen a document                     |
-|  [############........]   in progress   (JD)(AM)(+1)      |
-+----------------------------------------------------------+
-```
+With a search that matches nothing: `Nothing matches that search.` The phase groups still render, so
+the shape of the plan is never hidden by a filter.
 
-- **Title**, and the outcome sentence beneath it.
-- **Sprint** the epic is assigned to, or `unscheduled`. See [[Sprints]].
-- **Task count** done over total, with a progress bar. Counts include authored tasks associated
-  with the epic, since they are real work — the mix is shown in the drawer.
-- **Status** from the epic note: planned, in progress, done, cut.
-- **Assignees** — the distinct people across its tasks, not a separately assigned owner. An epic has
-  no owner field; it inherits from its work.
+## Phase groups
 
-Filters: phase, sprint, status. Sorting is by phase then roadmap order — never by completion, which
-would make the list jump around as work lands.
+Each phase is an `h3` reading `Phase {n} — {name}`, carrying exactly one status pill:
 
-## Epic drawer
-
-Clicking a row opens a drawer. Same component as the task drawer; see [[Task Card And Drawer]].
-
-1. **Title** and status.
-2. **Outcome** — what is observably true when this is done, in full.
-3. **Phase** and **sprint**. The sprint is editable; the phase is not — phases come from the
-   roadmap.
-4. **Approach** and **risks** from the epic note, rendered as Markdown.
-5. **Source ideas** — the ideas this epic came from, as relative Markdown links into `.idea/notes/`.
-   Never wikilinks: that is a separate vault.
-6. **Tasks** — every task in this epic, grouped by status, each showing assignees, points, and
-   estimate against actual. Derived and authored tasks are listed together, with authored ones
-   marked. Clicking one switches to its task drawer.
-7. **Effort roll-up** — total points, total estimate, total actual, and the gap. This is the number
-   people actually want from an epic view.
-8. **Dependencies** — blocked by, and blocking, from the epic note.
-9. **Link to the note** — a relative Markdown link to `.idea/epics/<Epic>.md`, for the full text.
-
-## What is editable here
-
-Only two things:
-
-- **The sprint** an epic is assigned to.
-- **Notes** — a free-text field stored in `board.db`, for things that are not part of the spec.
-
-Everything else — title, outcome, acceptance criteria, phase, approach, risks — is the plan. Editing
-it here would make the dashboard a second source of truth. To change an epic, run `/shape`; the
-drawer says so, with the command, rather than leaving the reader to guess.
-
-## Empty and edge states
-
-| State | What to show |
+| Phase | Pill |
 |---|---|
-| No epics yet | One line: the project has not been shaped. Offer the `/shape` command. |
-| Epic with no tasks | The row renders with `0/0` and no bar. The drawer says the epic has no acceptance criteria, which is a gap worth fixing in `/shape`. |
-| Epic not in any sprint | `unscheduled`, in muted text. Not an error — plenty of work is unscheduled. |
-| Cut epic | Struck through, excluded from counts, with the reason if the note carries one. |
+| Before the current one | `advanced past`, in `ok` — or `advanced past, roadmap pending` while `/setup` has not caught up |
+| The current one | `current`, in `accent`, weight 600 |
+| Later | The phase's own status from the roadmap |
+
+Phase status follows the phase the project is **effectively** on, so advancing updates it here as
+well as in the sidebar. Beneath the heading sits the phase goal as a lede.
+
+## Epics
+
+One native `<details>` per epic, in its own epic colour with a 4px leading edge — the same colour it
+carries on the board, so an epic is recognisable across sections.
+
+**Open by default only for the current phase.** Everything else stays closed: the summary already
+carries what a scan needs.
+
+### Summary
+
+```
+Expense Ledger Store        5/8      2 parked      in-progress
+```
+
+- **Title**, in the epic's colour, weight 600.
+- **`{done}/{required}`** — required is the task count with parked work removed.
+- **`{n} parked`** in `warn`, only when something is parked. A shrunken denominator always says by
+  how much.
+- **The epic's status** from its note.
+
+### Body
+
+- One muted line: `Theme: {theme}` and, when the epic has sources, `· From: {source ideas}`.
+- Then every task in the epic, one row each:
+
+| Glyph | Meaning | Row |
+|---|---|---|
+| `✓` in `ok` | done | text, id |
+| `⏸` in `warn` | parked | text, id, and the whole row at 65% opacity |
+| `·` muted | open | text, id, muted |
+
+Each row also carries its **points pill** where a value exists, and — on a done task that has one —
+`/setup`'s note about it on a second line. Every count on this page reads the shared task index, so
+parking a task on the board changes these numbers immediately and without a reload.
+
+Where a phase has no epics: `No epics in this phase.`
+
+## Not built, and deliberately
+
+An earlier draft specified an epic drawer with approach, risks, dependencies, an effort roll-up, and
+an editable sprint. None of it shipped, and rebuilding it is a regression:
+
+| Absent | Why |
+|---|---|
+| An epic drawer | The disclosure already shows everything the epic note carries that this page uses. A drawer would be a second place to read the same thing |
+| Editing the epic's sprint here | Sprint assignment is per task, in the task drawer. An epic-level assignment that does not cascade is a statement of intent nothing reads |
+| Approach, risks, dependencies | They live in the epic note. Duplicating them here creates a second copy that drifts |
+| A progress bar per epic | The `{done}/{required}` count is the number. A bar beside it adds nothing and invites reading a rounded percentage |
+| Assignee avatars per epic | An epic has no owner; it inherits from its tasks. That belongs on [[Team]] |
+
+## Related
+
+[[Board]] · [[Navigation]] · [[Components]] · [[Derivations]] · [[Status]] · [[Copy Deck]]

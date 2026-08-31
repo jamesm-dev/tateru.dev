@@ -1,87 +1,111 @@
 ---
 title: Team
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management, ui]
 status: active
 ---
 
 # Team
 
+Who is on what. Entirely authored data — `.idea/` has no opinion about people, so all of it lives in
+`board.db`.
+
 > [!important] Capacity is the reason points are mandatory
-> A member's **load** is the sum of points on their open tasks, and their **completed** figure is the
-> sum on tasks they finished in the current sprint. Both are only meaningful because every task
-> carries points — one unpointed task makes every load figure wrong by an unknown amount, which is
-> worse than showing none.
+> A member's **load** is the sum of points on their **open** tasks — neither done nor parked. It is
+> only meaningful because every task carries points: one unpointed task makes the figure wrong by an
+> unknown amount.
 >
-> Show load as a number with its task count beside it (`13 pts across 5 tasks`), never as a
-> percentage of some assumed capacity. Nobody has told this dashboard how many points a person can
-> take in a sprint, and inventing that denominator would turn a fact into a fiction.
+> So the unpointed ones are **counted and named** rather than folded silently into the total, and
+> load is shown as a number with its task count beside it — `13 pts across 5 open tasks` — never as
+> a percentage of an assumed capacity. Nobody has told this dashboard how many points a person can
+> take, and inventing that denominator would turn a fact into a fiction.
 
-Who is working on the project, what they are on now, and what they have contributed. Entirely
-authored data — `.idea/` has no opinion about people. It all lives in `board.db`.
+## Layout, top to bottom
 
-## List
+1. **`h2` — Team.**
+2. **Lede** — who is on what; names live in `board.db`, never in `.idea/`.
+3. **The empty note**, when nobody has been added — see below.
+4. **A search box** on its own URL key, `?tq=` — see [[Navigation]].
+5. **The member grid.**
+6. **The add-person form.**
 
-One card per member, in a responsive grid. Inactive members drop to a collapsed section at the
-bottom rather than disappearing, because their past contribution still counts.
+### The empty state is a correct result, not missing data
+
+With nobody added, the section shows a note saying so plainly: this is a single-person project by
+design — `SPECS.md` names one user and rules out accounts entirely — so this section may stay empty,
+**and that is a correct result rather than missing data**.
+
+The distinction matters. An empty section that reads like a configuration failure sends someone off
+to fix nothing.
+
+## Member card
+
+One card per person, in a responsive grid:
 
 ```
-+--------------------------------------------------+
-|  (JD)  Jamie Doe                        active   |
-|        @jamiedoe                                 |
-|                                                  |
-|  Now:  Persist documents across restart          |
-|        Restore on open                     +1    |
-|                                                  |
-|  Sprint 4     8 pts     3 tasks                  |
-|  Overall     47 pts    22 tasks                  |
-+--------------------------------------------------+
++--------------------------------------------+
+| Jamie Doe  @jamiedoe                       |
+|                                            |
+| 13 pts  across 5 open tasks                |
+| 47 pts completed · 8 tasks assigned        |
+| 2 open tasks unpointed - the load above is |
+| short by an unknown amount                 |
+|                                            |
+| TSK-8F31 Persist documents  (Expense Ledger)|
+| TSK-2C09 Restore on open    (Expense Ledger)|
++--------------------------------------------+
 ```
 
-- **Avatar and name.** GitHub handle beneath, when set — it is what matches them to PR authors.
-- **Now** — their in-progress tasks, at most two, then `+N`. Blocked tasks show first, with the
-  blocked glyph, because a blocked person is the thing a lead most needs to see.
-- **This sprint** — points and task count from the active sprint.
-- **Overall** — points and task count across every sprint.
+| Line | Contents |
+|---|---|
+| **Name** | Plus `@handle` in monospace, muted, when set — it is what matches them to PR authors |
+| **Load** | The points figure, large and tabular, with `across {n} open task{s}` beside it |
+| **Contribution** | `{n} pts completed · {n} task{s} assigned` |
+| **Unpointed gap** | In `warn`, and **only when there is one**: `{n} open task{s} unpointed — the load above is short by an unknown amount` |
+| **Assigned tasks** | Every task assigned to them: id, text, and an epic chip in that epic's colour. Empty reads `Nothing assigned.` |
 
-Points count when a task is **done**, never when it is assigned. A member's contribution is what
-shipped, not what was hoped for. On a task with several assignees, points are **not** divided —
-each assignee is credited with the full task, and the section says so in a line beneath the grid.
-Splitting points invents precision nobody entered.
+Every figure reads the shared task index, so parking a task on the board removes it from that
+person's load immediately — set aside is not pending — while leaving it visible in their list.
 
-## Member drawer
+Points are credited on **done**, never on assignment: a member's contribution is what shipped, not
+what was hoped for. On a task with several assignees points are **not** divided; each is credited
+with the whole task. Splitting them invents precision nobody entered.
 
-Clicking a card opens a drawer:
+## Adding a person
 
-1. **Name, handle, avatar** — all editable.
-2. **Status** — active or inactive.
-3. **Current tasks** — every in-progress and blocked task, with epic and sprint.
-4. **Contribution by sprint** — a small horizontal bar per sprint, points completed. Measured
-   history only; see [[Status]] for what may and may not be charted.
-5. **Totals** — points, tasks completed, and total time logged.
-6. **Recent time entries** — the last ten, with task and note.
+One row: **name** (required), **GitHub handle** (optional), **Add person**. Nothing else — no email,
+no role, no avatar upload. This is a build tool, not an HR system, and every extra field is personal
+data with no job to do here.
 
-## Adding a member
+Never auto-populate the team from git history. Commit authors are not the team; names may be
+*suggested* from contributors for a person to confirm.
 
-An `Add member` button opens a form: **name** (required), GitHub handle, avatar URL. Nothing else —
-no email, no role, no phone. This is a build tool, not an HR system, and every extra field is
-personal data with no job to do here.
+## Removing a person
 
-Names may be imported from the repository's contributors on request, as a suggested list a person
-confirms. Never auto-populate the team from git history: commit authors are not the team.
+**Not built as a control, and the schema explains why.** `assignee.active` exists so a person can be
+deactivated rather than deleted: their name stays on the tasks they did and the time they logged,
+and the board reads only active people. Deleting the row would corrupt every historical total.
 
-## Removing a member
+A rebuild that adds the control must deactivate, never delete — except for a person with no tasks
+and no time entries, the one case where nothing is lost.
 
-Members are **deactivated**, never deleted. Their name stays on the tasks they did and the time they
-logged; deleting the row would corrupt every historical total.
+## Not built, and deliberately
 
-Deactivating hides them from assignee pickers, moves their card to the collapsed section, and leaves
-every past record intact. A member with no tasks and no time entries may be deleted outright, with a
-confirm — that is the one case where nothing is lost.
+| Absent | Why |
+|---|---|
+| A member drawer | The card already carries every figure this section has. A drawer would repeat it |
+| Avatars from a URL | Initials are enough at this size, and an image is a network dependency for decoration |
+| Active/inactive UI | The column exists; no project here has needed the control yet |
+| Per-sprint contribution bars | Two or three sprints is not a history. See the forecast rule on [[Status]] |
+| A leaderboard, or any ranking by points | The section is titled contribution. A dashboard that ranks people by points will get people gaming points |
 
 ## Privacy
 
-This section holds real people's names. It is why the dashboard defaults to dev-only, and why
-`board.db` is gitignored by default — see [[Requirements]]. If the team wants shared assignment,
-committing the database is a deliberate decision, and one worth recording as an ADR.
+This section holds real people's names. It is why the dashboard defaults to development-only, and
+why `board.db` is gitignored — see [[Requirements]]. If the team wants shared assignment, committing
+the database is a deliberate decision, and one worth recording as an ADR.
+
+## Related
+
+[[Board]] · [[Navigation]] · [[Components]] · [[Sprints]] · [[Derivations]] · [[Requirements]]

@@ -25,7 +25,8 @@ contract.
 | `GET /board` | Everything authored or synced: meta, authored tasks, assignees, task assignees, sprints, epic sprints, time entries, PRs, test runs, advances, parked criteria, priorities, statuses, pull requests |
 
 Both are fetched together on load and re-fetched after **every** successful write. The page holds no
-optimistic local model of derived state — see [[Derivations]].
+local model of derived state at all: it rebuilds the shared task index from what came back. See
+[[Derivations]].
 
 > [!note] `pullRequests: null` means "no GitHub MCP configured"
 > It does not mean "no open pull requests". The distinction is the whole point: an integration that
@@ -64,9 +65,10 @@ that treats `null` as "no change" silently breaks drag-back-to-origin.
 Non-2xx responses carry `{ "error": "<human sentence>" }`. The client throws with that text, and the
 drawer or board renders it inline.
 
-> [!warning] A failed write is never silent
-> The UI applies a write optimistically, then rolls back **visibly** with the server's message on
-> failure. A board that quietly reverts a card looks like a drag that missed.
+> [!warning] A failed write is never silent, and nothing is applied optimistically
+> A write posts, and **only on success** does the page re-read both stores and re-render. On failure
+> nothing has changed and the server's own sentence renders inline at the control that failed. The
+> extra round trip is what makes it impossible for two sections to disagree — see [[Derivations]].
 
 Validation belongs on the server, not only in the form: sprint dates, unique names, known status and
 priority values, and existence of the referenced task.

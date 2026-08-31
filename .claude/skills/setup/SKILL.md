@@ -118,10 +118,10 @@ It is **derived from `.idea/`**, never a second source of truth. `.idea/` holds 
 why); `.management/` holds state (progress, blockers, dates, what shipped). Create it on the first
 run; refresh it on every later run.
 
-1. **Ingest commits first.** Read `.management/commits.jsonl` and any `board.db` commit rows written
-   since the last run. Map them to tasks by reference id; a commit is evidence, never completion.
-   Commits referencing no task become untracked delivery-log rows, so unplanned work is still
-   counted.
+1. **Ingest commits first.** Read `.management/commits.jsonl` — written by the `post-commit` hook,
+   and the whole commit record; there is no table. Map commits to tasks by reference id; a commit is
+   evidence, never completion. Commits referencing no task are recorded as untracked work, so
+   unplanned effort is not lost.
 2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`.
 3. Derive tasks from epic acceptance criteria. Never invent a task with no epic behind it, and never
    quietly drop one — an epic with no criteria is a gap, so report it.
@@ -190,20 +190,74 @@ is `/shape` or `/epic`, regenerating state is `/setup`, shipping is `/ship`.
 On a later run, update its description if the project's shape changed; never overwrite a definition
 the user has edited without saying so first.
 
-### Then ask about the dashboard
+### Then, last of all, the dashboard
 
-Use `AskUserQuestion`: does the user want a `/management` route in the app serving this as a
-dashboard? Lead with the recommended option, and state the trade-off in one line — such a route
-exposes the roadmap, blockers, unshipped plans, and team names to anyone who can reach it.
+> [!important] The dashboard is built **after** the app, never alongside it
+> It is the final thing `/setup` builds: after Phase 4 has executed and **Phase 5 has verified
+> green**. That order is not tidiness, it is the whole reason the page looks like it belongs.
+>
+> The dashboard introduces no design of its own. It is assembled from the app's tokens, its
+> components, its dark-mode mechanism, its router, its test runner and its build config. Build it
+> before those exist and there is nothing to reuse, so it invents them — a second design system
+> inside one repository, which the app then contradicts for every phase afterwards. That is the
+> single most expensive mistake available here, because by the time anyone notices, both are load
+> bearing.
 
-It is four sections behind a sidebar — Board, Specs, Team, Status — backed by a standalone
-database. Say that up front: it is more than a status page, and it is a real build.
+**Do not start it while any of these is true.** Fix the app first and come back:
 
-Offer: **dev-only (recommended)** · auth-gated in production · public · none.
+- install, lint, typecheck, test or build is failing;
+- the target phase's exit criteria are unmet;
+- `app/` is mid-scaffold, or the framework choice is still open;
+- the performance budget was missed and not yet accepted.
 
-Build it only on a yes. **Read `.management/DESIGN.md` and the notes in `.management/design/`
-first** - they are the spec, and they describe the dashboard as it was refined in use, not as it was
-first sketched. Four of them are what make a rebuild land in the same place:
+A dashboard reporting on a project that does not build is furniture.
+
+#### Audit the app before offering to build anything
+
+Read what the app actually has, and **report the findings to the user in the question itself**. This
+takes one pass and decides everything downstream — `references/management.md` has the full checklist
+of what to look for and where.
+
+At minimum, establish and name: the **theme tokens** and where they live · the **component library**,
+if any, and whether it is shadcn · the **dark-mode mechanism** · the **spacing and radius scale** ·
+the **router** · the **test runner** · whether a **drawer, sheet or dialog** already exists.
+
+Two outcomes matter:
+
+| Audit found | What it means |
+|---|---|
+| Tokens and components | Build against them. Every substitution goes in `.management/contract/tokens.map`, so a reviewer can see what was swapped for what |
+| Neither — a bare Phase 0 skeleton | There is nothing to inherit. **Say so and offer to defer** |
+
+#### The question
+
+Use `AskUserQuestion`. Lead with the recommended option, and state the trade-off in one line — such
+a route exposes the roadmap, blockers, unshipped plans, and team names to anyone who can reach it.
+
+Say up front what it is: four sections behind a sidebar — Board, Specs, Team, Status — backed by a
+standalone database. It is more than a status page, and it is a real build.
+
+Offer: **dev-only (recommended)** · auth-gated in production · public · **defer to a later phase** ·
+none.
+
+> [!warning] When the app has no design system yet, lead with *defer*
+> On a first run the app is a walking skeleton: a token file with four colours, no component
+> library, maybe no dark mode. A dashboard built then has to invent a card, a badge, a drawer and a
+> scale — and a later phase that adds the real ones inherits a page that matches none of them.
+>
+> Deferring costs nothing. `.management/` still gets its Markdown and `state.json`, so progress is
+> tracked from day one; only the page waits. Say which phase to revisit it in — the one that
+> introduces the app's own components — and record the deferral in the run report so the next
+> `/setup` picks it up rather than forgetting it.
+>
+> If the user wants it now anyway, that is their call: build it, keep it plain rather than inventing
+> a design system, and **say in the report that it will need revisiting** once the app has a theme.
+
+#### Building it
+
+Build only on a yes. **Read `.management/DESIGN.md` and the notes in `.management/design/` first** —
+they are the spec, and they describe the dashboard as it was refined in use, not as it was first
+sketched. Five of them are what make a rebuild land in the same place:
 
 | Note | Fixes |
 |---|---|
@@ -211,24 +265,37 @@ first sketched. Four of them are what make a rebuild land in the same place:
 | `design/Derivations.md` | Every derived number as portable pseudocode |
 | `design/API Surface.md` | The operation set, and what `null` means in each write |
 | `design/Copy Deck.md` | The exact words, including the ones that must not be softened |
+| `design/Conformance.md` | How the result is **checked**, and what the check cannot prove |
 
-**Appearance still comes from the app**: its theme, its tokens, its components, its dark mode. Those
+**Appearance comes from the app** — its theme, its tokens, its components, its dark mode. Those
 notes fix layout, behaviour and wording, not palette. Reach for the project's own component first;
-where it has none, build it once in `ui/` from the project's tokens. Snap to the project's nearest
-scale step where it has a scale; use the literal values where it has nothing. Record every
-substitution in the build report — a silent one is how two builds drift apart.
+where it has none, build it once in a `ui/` directory from the project's tokens. Snap to the
+project's nearest scale step where it has a scale; use the literal values where it has nothing.
 
-Check `design/Requirements.md` before starting: it needs a standalone
-database, and pull request status needs the GitHub MCP. If either is missing, say so and build the
-part that works rather than faking the rest.
+Check `design/Requirements.md` before starting: it needs a standalone database, and pull request
+status needs the GitHub MCP. If either is missing, say so and build the part that works rather than
+faking the rest.
 
-Use the framework in `SPECS.md`, build from the project's own theme and components, add no new
-dependencies beyond the one database driver, and apply the gate they picked.
+Add no new dependencies beyond the one database driver, and apply the gate the user picked.
 
-Before reporting the dashboard built, **walk the compliance checklist in `.management/DESIGN.md`
-item by item** and report it as met over total, naming every item that is not. It is long because
-each line is something a build has actually got wrong. "It looks right" is not a check, and a rule
-that is never exercised is a rule the next build quietly drops.
+#### Before reporting it built
+
+Two checks, in this order, and **report both**:
+
+1. **Conformance.** Write `.management/contract/sources.txt` (including the server side) and
+   `tokens.map`, write the derivation goldens from `.management/contract/fixtures/` as tests in the
+   project's own runner, then run them and:
+
+   ```bash
+   bash .claude/scripts/dashboard-conformance.sh
+   ```
+
+   These are mechanical. Do not report the dashboard built while either fails.
+
+2. **The compliance checklist in `.management/DESIGN.md`**, walked item by item and reported as met
+   over total, naming every item that is not. It is long because each line is something a build has
+   actually got wrong. "It looks right" is not a check, and a rule that is never exercised is a rule
+   the next build quietly drops.
 
 If the project has no web surface — a CLI, a library — say so and offer the reference's fallback
 instead: a self-contained `.management/dashboard.html` plus a `board` script that prints progress.

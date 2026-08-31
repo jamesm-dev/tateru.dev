@@ -5,34 +5,37 @@ Set these up on every project, in Phase 4. They are what keeps `.management/` ho
 
 ## Which runner
 
-**Husky when the project is Node** — it has a `package.json` and installs dependencies. Otherwise use
-the ecosystem's equivalent, with the same three hooks and the same scripts:
+**None. The hooks already exist** — this repository ships them in [.githooks/](../../../../.githooks/),
+as three plain shell scripts. Wire them up and verify:
 
-| Project | Runner | Install |
-|---|---|---|
-| Node | **Husky** | `npm i -D husky && npx husky init` |
-| Python | pre-commit | `pipx install pre-commit && pre-commit install` |
-| Go, Rust, mixed | Lefthook | `lefthook install` |
-| Anything else | Native `.git/hooks`, committed to `scripts/hooks/` and installed by a `make hooks` target | — |
+```bash
+git config core.hooksPath .githooks
+git config core.hooksPath          # must echo the path back
+```
 
-Do not install Husky into a non-Node project just to satisfy the word "Husky". It would drag in Node
-purely to run a shell script. Use the ecosystem's runner and say which you chose and why.
+Do that from whatever the project's install step is, so a fresh clone gets them without anyone
+remembering: an `npm prepare` script, a `make hooks` target, a line in the setup docs.
 
-> [!warning] The runner installs in `app/`, so point git at it
-> Application code lives in `app/`, so the hook runner installs beside the manifest — `app/.husky`,
-> not `.husky`. Git looks in `.git/hooks` by default and will find nothing there, so the hooks
-> silently never fire, which looks exactly like a project where nobody commits.
+> [!important] Do not install Husky, and do not reach for a hook runner
+> A runner installs beside the manifest — `app/.husky`, not `.husky` — and git looks in
+> `.git/hooks`, so the hooks silently never fire. That looks exactly like a project where nobody
+> commits. Pointing `core.hooksPath` at the runner's directory fixes it, at which point the runner
+> is a dependency that manages three files git was already going to run.
 >
-> Set the path explicitly and verify it:
+> It is also a Node dependency in a workflow that has to work for Python, Go and Rust. Shell scripts
+> in `.githooks/` work everywhere and ship with the clone.
 >
-> ```bash
-> git config core.hooksPath app/.husky
-> git config core.hooksPath          # must echo the path back
-> ```
->
-> Hook scripts run with the working directory at the repository root, so paths to
-> `.management/commits.jsonl` stay root-relative while commands that need the manifest must
-> `cd app` first.
+> The exception is a project that **already** uses one for its own hooks — lint-staged, a
+> commit-message linter. Keep its runner, and have it call these three scripts rather than
+> replacing them.
+
+Hook scripts run with the working directory at the repository root, so paths to
+`.management/commits.jsonl` stay root-relative, while any command needing the manifest must
+`cd app` (or wherever the app lives) first.
+
+The three scripts are described below. They are committed, so read them before changing one — and if
+the project genuinely needs different behaviour, change the script rather than adding a layer on top
+of it.
 
 ## The hard rule
 
@@ -77,20 +80,20 @@ Append one line to `.management/commits.jsonl`:
 Append-only, one JSON object per line, never rewritten. It survives rebases badly on purpose: it is
 a log of what happened locally, not a mirror of history.
 
-Also upsert the rows into `board.db` — the `commit` and `task_commit` tables in
-`.management/design/Database Schema.md` — when a database driver is available. If it is not, the
-JSONL alone is enough; `/setup` backfills.
+**The JSONL is the only store.** There are no `commit_log` or `task_commit` tables, deliberately —
+see the *not tables* section of `.management/design/Database Schema.md`. A hook is a shell script,
+and giving it a database driver to write rows nothing yet reads buys complexity and no information.
+`/setup` reads the JSONL.
 
 ### `pre-push` — verify, then take stock
 
 1. Run the project's real checks: lint, typecheck, test. **Block the push if they fail.** This is the
    one hook that should stop you, because a red push is what turns into a broken deploy.
 
-   Where the runner emits a machine-readable report, upsert its runs into `board.db`'s `test_run`
-   table as it goes, so the trail is recorded at the moment the tests actually ran rather than
-   reconstructed later. Data only — the hook never writes Markdown.
-2. Recompute readiness (below) and write it to `board.db`.
-3. Print a two-line summary so the developer sees where the phase stands as they push:
+   Leave the machine-readable report where the runner wrote it. `/setup` reads it and writes the
+   runs into `board.db`'s `test_run` table, because that is where a database driver already exists;
+   the hook stays a shell script with no dependencies.
+2. Print a two-line summary so the developer sees where the phase stands as they push:
 
 ```
 Phase 1 - Core loop:  12/19 tasks, 3 of 4 exit criteria met
@@ -121,10 +124,12 @@ never as `71% ready` — a percentage of a checklist invites rounding up.
 
 On each run, before regenerating `.management/`:
 
-1. Read `commits.jsonl` and any `board.db` commit rows since the last run.
+1. Read `commits.jsonl` since the last run. That is the whole commit record — there is no table.
 2. Map commits to tasks by reference id. **A commit never marks a task done** — it is evidence, not
    completion. Completion comes from a verified exit criterion in Phase 5.
-3. Surface commits that referenced no task as untracked work, so they appear in the delivery log
-   rather than vanishing.
+3. Surface commits that referenced no task as untracked work, so unplanned effort is recorded
+   rather than vanishing. **No page reads this yet** — the dashboard has no delivery log; see
+   `.management/design/Components.md` for why one was dropped. It is kept because the record is
+   cheap and reconstructing it later is impossible.
 4. Recompute readiness and write it into `PROGRESS.md`.
 5. Report: commits since last run, tasks they touched, and the readiness gates still open.

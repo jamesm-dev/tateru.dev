@@ -1,0 +1,27 @@
+# Declared substitutions for measurements the host project expresses its own way.
+#
+# FORMAT   key<TAB>the literal this project uses instead
+#
+# A project with its own scale will not contain the literals in layout.txt. Tailwind
+# writes w-62 or w-[248px]; Chakra writes space.4; a design-token pipeline writes
+# --size-sidebar. All of those are correct - the ratios survive, the values bend to the
+# host - and all of them would fail a check that only looks for "248px".
+#
+# So declare the substitution. The checker then requires YOUR literal instead:
+#
+#     sidebar.width	w-[248px]
+#     space.4	p-4
+#     radius.card	rounded-xl
+#
+# WHY DECLARE IT AT ALL, rather than skipping the check? Because a declared substitution
+# can be read by a person in ten seconds, and a silent one cannot be read at all. This
+# file is the difference between "we used the project's scale" and "we did not check".
+# It is also the machine-readable half of the rule that /setup must report every
+# substitution it made.
+#
+# A substitution that maps a value to something that is NOT equivalent is not caught
+# here - nothing can check that w-62 is 248px. It is caught by a reviewer reading this
+# file, which is exactly why the file is short and exactly why it must not be padded
+# with entries nobody intends to read.
+#
+# This build uses the values as written, so there is nothing to declare.

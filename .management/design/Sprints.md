@@ -1,7 +1,7 @@
 ---
 title: Sprints
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management]
 status: active
 ---
@@ -36,8 +36,9 @@ Things are assigned to a sprint at two levels:
 
 - **A task** belongs to at most one sprint.
 - **An epic** may be assigned to a sprint as a whole, which is a statement of intent. It does not
-  cascade: assigning an epic to Sprint 4 does not move its tasks. The Specs drawer shows when an
-  epic's tasks are scattered across sprints, since that is usually a mistake worth seeing.
+  cascade: assigning an epic to Sprint 4 does not move its tasks. `epic_sprint` holds it; **no UI
+  writes it yet**, and a rebuild should not invent one — an assignment nothing reads is a promise
+  the page cannot keep.
 
 > [!danger] Sprints are created here. Phases are not.
 > A sprint lives in `board.db` and this page is its only editor, so creating one here is correct.
@@ -151,21 +152,29 @@ erase which sprint that work was completed in. Move the tasks off first, or leav
 
 ## Closing a sprint
 
-A sprint closes on its end date. Nothing happens automatically to its tasks — **unfinished work is
-not silently rolled forward**, because a sprint that quietly absorbs its own overflow can never be
-learned from.
+A sprint closes on its end date, and its status changes because the date passed. **Nothing happens
+automatically to its tasks** — unfinished work is not silently rolled forward, because a sprint that
+quietly absorbs its own overflow can never be learned from.
 
-Instead, when a sprint has closed with unfinished tasks, Status shows them and offers to move them
-to the active sprint, as one explicit action. What was carried over is recorded, so the next
-retrospective can see it.
+Moving that work on is a person's action, one task at a time, through the task drawer's sprint
+select.
+
+> [!note] The carry-forward prompt is not built
+> An earlier draft had Status list a closed sprint's unfinished tasks and offer to move them in one
+> action, recording what was carried. It is a good idea and it is still unbuilt. Do not rebuild it
+> from this note alone — it needs `sprint_carry`, a writer, and somewhere to show the history, and
+> half of it is worse than none.
 
 ## Counting
 
 - **Committed points** — the sum of points on every task in the sprint, at any status.
 - **Completed points** — the sum on tasks that are done.
 - **Every task is pointed**, because `/shape` points every acceptance criterion. A task with no
-  points is therefore a defect in the plan, not a normal case: show it as `no pts` in the warning
-  colour and count it as zero, so the hole is visible rather than silently absorbed.
+  points is therefore a defect in the plan, not a normal case — and it is counted as zero, so the
+  hole has to be visible somewhere. It is **not** shown on the card, where a `no pts` badge would be
+  noise on every card of a healthy project; it surfaces on [[Team]], as the count of unpointed open
+  tasks that makes a load figure wrong, and in the sprint table's footnote. Report a gap where it
+  distorts a number, not where it merely exists.
 - Both the task count and the points total are shown. Points alone would hide a sprint of many tiny
   tasks; the count alone would hide a sprint of one enormous one.
 - Points are credited to the sprint the task was **in when it was completed**, not the one it was

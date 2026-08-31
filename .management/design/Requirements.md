@@ -1,7 +1,7 @@
 ---
 title: Requirements
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management, requirements]
 status: active
 ---
@@ -19,8 +19,13 @@ What must exist before the `/management` dashboard can be built, and what each t
 | 2 | `.idea/ROADMAP.md` and `.idea/epics/` | The tasks are derived from them | Run `/shape` first |
 | 3 | Task reference ids on acceptance criteria | The join key for all authored data | `/shape` assigns them; without one a card is read-only |
 | 4 | `state.json` | Derived structure the page renders | `/setup` generates it |
-| 5 | A standalone database | Holds assignees, effort, links, test runs | The board renders read-only |
-| 6 | Obsidian MCP | All `.management/` Markdown is written through it | Stop and ask the user to install it |
+| 5 | A standalone database | Holds assignees, effort, links, test runs | It is created empty on first request; only if a driver is genuinely unavailable does the board fall back to read-only |
+| 6 | Nothing else | — | — |
+
+> [!note] No Obsidian MCP is required
+> An earlier draft listed one as a hard requirement. It is not: `.idea/` and `.management/` are
+> written with ordinary file writes and validated against the vault contract by a hook. An MCP
+> server is optional, and where one is configured its tools are validated identically.
 
 ## The database
 

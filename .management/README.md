@@ -1,7 +1,7 @@
 ---
 title: README
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-09-01
 tags: [meta, management]
 status: active
 ---
@@ -37,16 +37,19 @@ anything. Structure stays derived; that data does not.
 | `README.md` | This file | By hand |
 | `DESIGN.md` | Index of the dashboard design | By hand |
 | `design/` | The design spec, one concern per note | By hand |
+| `contract/` | The machine-checkable half of that spec: strings, measurements, order, fixtures | By hand |
 | `board.db` | Assignees, effort, PR links, test runs — the dashboard's own store | People, via the dashboard |
 | `BOARD.md` | Every task by status, each linked to its epic | Generated |
 | `PROGRESS.md` | Per-phase rollup with exit criteria | Generated |
 | `BLOCKERS.md` | What is stuck, since when, and the next action | Generated + hand notes |
 | `CHANGELOG.md` | Dated log of what actually shipped | Appended |
 | `state.json` | Machine-readable snapshot — the dashboard's data source | Generated |
+| `commits.jsonl` | Append-only commit log | The post-commit git hook |
 
-Only `README.md`, `DESIGN.md`, and `design/` exist yet. The rest are created by `/setup` once there
-are real epics to derive them from — writing them now would mean inventing progress that has not
-happened.
+**Only `README.md`, `DESIGN.md`, `design/`, and `contract/` exist.** Every other row above is created by
+`/setup`, once there are real epics to derive it from — writing one now would mean inventing
+progress that has not happened. Until then, do not read, link to, or cite any of them; if a question
+needs `BOARD.md` or `PROGRESS.md`, the answer is that the work has not started.
 
 ## How it stays accurate
 
@@ -77,21 +80,15 @@ That makes `.idea/` and `.management/` two separate vaults.
 
 ## The dashboard
 
-`/setup` offers to serve this at a `/management` route in the app. It reads `state.json` and is
-built to [[DESIGN]]. It is opt-in and gated — by default it returns a 404 outside development,
-because the page exposes the roadmap, blockers, and unshipped plans to anyone who can reach it.
+There is no dashboard yet, because there is no app to serve it from — `/setup` has not run and
+there is no `app/` directory.
 
-## The dashboard
+When `/setup` does run, it offers to serve this folder at a `/management` route — **after** the app
+is built and verified, never alongside it, because the page is assembled from the app's own theme,
+components and dark mode. Where the app has none of those yet, it offers to defer instead; tracking
+carries on regardless, and only the page waits. The page reads `state.json` and is built to [[DESIGN]]. It is opt-in and gated — by default
+it returns a 404 outside development, because it exposes the roadmap, blockers, and unshipped plans
+to anyone who can reach it.
 
-Built on 2026-08-31, development-only. Run `pnpm dev` in [../app](../app) and open
-**http://localhost:5173/management**.
-
-Four sections behind a sidebar — Board, Specs, Team, Status. Structure is derived from `.idea/` and
-read-only there; assignees, points and ad-hoc tasks are authored into `board.db`, which is
-gitignored because it holds names and is regenerable.
-
-Deployment readiness lives in `state.json`, written by `/setup`, and the page renders it unchanged
-so it can never disagree with [PROGRESS.md](PROGRESS.md).
-
-Pull request status is absent: it needs the GitHub MCP, which is not configured. The gate says so
-rather than showing an empty list that would read as "no open PRs".
+Structure comes from `.idea/` and is read-only there; assignees, points, and ad-hoc tasks are
+authored into `board.db`, which is gitignored because it holds names and is regenerable.

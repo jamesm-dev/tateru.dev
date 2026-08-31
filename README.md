@@ -142,7 +142,7 @@ These will occasionally annoy you. That's the point.
 .management/    State — how it's actually going.
                 Board, progress, blockers, changelog.
 
-.claude/        The machinery. Commands, skills, hooks, the PM agent.
+.claude/        The machinery. Commands, skills, hooks, scripts, the PM agent.
 
 app/            Your actual project. Everything /setup scaffolds lands here.
 ```
@@ -165,6 +165,16 @@ The root belongs to the workflow; **`app/` is yours.** That split is why cloning
 Structure comes from `.idea/`. Assignees and effort live in a database the dashboard owns. PR and test data is synced in, always stamped with *when*. Nothing pretends to be fresher than it is — and there are **no burndown charts, no velocity, no forecast dates** invented from three sprints of noise.
 
 **Dev-only by default**, because a public roadmap of everything you haven't built yet should be a choice.
+
+**It's built last, after your app works.** The page borrows your tokens, your components, your dark mode — so `/setup` waits until the app is built and verified, checks what's actually there, and offers to *defer* if there's nothing yet to inherit. Tracking starts on day one either way; only the page waits. A dashboard built against an empty skeleton has to invent a card, a badge and a drawer, and every one of them is wrong the moment you add the real ones.
+
+**And it's rebuildable.** The design isn't only prose — every string, measurement and ordering lives as data in `.management/contract/`, with fixtures pinning every derived number. One command checks a build against all of it:
+
+```bash
+bash .claude/scripts/dashboard-conformance.sh
+```
+
+So the tenth rebuild is the same page as the first: same sections, same order, same words, same numbers — in *your* stack's clothes, whatever stack that turns out to be.
 
 ---
 

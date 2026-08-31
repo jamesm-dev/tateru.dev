@@ -1,7 +1,7 @@
 ---
 title: Design System
 created: 2026-08-30
-updated: 2026-08-31
+updated: 2026-09-01
 tags: [design, management, ui]
 status: active
 ---
@@ -70,8 +70,18 @@ Rules, in order of precedence:
 > Someone opening this page should not be able to tell it was generated. If it looks like a
 > different product bolted onto the app, it is wrong — however good it looks on its own.
 
-If the project genuinely has no theme or components yet (a bare Phase 0 skeleton), keep the page
-plain and unstyled rather than inventing a design system. Say so, and revisit when one exists.
+> [!important] With nothing to inherit, the right answer is usually to wait
+> If the project genuinely has no theme and no components yet — a bare Phase 0 skeleton — then
+> building this page means hand-rolling a card, a badge, a drawer and a scale, and the phase that
+> later introduces the app's real ones inherits a dashboard matching none of them.
+>
+> So `/setup` builds the dashboard **after** the app is built and verified, and where the app still
+> has nothing to offer it **offers to defer** to the phase that introduces those components.
+> Tracking continues either way: `.management/` gets its Markdown and `state.json` from the first
+> run, and only the page waits.
+>
+> Built anyway, it stays plain and unstyled rather than inventing a design system — and the report
+> says it needs revisiting once a theme exists.
 
 ## Visual language
 

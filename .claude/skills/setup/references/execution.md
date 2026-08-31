@@ -69,16 +69,23 @@ language version to match local.
 
 ## 9. Git hooks
 
-**Always.** Install the commit-tracking hooks per `git-hooks.md`: Husky when the project is Node,
-the ecosystem's equivalent otherwise. Three hooks — `commit-msg` links commits to task ids,
-`post-commit` records them, `pre-push` runs the checks and recomputes deployment readiness.
+**Always.** The three hooks already exist in `.githooks/` — `commit-msg` links commits to task ids,
+`post-commit` records them, `pre-push` runs the checks. Wire them up per `git-hooks.md`:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Do it from the project's own install step so a fresh clone gets them without anyone remembering.
+**Do not install Husky or another hook runner** — see `git-hooks.md` for why.
 
 Verify by making a throwaway commit and confirming a line appears in `.management/commits.jsonl`,
 then confirm `pre-push` blocks on a deliberately failing check. A hook nobody proved fires is a hook
 that does not fire.
 
-Hooks write data only — `board.db` and `commits.jsonl` — never Markdown in `.idea/` or
-`.management/`.
+Hooks write data only — `commits.jsonl` — never Markdown in `.idea/` or `.management/`, and never
+into `board.db`: a shell script with a database driver is a dependency bought for rows nothing
+reads yet.
 
 ## 10. Docs
 

@@ -11,8 +11,12 @@ Invoke the `setup` skill and follow it in full. Hints: **$ARGUMENTS**
 - `$ARGUMENTS` naming a phase overrides the target phase, except that a first run always includes
   the Phase 0 walking skeleton.
 - Hints are constraints on *how*, not permission to skip the plan-and-confirm step.
-- Commit-tracking git hooks (Husky on Node, the equivalent elsewhere) are always installed, and
-  Phase 6 ingests commits before regenerating progress.
-- Once the phase is built and verified, Phase 6 stands up `.management/`, installs the
-  `project-manager` agent, and asks whether to serve the dashboard at a `/management` route. Never
-  build that route without an explicit yes.
+- The commit-tracking hooks ship in `.githooks/` and are wired with `core.hooksPath` — never Husky
+  or another runner. Phase 6 ingests `commits.jsonl` before regenerating progress.
+- Once the phase is built **and verified green**, Phase 6 stands up `.management/`, installs the
+  `project-manager` agent, and only then asks whether to serve the dashboard at a `/management`
+  route. Never build that route without an explicit yes.
+- The dashboard is always last, and is built from the app's own theme and components — so the skill
+  audits what the app actually has first, and offers to **defer** when there is nothing yet to
+  inherit. Built, it must pass `.claude/scripts/dashboard-conformance.sh` and the derivation
+  goldens before it is reported done.

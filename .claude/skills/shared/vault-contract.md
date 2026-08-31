@@ -110,6 +110,22 @@ Two consequences:
    is optional — if one is configured and covers the folder its `obsidian_*` tools work too, and are
    validated identically.
 
+### Not everything in these folders is a note
+
+The contract governs **Markdown**. `.management/` also holds data that is deliberately not
+Obsidian-compatible and must never be given frontmatter:
+
+| Path | Is |
+|---|---|
+| `.management/board.db` | The dashboard's SQLite store |
+| `.management/commits.jsonl` | The append-only commit log the `post-commit` hook writes |
+| `.management/state.json` | The generated snapshot the dashboard reads |
+| `.management/contract/` | The machine-checkable half of the dashboard design — strings, measurements, order, and JSON fixtures |
+
+The validator only inspects `.md`, so these pass through untouched. That is the intent, not an
+oversight: they are read by scripts and test runners in any language, and a YAML header would break
+every one of them.
+
 ### `suggested` epics are proposals, not plan
 
 An epic at `status: suggested` was proposed by the `project-manager` agent, not agreed by a person.
