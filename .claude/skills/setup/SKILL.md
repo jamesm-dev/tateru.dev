@@ -74,6 +74,21 @@ verify → git.
 The commit-tracking hooks are not optional: they are what keeps `.management/` honest between runs.
 See `references/git-hooks.md`.
 
+**Neither is the test setup.** A runner, at least one test that asserts something real, and the
+checks wired into CI and the `pre-push` hook go in on the *first* run, before any feature exists —
+not when the project is big enough to feel like it needs them. A project that reaches its second
+phase untested never retrofits them, and every later phase's exit criteria then rest on nothing.
+
+Set up, in this order and always:
+
+- **A unit runner** for the ecosystem, with one test that asserts real behaviour.
+- **A browser or integration runner** wherever the product has behaviour a unit test cannot reach —
+  offline, persistence, a migration, a real request. Say so plainly if the product genuinely has
+  none.
+- **CI** running install → lint → typecheck → test → build on every push.
+- **`pre-push`** running the same checks locally, blocking a red push.
+- **Test results recorded against tasks**, per Phase 6 below.
+
 Non-negotiables:
 - Never fabricate a version number or CLI flag. Verify, or let the official scaffolder decide.
 - Never invent or commit a secret. `.env.example` documents keys with empty values.
@@ -110,6 +125,12 @@ run; refresh it on every later run.
 2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`.
 3. Derive tasks from epic acceptance criteria. Never invent a task with no epic behind it, and never
    quietly drop one — an epic with no criteria is a gap, so report it.
+
+   **Carry each criterion's `(N pts)` into `state.json` as the task's points.** A task must never
+   reach the board unpointed: assignee capacity is the sum of points on their open tasks, and one
+   missing value makes every capacity figure a lie of unknown size. An epic whose criteria lack
+   points is a gap in `.idea/` — report it and offer `/shape` to fix it, rather than defaulting the
+   number here and hiding the omission.
 4. Write `README.md`, `BOARD.md`, `PROGRESS.md`, `BLOCKERS.md`, `CHANGELOG.md`, and `state.json`.
    Carry each task's reference id (`^tsk-`) through into `state.json`; a task without one cannot
    hold assignees or effort.
@@ -118,7 +139,32 @@ run; refresh it on every later run.
 7. If the dashboard exists, create or migrate `board.db` per `.management/design/Database Schema.md`,
    then sync pull request and test data into it. **Never** clear a row a person authored: a task id
    that has left `.idea/` is marked orphaned, not deleted.
-8. **Recompute deployment readiness** — the seven gates in `references/git-hooks.md` — and write it
+8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
+   each row not yet consumed, set that phase `done` in `ROADMAP.md`, open the next one, and stamp
+   `consumed_at` so it is applied once.
+
+   Carry the **parked** items into the record rather than dropping them: a criterion in
+   `criterion_park` is written into `ROADMAP.md` as `- [~] <text> — parked <date>`, not ticked, and
+   a phase that advanced with parked work says so in its section. A phase reported as complete when
+   three of its criteria were skipped is exactly the lie this workflow exists to prevent — the aim
+   is that skipping is *allowed and visible*, not that it is hidden.
+
+   If the roadmap and the dashboard disagree because someone edited `ROADMAP.md` by hand, say so and
+   ask. Never silently overwrite a phase status a person set.
+
+9. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
+   the runner's own output — and write each run into `board.db`'s `test_run` table, linked to a task
+   by its reference id where the test names one, and to the epic otherwise.
+
+   This is what makes a task's claim to be done inspectable: the drawer shows which runs covered it,
+   when they ran, and whether they passed. A task marked done with no linked run is not a
+   contradiction to hide — it is exactly the thing the Tests readiness gate is asking about, and it
+   should read as unmet until a run exists.
+
+   Never write a passing run that did not happen. If the reporter produced nothing, record nothing
+   and say so.
+
+10. **Recompute deployment readiness** — the seven gates in `references/git-hooks.md` — and write it
    into `PROGRESS.md` as a checklist. Report gates met over gates total, never a percentage.
 
 ### Install the project management agent
@@ -156,12 +202,33 @@ database. Say that up front: it is more than a status page, and it is a real bui
 Offer: **dev-only (recommended)** · auth-gated in production · public · none.
 
 Build it only on a yes. **Read `.management/DESIGN.md` and the notes in `.management/design/`
-first** - they are the spec. Check `design/Requirements.md` before starting: it needs a standalone
+first** - they are the spec, and they describe the dashboard as it was refined in use, not as it was
+first sketched. Four of them are what make a rebuild land in the same place:
+
+| Note | Fixes |
+|---|---|
+| `design/Reference Implementation.md` | Every measurement, breakpoint, and the epic colour algorithm |
+| `design/Derivations.md` | Every derived number as portable pseudocode |
+| `design/API Surface.md` | The operation set, and what `null` means in each write |
+| `design/Copy Deck.md` | The exact words, including the ones that must not be softened |
+
+**Appearance still comes from the app**: its theme, its tokens, its components, its dark mode. Those
+notes fix layout, behaviour and wording, not palette. Reach for the project's own component first;
+where it has none, build it once in `ui/` from the project's tokens. Snap to the project's nearest
+scale step where it has a scale; use the literal values where it has nothing. Record every
+substitution in the build report — a silent one is how two builds drift apart.
+
+Check `design/Requirements.md` before starting: it needs a standalone
 database, and pull request status needs the GitHub MCP. If either is missing, say so and build the
 part that works rather than faking the rest.
 
 Use the framework in `SPECS.md`, build from the project's own theme and components, add no new
 dependencies beyond the one database driver, and apply the gate they picked.
+
+Before reporting the dashboard built, **walk the compliance checklist in `.management/DESIGN.md`
+item by item** and report it as met over total, naming every item that is not. It is long because
+each line is something a build has actually got wrong. "It looks right" is not a check, and a rule
+that is never exercised is a rule the next build quietly drops.
 
 If the project has no web surface — a CLI, a library — say so and offer the reference's fallback
 instead: a self-contained `.management/dashboard.html` plus a `board` script that prints progress.

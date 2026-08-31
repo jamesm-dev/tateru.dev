@@ -18,16 +18,48 @@ the sprint stands. The only section that charts anything.
 ## Sections, in order
 
 1. **Headline row** — a few stat tiles.
-2. **Deployment readiness** — how much more before this can ship.
-3. **Delivered** — the milestone log: everything done, with or without a task.
-4. **Needs attention** — the risk list.
+2. **Needs attention** — the risk list, and what is in the way.
+3. **Deployment readiness** — how much more before this can ship.
+4. **Delivered** — the milestone log: everything done, with or without a task.
 5. **Sprint progress** — the active sprint, and sprint management.
 6. **Delivery history** — measured, per sprint.
 7. **Effort accuracy** — estimate against actual.
 8. **Team contribution** — who shipped what.
 
-Readiness and Delivered sit above the risk list because they answer the two questions people open
-this page for: *can we ship yet*, and *what have we actually got done*.
+**Needs attention comes first.** Readiness answers *can we ship yet*, but the risk list is *why not* —
+and a reader who sees the gates before the reasons has to scroll back up to act on anything. Put the
+obstacles above the score.
+
+### Every item is actionable by reference
+
+Each attention item carries a stable reference — `ATT-3C81F0` — derived from its title, so it
+survives `/setup` runs and a link to it does not rot. The card shows the reference and the exact
+command:
+
+```
+/epic ATT-3C81F0
+```
+
+That turns the warning into an epic with tasks. Clicking the reference copies the command.
+
+A `critical` item is one holding the current phase's exit criteria; a `warning` is not. Severity
+carries **its word and an icon**, never colour alone.
+
+> [!warning] A risk list you cannot act on is decoration
+> An item that names a problem and offers no way to start on it trains people to scroll past the
+> section. The reference and the command are what make it a queue rather than a lament.
+
+## Phases
+
+The phase list carries what each phase delivered, rather than repeating it as a separate section
+that grows without bound.
+
+**Every phase is collapsed by default**, including the current one. The summary already carries the
+phase, its status, its done-over-required count and anything parked — enough to scan four phases at a
+glance. Opening one is a deliberate look, not the page unfolding itself at you.
+
+Inside, work is grouped by epic in the epic's own colour, with done, parked and outstanding items
+distinguished by their glyph and word.
 
 ## 1. Headline row
 

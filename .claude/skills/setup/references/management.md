@@ -124,6 +124,21 @@ Build only if the user opts in.
 Start with `design/Requirements.md` and `design/Data Sources.md`: they carry the decisions everything
 else depends on. Do not design the page from scratch here.
 
+Then read the four reference notes before writing markup. They exist because the same build has been
+got wrong in the same ways more than once:
+
+- `design/Reference Implementation.md` — measurements, breakpoints, board geometry, epic palette
+- `design/Derivations.md` — every derived number, as pseudocode
+- `design/API Surface.md` — the operation set and the meaning of `null`
+- `design/Copy Deck.md` — the exact strings
+
+Appearance comes from the app — its theme, tokens, components and dark mode. These notes fix layout,
+behaviour and wording. Where the project has a component, use it; where it has none, build it once
+in `ui/` from the project's tokens. Never add a UI kit for this page.
+
+Finish by walking the compliance checklist in `.management/DESIGN.md` and reporting it as met over
+total, naming what is not.
+
 The dashboard is four sections behind a sidebar: **Board** (task cards, task creation), **Specs**
 (epics and their drawer), **Team** (members and contribution), and **Status** (insights, risk rules,
 sprints). It needs a standalone database; pull request status needs the **GitHub MCP**. If either is

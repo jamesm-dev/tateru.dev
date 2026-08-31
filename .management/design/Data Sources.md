@@ -86,3 +86,34 @@ When `/setup` regenerates:
 - **Orphans:** if a task id disappears from `.idea/` — its criterion was deleted — its `board.db`
   rows are kept and marked orphaned, not deleted. Report them so a person decides. Data a human
   typed is never destroyed by an automated regeneration.
+
+## One derivation, read by every view
+
+Structure comes from `state.json`; status, points and priority may be overridden in `board.db`. The
+**effective** value of a task is the plan with those overrides applied — and it must be computed
+**once**, in one place, and read by every section.
+
+This is not tidiness. Board, Specs, Status and Team each derived "done" for themselves, and parking
+a task moved the card while Specs and the headline tiles went on counting the plan as though nothing
+had happened. Two views showing different numbers for the same question is worse than a view showing
+none: the reader cannot tell which one is lying.
+
+> [!warning] A section that computes its own status is a bug
+> If a view needs to know whether a task is done, parked, or how many points it carries, it reads
+> the shared index. Never `task.done` straight from `state.json` in a component — that value is the
+> plan's opinion, not the current one.
+
+Changes propagate without a reload: a write refreshes the shared data, the index recomputes, and
+every section re-renders from it. Switching tabs must never show a stale number, because there is
+only one number.
+
+## Parked work and denominators
+
+Parked work leaves the denominator rather than sitting in it forever:
+
+- Specs counts read **done / still required**, with the parked count shown beside them.
+- Phase progress and the headline tile exclude parked work from the total.
+- A member's load excludes parked tasks — set aside is not pending.
+
+Never simply subtract it and move on: every place a denominator shrank says how many were parked, so
+progress cannot be manufactured by parking things.

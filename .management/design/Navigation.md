@@ -25,6 +25,7 @@ chart.
 ```
 +---------------+------------------------------------------+
 |  Project Name |                                          |
+|  Phase 1 of 4 |                                          |
 |  Sprint 4     |                                          |
 |               |                                          |
 |  > Board   12 |            section content               |
@@ -39,8 +40,17 @@ chart.
 ```
 
 - **Fixed 240px** on the left, full height, its own scroll. Content area scrolls independently.
-- **Header** — project name, and the active sprint beneath it. The sprint is here because it scopes
-  three of the four sections; see [[Sprints]].
+- **Header** — project name, then **the current phase**, then the active sprint beneath it.
+
+  The phase is always shown and always first: it is the only one of the two that always exists, and
+  it is what the plan is actually measured against. The sprint line appears **only when at least one
+  sprint has been created**, and reads `no active sprint` when sprints exist but none contains
+  today.
+
+  > [!warning] Never render "No sprint defined"
+  > A project with no sprints is the normal state, not a missing setting. Saying a thing is
+  > undefined implies it should have been defined and invites the reader to go and fix nothing.
+  > Show the phase, which is real, and stay silent about sprints until one exists.
 - **Items** — icon and label. A count badge where one is meaningful: open tasks on Board, epics in
   the current phase on Specs, active members on Team. Status carries no count; a number there would
   imply a problem count that changes meaning as rules change.
@@ -71,3 +81,19 @@ chart.
 - Count badges are inside the link's accessible name — `Board, 12 open tasks` — not floating text a
   screen reader reads separately.
 - Focus order is sidebar, then main content. A skip link jumps straight to main.
+
+## Search, per section
+
+Board, Specs and Team each carry a search box. **Each owns its own URL key** — `?q=`, `?sq=`, `?tq=`
+— so a filtered view is shareable and switching tabs never silently applies one section's search to
+another section's list, which reads as a bug rather than a feature.
+
+| Section | Key | Matches |
+|---|---|---|
+| Board | `?q=` | Task title, description, epic, assignee, reference |
+| Specs | `?sq=` | Epic title, theme, source ideas, and any task inside it |
+| Team | `?tq=` | Name, handle, and anything assigned to them |
+
+Each shows a **Clear** control with a count while a search is active. Specs and Team share one
+`SearchBox` component; the Board keeps its own because its box sits inside a row of four filters
+whose Clear reports all of them together.

@@ -55,7 +55,26 @@ An idea is a bet. An epic is deliverable work. The conversion:
 6. Write each to `.idea/epics/<Epic Title>.md` with acceptance criteria as `- [ ]` tasks and
    `sources:` pointing back at its idea notes. Set `epic:` on those notes and flip them to
    `committed`.
-7. **Give every acceptance criterion a task reference id** as an Obsidian block reference:
+7. **Give every acceptance criterion sprint points.** Not optional, and not left for someone to
+   fill in later — a points field that starts empty on thirty tasks stays empty, and an unpointed
+   backlog cannot answer "how much is on this person" at all.
+
+   Write them inline, before the block reference, because a block reference must end the line:
+
+   ```
+   - [ ] A document survives a restart (3 pts) ^tsk-7f3a21
+   - [ ] It reloads without a prompt (1 pt) ^tsk-9c04e8
+   ```
+
+   Use a Fibonacci-ish scale — 1, 2, 3, 5, 8, 13 — and size **relative effort, not hours**. A 13 is
+   a criterion that should have been split; treat it as a signal to re-decompose rather than a
+   number to record.
+
+   Points are a plan-time estimate and live in `.idea/`. A person can override one later on the
+   dashboard, and that override is authored data in `board.db` — the estimate itself is never
+   rewritten from there.
+
+8. **Give every acceptance criterion a task reference id** as an Obsidian block reference:
    `- [ ] A document survives a restart ^tsk-7f3a21`. Six lowercase hex characters, unique across
    the vault. Assign once and **never reassign** - the management dashboard keys assignees, effort,
    and pull requests on it, so a changed id orphans real data. When amending an epic, add ids only
@@ -97,6 +116,8 @@ Get the date from `date +%Y-%m-%d`. Number ADRs by scanning `.idea/decisions/` f
 Before reporting, check and state the result of each:
 
 - [ ] Every epic has ≥1 source idea note, and that note's `epic:` points back.
+- [ ] **Every acceptance criterion carries points** in `(N pts)` form and a `^tsk-` id. No criterion
+      is unpointed; capacity cannot be computed from a backlog with holes in it.
 - [ ] Every committed idea appears in exactly one phase.
 - [ ] Every phase has a goal, checkable exit criteria, and a demo.
 - [ ] Every `SPECS.md` stack choice has a rationale that names its cost and its rejected

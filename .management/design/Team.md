@@ -8,6 +8,16 @@ status: active
 
 # Team
 
+> [!important] Capacity is the reason points are mandatory
+> A member's **load** is the sum of points on their open tasks, and their **completed** figure is the
+> sum on tasks they finished in the current sprint. Both are only meaningful because every task
+> carries points — one unpointed task makes every load figure wrong by an unknown amount, which is
+> worse than showing none.
+>
+> Show load as a number with its task count beside it (`13 pts across 5 tasks`), never as a
+> percentage of some assumed capacity. Nobody has told this dashboard how many points a person can
+> take in a sprint, and inventing that denominator would turn a fact into a fiction.
+
 Who is working on the project, what they are on now, and what they have contributed. Entirely
 authored data — `.idea/` has no opinion about people. It all lives in `board.db`.
 

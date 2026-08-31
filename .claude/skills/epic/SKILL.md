@@ -11,6 +11,27 @@ this is for adding to one already underway.
 
 Read `.claude/skills/shared/vault-contract.md` before writing anything to `.idea/`.
 
+
+## An `ATT-` reference from the dashboard
+
+`/epic ATT-3C81F0` names an item from **Needs attention** on the management dashboard. Resolve it
+before anything else:
+
+1. Read `.management/state.json` and find the blocker whose `ref` matches. If none does, say so and
+   list the references that exist rather than guessing at a near match.
+2. The item gives you the epic's substance directly: its `title` is the problem, `nextAction` is the
+   first concrete step, `epic` names what it holds up, and `since` says how long it has been true.
+3. Build the epic against **that**, and say in its `## Why` which attention item it came from and
+   what will stop firing once it is done.
+
+A `critical` item is the roadmap's own blocker — it is why a phase cannot finish — so its epic
+belongs in the **current** phase unless the user says otherwise. A `warning` can wait.
+
+> [!warning] The attention item is evidence, not the plan
+> `.management/` is derived state. The epic still lands in `.idea/epics/` with sources traced back to
+> an idea note, like any other. If the item traces to no idea, capture one first — an epic that
+> exists only because a dashboard row said so has no recorded reason behind it.
+
 ## Phase 1 — Work out which case this is
 
 Read `.idea/INDEX.md`, `SPECS.md`, `ROADMAP.md`, and the existing `epics/`. Then route:

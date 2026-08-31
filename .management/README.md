@@ -80,3 +80,18 @@ That makes `.idea/` and `.management/` two separate vaults.
 `/setup` offers to serve this at a `/management` route in the app. It reads `state.json` and is
 built to [[DESIGN]]. It is opt-in and gated — by default it returns a 404 outside development,
 because the page exposes the roadmap, blockers, and unshipped plans to anyone who can reach it.
+
+## The dashboard
+
+Built on 2026-08-31, development-only. Run `pnpm dev` in [../app](../app) and open
+**http://localhost:5173/management**.
+
+Four sections behind a sidebar — Board, Specs, Team, Status. Structure is derived from `.idea/` and
+read-only there; assignees, points and ad-hoc tasks are authored into `board.db`, which is
+gitignored because it holds names and is regenerable.
+
+Deployment readiness lives in `state.json`, written by `/setup`, and the page renders it unchanged
+so it can never disagree with [PROGRESS.md](PROGRESS.md).
+
+Pull request status is absent: it needs the GitHub MCP, which is not configured. The gate says so
+rather than showing an empty list that would read as "no open PRs".

@@ -43,8 +43,8 @@ status: active
 - A pie chart of two slices where a meter belongs, or a one-bar bar chart where a stat tile belongs.
 - A trend line through three sprints.
 - Ranking people by points. The Team section shows contribution; it is not a leaderboard.
-- Drag-and-drop between board columns, which would either lie about derived status or silently edit
-  the plan.
+- Drag-and-drop that writes to `.idea/`, or that snaps back because the status it moved was derived.
+  Dragging itself is required — see [[Board]] for the only honest way to implement it.
 - Showing a synced PR or test status without the time it was synced.
 - Presenting stale data as current.
 

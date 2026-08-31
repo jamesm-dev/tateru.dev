@@ -46,8 +46,21 @@ These are the commands `CLAUDE.md` and the README will promise, so they must act
 
 ## 7. Tests
 
+**Always, on the first run.** Not deferred to a later phase: a project that reaches Phase 2 untested
+does not go back and add them, and every exit criterion after that rests on nothing.
+
 Configure the runner and write at least one test that asserts something real. A test that asserts
 `true === true` proves the runner starts and nothing else — say so if that is all you wrote.
+
+Where the product has behaviour a unit test cannot reach — offline, persistence, a schema migration,
+a real HTTP request — add the runner that can reach it and one test that does. The rule of thumb: if
+getting it wrong would not be caught by any test you just wrote, that is the test to write first.
+
+**Emit a machine-readable report** — JUnit XML or the runner's JSON reporter — so `/setup` can record
+runs against tasks. A test trail nobody can parse is a test trail nobody keeps.
+
+Name tests after the task they cover where it is natural (`TSK-7F3A21` in the title, or the file
+path matching the epic), so runs link to work without a second mapping to maintain.
 
 ## 8. CI
 

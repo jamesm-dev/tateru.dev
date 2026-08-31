@@ -31,10 +31,11 @@ opening anything.
 | **Title** | The task text. Two lines maximum, then ellipsis. Never reflow to three. |
 | **Description** | One muted line, truncated. The full text lives in the drawer. Omit the line entirely when there is no description — do not leave a blank row. |
 | **Assignees** | Overlapping avatars, at most three, then `+2`. Initials when there is no image. Unassigned shows a dashed placeholder that is itself the assign control, so assigning costs one click. |
-| **Points** | Sprint points as a small badge. Hidden when unset; `0` is a real value and displays as `0 pts`. |
+| **Points** | Sprint points as a small badge. Omitted entirely when there is no value — a badge reading `no pts` is noise on a card that already has enough of it. The gap is surfaced where it matters instead: on [[Team]], where an unpointed task makes a load figure wrong. `0` is a real value and displays as `0 pts`; `1` reads `1 pt`. |
 | **Estimate / actual** | `2h / 3.5h`. Actual is emphasised when it exceeds the estimate — that contrast is the whole reason to show both. `2h / —` when no time is logged. Omit the pair when neither is set. |
 | **PR badge** | Small, only when a PR is linked, coloured by its state. |
 | **Test glyph** | Only when the latest run failed. A passing run needs no badge; silence means fine. |
+| **Origin** | An ad-hoc task is identified by its `ADH-` reference, which is already on the card. Do **not** add a separate "ad-hoc" pill beside it — the id carries the meaning, and a second marker for the same fact is clutter. |
 | **Unconfirmed marker** | On a task the `project-manager` agent marked done from commits: `done · unconfirmed` in muted text with a small agent glyph. It stays until a person confirms. |
 
 The whole card is the click target and opens the drawer. It must be a `<button>` or a link — never a

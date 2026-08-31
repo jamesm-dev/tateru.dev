@@ -83,3 +83,36 @@ their own notes.
 - **768px and up:** the three-column board, drawer from the right.
 - Progress bars and the roadmap list stay fluid at every width.
 - Nothing is hidden at small sizes. Truncation is fine; omission is not.
+
+## Spacing
+
+The dashboard is read at a glance, not filled in like a form. It should feel unhurried.
+
+- **A spacing scale, used everywhere**: 4, 8, 12, 16, 24, 32, 48px. No arbitrary values between
+  steps; if a gap needs 14px, the layout is wrong rather than the scale.
+- **Cards breathe**: at least 16px of internal padding, and 12px between cards in a column. A card
+  whose text touches its border reads as cramped however good the type is.
+- **Columns are separated by at least 24px**, so the eye groups by column without needing a rule
+  between them.
+- **Sections are separated by 32px or more**, with the heading closer to its own content than to the
+  section above it. Proximity is what says which heading owns which block.
+- **Content has a maximum width** and does not stretch to a wide monitor. Long lines are unreadable
+  regardless of spacing.
+
+  > [!note] The board is the exception
+  > A column of cards is scanned, not read as prose, so the max-width rule does not apply to it. A
+  > card squeezed to fit five columns on screen is harder to read than one you scroll sideways to
+  > reach.
+  >
+  > The board **fills the available width** and shares it evenly between columns, with a
+  > **comfortable floor of roughly 15% of the viewport** per column. It scrolls horizontally only
+  > once that floor no longer fits.
+  >
+  > Fixed-width columns are the trap: they leave the last column sliced by the viewport edge, which
+  > reads as broken rather than as scrollable. Flexible columns with a minimum fill the screen and
+  > degrade to a scroll honestly.
+- **The drawer is roomier than the board**, not denser: it is where someone stops to read and type.
+
+> [!warning] Density is not information
+> Fitting more on screen does not communicate more. If a board needs to be compressed to fit, the
+> answer is a filter, not smaller gaps.

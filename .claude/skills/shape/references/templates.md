@@ -183,10 +183,11 @@ What is observably true when this is done.
 
 ## Acceptance criteria
 
-Each carries a permanent task reference id as a block ref. Assign once, never reassign.
+Each carries **points** and a permanent task reference id. Points come first because a block
+reference must be the last thing on the line. Write `1 pt`, and `N pts` for anything else. Assign the id once and never reassign it.
 
-- [ ] ... ^tsk-7f3a21
-- [ ] ... ^tsk-9c04e8
+- [ ] ... (3 pts) ^tsk-7f3a21
+- [ ] ... (5 pts) ^tsk-9c04e8
 
 ## Approach
 

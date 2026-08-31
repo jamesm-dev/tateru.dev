@@ -11,6 +11,27 @@ The production step. Everything before this builds; this is what puts it in fron
 **Nothing here is irreversible without an explicit yes.** Deploying, tagging, and publishing are
 outward-facing acts, and approval for one is not approval for the next.
 
+## What actually ships
+
+> [!important] Shipping publishes the app's build output. It does not publish the repository.
+> The deploy serves whatever `app/`'s build produces — `app/dist`, or the equivalent for the stack.
+> `.idea/`, `.management/`, `.claude/` and the root `README.md` are **repository** content: they are
+> cloned by the build, never served by it.
+>
+> Confirm this rather than assuming it. Name the output directory the host is configured to publish,
+> list what is in it, and say so in the release notes. A host misconfigured to serve the repository
+> root would publish the roadmap, the blockers and every ADR to the open internet, and it would look
+> like a successful deploy.
+
+Two different questions follow, and they are easy to conflate:
+
+| | Reaches the public URL | Reaches the git remote |
+|---|---|---|
+| `app/` build output | Yes | Yes |
+| `.idea/`, `.management/` | **No** | **Yes** |
+
+The second column is what the pre-flight visibility check below is for.
+
 ## Phase 1 — Establish where things stand
 
 Read `.idea/ROADMAP.md` for the current phase and its exit criteria, `.management/PROGRESS.md` and
@@ -47,6 +68,25 @@ Things that are cheap now and expensive at 2am:
 
 - **Secrets** — every key the app needs exists in the target environment. `.env.example` lists them;
   check each is set there. Never print a value.
+- **Repository visibility** — this workflow keeps the plan in the repo, so a public remote makes
+  `SPECS.md`, `ROADMAP.md`, every ADR, and `.management/`'s blockers and progress public with it.
+  That is often fine and sometimes the whole point; it should still be a decision.
+
+  Check it before the **first** release, not the fifth:
+
+  ```bash
+  git remote -v
+  gh repo view --json visibility -q .visibility   # PUBLIC or PRIVATE
+  ```
+
+  If the remote is public and the vault is tracked, say plainly what becomes readable — unshipped
+  plans, open blockers, what was parked and why, and any decision recorded under a name a competitor
+  or a customer would recognise. Then ask. Do not decide it for them, and do not skip it because the
+  code itself is open source: the code being public says nothing about wanting the roadmap public.
+
+  If they want it private, the options are a private remote, or removing `.idea/` and `.management/`
+  from tracking — which costs the project its record, so name that cost rather than offering it as a
+  tidy fix.
 - **Migrations** — pending ones identified, reversible or explicitly not, and a note on ordering if
   the deploy is not atomic.
 - **Rollback** — say concretely how to undo this. If the answer is "redeploy the previous tag",
@@ -66,13 +106,16 @@ Ask before each outward-facing step. Do not chain them.
    Real changes, in the user's language, not commit subjects.
 3. **Tag** — annotated, matching the version.
 4. **Deploy** — the project's own command or pipeline. Never a hand-rolled deploy invented here.
+   Before running it, state the output directory being published and confirm it is the app's build
+   output, not the repository root.
 5. **Verify live** — hit the deployed thing and confirm it responds. A deploy that reported success
    is not a deploy that works.
 
 ## Phase 5 — Record
 
-- Append the release to `.management/CHANGELOG.md`: version, date, what shipped, and any gate that
-  was waived.
+- Append the release to `.management/CHANGELOG.md`: version, date, what shipped, any gate that was
+  waived, and **what was published** — the output directory, so a later reader can tell at a glance
+  that the vault was never part of the release.
 - Mark the phase `done` in `ROADMAP.md`, with its exit criteria ticked against evidence.
 - Set its epics to `done`.
 - Write an ADR for anything decided under pressure during the release — those are the decisions

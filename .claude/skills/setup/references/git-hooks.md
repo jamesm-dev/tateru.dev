@@ -85,6 +85,10 @@ JSONL alone is enough; `/setup` backfills.
 
 1. Run the project's real checks: lint, typecheck, test. **Block the push if they fail.** This is the
    one hook that should stop you, because a red push is what turns into a broken deploy.
+
+   Where the runner emits a machine-readable report, upsert its runs into `board.db`'s `test_run`
+   table as it goes, so the trail is recorded at the moment the tests actually ran rather than
+   reconstructed later. Data only — the hook never writes Markdown.
 2. Recompute readiness (below) and write it to `board.db`.
 3. Print a two-line summary so the developer sees where the phase stands as they push:
 

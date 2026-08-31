@@ -1,7 +1,7 @@
 ---
 title: Design System
 created: 2026-08-30
-updated: 2026-08-30
+updated: 2026-08-31
 tags: [design, management, ui]
 status: active
 ---
@@ -10,6 +10,15 @@ status: active
 
 **This page introduces no new design.** It is assembled from the project's existing theme and
 component library. Before writing any markup, read what already exists and use it.
+
+This note governs *where the design comes from*; [[Reference Implementation]] governs *what it must
+measure and how it must behave*. Read them together, in that order.
+
+**The order matters.** Reach for the project's token or component first, every time. These
+measurements describe the shape of the result, not a licence to bypass the theme to hit a number —
+a page that matches every value here while looking nothing like the app it lives in has failed the
+only test that counts. Where the project offers a scale, snap to its nearest step. Where it offers
+nothing at all, build the component and use the values as written.
 
 | Look for | Use it for |
 |---|---|
@@ -24,9 +33,35 @@ Rules, in order of precedence:
 1. **Use the existing component.** If the project has a `Card`, the task card is that `Card`. If it
    has a `Badge`, the status pill is that `Badge`. If it has a `Drawer` or `Sheet`, the task drawer
    is that.
+
+   **Prefer shadcn wherever the project already has it** — shadcn/ui in React, shadcn-svelte in
+   Svelte, or whatever the project's ecosystem equivalent is. Its components are copied into the
+   repository rather than installed, so using them adds no dependency and inherits the project's own
+   theme. If a shadcn `Sheet`, `Dialog`, `Badge`, `Avatar` or `Select` is present, that is the
+   component, and no hand-rolled substitute ships beside it.
+
+   > [!warning] Prefer it where it exists; never install it for this page
+   > "Prefer shadcn" is not licence to add a UI kit to a project that does not use one. Adding
+   > components, a class-variance library and a Tailwind config to build one dashboard is exactly
+   > the dependency the no-new-dependency rule exists to prevent. Where shadcn is absent, build from
+   > the project's own tokens instead.
 2. **Compose before creating.** If no exact component exists, build it from ones that do.
 3. **Only then write something new** — with the project's tokens, matching the conventions of its
    neighbours, so it looks like it was always there.
+
+   **The drawer is the case where this usually applies.** Most projects have no drawer or sheet, and
+   the board is unusable without one, so building it is expected rather than a last resort. A
+   hand-built drawer still owes everything a library one would give:
+
+   - a real modal dialog — `<dialog>` or `role="dialog"` with `aria-modal="true"` and a label,
+   - focus moved in on open, trapped while open, and returned to the originating card on close,
+   - Escape closes; a click on the backdrop closes; the page behind does not scroll,
+   - it sets `?task=` so a task is linkable and the back button closes it,
+   - full height from the right above 768px, a bottom sheet below it,
+   - it animates from the edge, and respects `prefers-reduced-motion`.
+
+   Build it once, in the project's `ui/` directory, and reuse it. A drawer that only works for one
+   caller is a modal in disguise.
 4. **Never add a dependency** for this page. Not a chart library, not an icon pack, not a UI kit.
    If the project ships an icon set, use it; otherwise use text and Unicode glyphs. The single
    sanctioned exception is one database driver — see [[Requirements]].
@@ -64,7 +99,9 @@ Typography: the project's existing scale. Page title, section heading, body, and
 size — four steps, no more. Counts, points, durations, and dates in tabular or monospace figures so
 columns line up.
 
-Spacing: generous vertical rhythm between sections, tight within a card. The page should read as five
-or six distinct blocks, not one continuous wall.
+Spacing: one scale — 4 / 8 / 12 / 16 / 24 / 32 / 48 — mapped onto the project's own steps. Generous
+vertical rhythm between sections (32px), tight within a card (16px padding, 12px between cards), and
+a heading always nearer its own content than the block above it. The page should read as five or six
+distinct blocks, not one continuous wall. Exact values in [[Reference Implementation]].
 
 Dark mode: inherit the project's, if it has one. Do not build a separate toggle for this page.

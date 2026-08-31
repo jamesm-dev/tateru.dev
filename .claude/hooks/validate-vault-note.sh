@@ -148,6 +148,24 @@ bad_callouts=$(grep -o '^>[[:space:]]*\[![a-zA-Z-]*\]' "$fp" \
   | sort -u | tr '\n' ' ')
 [ -n "$bad_callouts" ] && add "Unknown callout type(s): $bad_callouts"
 
+# --- epics: every acceptance criterion carries points ------------------------
+# Assignee capacity is the sum of points on open tasks, so one unpointed task
+# makes every capacity figure wrong by an unknown amount. /shape writes them.
+case "$fp" in
+  */epics/*)
+    while IFS= read -r line; do
+      case "$line" in
+        *'^tsk-'*)
+          # Points must sit before the block ref, which has to end the line.
+          if ! printf '%s' "$line" | grep -qE '\([0-9]+ pts?\) \^tsk-[0-9a-f]{6}[[:space:]]*$'; then
+            add "Acceptance criterion has no points. Write '(N pts) ^tsk-xxxxxx' - see shape/SKILL.md: $line"
+          fi
+          ;;
+      esac
+    done < "$fp"
+    ;;
+esac
+
 # Cross-vault wikilinks: .idea and .management are separate Obsidian vaults, so a
 # wikilink cannot reach from one into the other.
 other=""

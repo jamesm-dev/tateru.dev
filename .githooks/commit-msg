@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+# Link the commit to work.
+#
+# Warns when no task is referenced — plenty of legitimate commits belong to no
+# task, and blocking those teaches people to pass --no-verify, which disables
+# every other hook too.
+#
+# Blocks only on a reference that does not exist: TSK- followed by an id absent
+# from state.json is a typo, and silently losing the link is worse than one
+# rejected commit.
+#
+# Never rewrites the message.
+
+set -u
+
+MSG_FILE="$1"
+STATE=".management/state.json"
+
+# Accept a reference anywhere in the message, and a "Task:" trailer.
+IDS=$(grep -oiE 'TSK-[0-9a-f]{6}' "$MSG_FILE" 2>/dev/null | tr '[:upper:]' '[:lower:]' | sort -u)
+
+if [ -z "$IDS" ]; then
+  echo "hint: no task reference in this commit message."
+  echo "hint: add one like TSK-1c4407, or a trailer 'Task: TSK-1c4407', to link it to the board."
+  exit 0
+fi
+
+# Without a board there is nothing to validate against; the reference is still
+# recorded by post-commit and /setup backfills it later.
+[ -f "$STATE" ] || exit 0
+
+UNKNOWN=""
+for id in $IDS; do
+  if ! grep -qi "$id" "$STATE"; then
+    UNKNOWN="$UNKNOWN $id"
+  fi
+done
+
+if [ -n "$UNKNOWN" ]; then
+  echo "error: commit references unknown task id(s):$UNKNOWN" >&2
+  echo "error: nothing in $STATE matches. Fix the typo, or drop the reference." >&2
+  exit 1
+fi
+
+exit 0
