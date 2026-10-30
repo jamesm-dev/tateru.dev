@@ -6,6 +6,15 @@ Changes to the tateru workflow itself — not to a project built with it. A proj
 `/upgrade` reads this file to tell a cloned project what changed. Mark anything that needs action
 after upgrading as **Breaking**, and say what to do.
 
+## Unreleased
+
+- **Fixed:** `/upgrade` on a project cloned before versioning now finds the starting point from the
+  git history it shares with tateru, so it only asks about files you actually edited. Before, it
+  would have asked about every file tateru had changed.
+- **Fixed:** `selftest.sh` tests the working tree, not the last commit, so it verifies an upgrade
+  `/upgrade` has applied but not committed. It no longer checks the root `README.md`, which is the
+  project's own file in a clone, or fails because of the project's own notes.
+
 ## 0.1.0 — 2026-10-30
 
 The first versioned release. Projects cloned earlier have no `.claude/TATERU_VERSION`; `/upgrade` handles
