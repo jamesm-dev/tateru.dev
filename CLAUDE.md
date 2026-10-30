@@ -48,7 +48,7 @@ The validator doubles as a CLI:
 bash .claude/hooks/validate-vault-note.sh --check ".idea/notes/Some Idea.md"
 ```
 
-All four fail open and never block on their own error. Everything outside those two folders passes
+All three fail open and never block on their own error. Everything outside those two folders passes
 through untouched. If you change the vault contract, change the validator in the same edit — a rule
 that only exists in prose is not a rule.
 

@@ -30,6 +30,8 @@ When you find a gap — an uncovered exit criterion, an untested area, work the 
 never names — propose it as an epic at **`status: suggested`** in `.idea/epics/`.
 
 - Write it with `Write`, as a new file in `.idea/epics/`. It must satisfy the vault contract.
+  `Write` is yours for this and nothing else: never use it on an existing file, and never outside
+  `.idea/epics/`. You have no `Edit` on purpose.
 - `status: suggested` is the only status you may write, and a suggested epic is the only note you
   may create.
 - It belongs to **no phase** and counts toward **nothing** until a person accepts it.

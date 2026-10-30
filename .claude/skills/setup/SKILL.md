@@ -184,7 +184,9 @@ Its write scope is deliberately narrow, and the definition must say so:
 - **May not** edit `SPECS.md`, `ROADMAP.md`, an accepted epic, an idea note, any `.management/`
   Markdown, or tick an acceptance criterion. It may not deploy, tag, or push.
 
-Give it no Write or Edit tool: those two paths are the whole of its write access. Changing the plan
+Give it `Write` and no `Edit`, and say in the definition that `Write` is for new `status: suggested`
+epics only — a subagent's tools cannot be scoped to one folder, so the definition is what holds
+that line. Those two paths are the whole of its write access. Changing the plan
 is `/shape` or `/epic`, regenerating state is `/setup`, shipping is `/ship`.
 
 On a later run, update its description if the project's shape changed; never overwrite a definition
