@@ -249,7 +249,7 @@ until a sprint exists.
 
 | Meaning | Exactly |
 |---|---|
-| A person dropped a derived task into Done, unverified by an exit criterion | `done · unverified` |
+| A person dropped a derived task into Done, or confirmed the agent's completion, unverified by an exit criterion | `done · unverified` |
 | The agent marked a task done from commit evidence | `done · unconfirmed` |
 | An advance was made here, not yet written to the roadmap by `/setup` | `roadmap pending` |
 | A phase the project has moved beyond | `advanced past` |

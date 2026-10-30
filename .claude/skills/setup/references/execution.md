@@ -131,9 +131,17 @@ git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
   done
 ```
 
-Then stop a plain `git fetch` from bringing them back, when the tateru remote is still `origin`:
-`git config remote.origin.tagOpt --no-tags`. Say what was moved. These are local tags; `/upgrade`
-reads the same `tateru/v*` names.
+Then, still on the first run:
+
+- **Mark where the project began**: `git tag tateru/base HEAD`, before any project commit. Commit
+  ingestion and the author check exclude everything up to it, so tateru's own history never reads
+  as the project's work.
+- **Rename the tateru remote** if a plain clone left it as `origin`: `git remote rename origin
+  tateru`, then `git config remote.tateru.tagOpt --no-tags`, so a fetch never brings bare `v*` tags
+  back. The project adds its own `origin` when it has a repository; `/upgrade` finds `tateru` by
+  URL either way.
+
+Say what was moved and renamed. These are local tags; `/upgrade` reads the same `tateru/*` names.
 
 ## Windows notes
 

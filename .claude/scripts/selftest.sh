@@ -60,8 +60,8 @@ git ls-files -z --cached --others --exclude-standard \
       cp -p "$f" "$tmp/repo/$f"
     done
 cd "$tmp/repo" || exit 1
-# A team may commit its real board.db (/setup offers it). The hook tests build
-# their own, so a copied one must not leak in.
+# Someone may have committed their board.db against the advice. The hook tests
+# build their own, so a copied one must not leak in.
 rm -f .management/board.db .management/commits.jsonl .management/state.json
 git init -q
 git -c core.hooksPath=/dev/null -c user.name=selftest -c user.email=selftest@example.com \

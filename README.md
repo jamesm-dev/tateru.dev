@@ -191,9 +191,9 @@ So the tenth rebuild is the same page as the first: same sections, same order, s
 It has exactly **two** powers, both of which leave a trail:
 
 - **Suggests epics** for gaps it finds. They land at `status: suggested`, belong to no phase, and count toward nothing until you accept one.
-- **Marks tasks done from commits** — with a note explaining why and the SHAs it relied on. Shows as `done · unconfirmed`, and counts as not done, until you confirm it during the next `/setup`.
+- **Marks tasks done from commits** — with a note explaining why and the SHAs it relied on. Shows as `done · unconfirmed` until you confirm or reject it during the next `/setup`, and counts as done only once a verified criterion ticks it — your confirmation vouches for it, it doesn't replace the evidence.
 
-It's built not to edit the plan, tick an exit criterion, or deploy: it has no `Edit` tool, its one `Write` is for new suggestions, and its instructions forbid the rest. That's a rule it follows, not a lock — so every change it makes is labelled, and nothing it does counts until a person agrees. An overseer that can quietly rewrite what it audits isn't an overseer.
+It's built not to edit the plan, tick an exit criterion, or deploy: it has no `Edit` tool, its one `Write` is for new suggestions, and its instructions forbid the rest. That's a rule it follows, not a lock — so every change it makes is labelled, and nothing it does counts until a person agrees and a check backs it up. An overseer that can quietly rewrite what it audits isn't an overseer.
 
 ### The build team
 

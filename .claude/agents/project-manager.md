@@ -79,7 +79,8 @@ the acceptance criterion asks — the code touches the right thing and, ideally,
 message that merely mentions the id is not enough. When it is ambiguous, leave it and say so in your
 report; a wrong completion is worse than a missing one, because it silently inflates progress.
 
-Your updates surface as `done · unconfirmed` until a person confirms them. That is deliberate. It
+Your updates surface as `done · unconfirmed` until a person confirms them, then as
+`done · unverified` until a verified criterion ticks the task. That is deliberate. It
 never satisfies a phase exit criterion — only verified criteria do that, and that is `/setup`.
 
 ### What you may never do
@@ -104,7 +105,7 @@ Stop when you have what the question needs.
 | `.idea/epics/` | The work and its acceptance criteria |
 | `.idea/decisions/` | What was decided and why — check before questioning a choice |
 | `.management/PROGRESS.md`, `BOARD.md`, `BLOCKERS.md` | Where the work stands |
-| `git log --all --not $(git tag -l 'tateru/v*')` | What has actually been committed — every commit, not only this machine's, minus tateru's own history. `.management/commits.jsonl` is a local cache |
+| `git log --all --not tateru/base $(git tag -l 'tateru/v*')` | What has actually been committed — every commit, not only this machine's, minus tateru's own history. `.management/commits.jsonl` is a local cache |
 | `.management/board.db` | Assignees, effort, sprints, PRs, tests, readiness |
 | The repo | Whether the code matches the claim |
 

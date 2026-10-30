@@ -137,8 +137,9 @@ run; refresh it on every later run.
 
 1. **Ingest commits first.** The record is `git log --all` itself — every commit, including pulled
    ones, squash-merges from GitHub and a teammate's work — minus tateru's own history, which every
-   clone carries: `git log --all --not $(git tag -l 'tateru/v*')`. Start after the SHA in
-   `state.json` `lastIngested` when there is one, and write the newest ingested SHA back. Parse task ids from each message the way
+   clone carries: `git log --all --not tateru/base $(git tag -l 'tateru/v*')`. Read it whole on
+   every run; it is cheap, and a resume point would break on the first rebase. (`tateru/base` is
+   the commit the project started from, tagged by the first run's Git step.) Parse task ids from each message the way
    the `post-commit` hook does (`TSK-` and `ADH-` ids, case-insensitive). `.management/commits.jsonl`
    is a local cache of this machine's commits, useful for timing, never the whole record. Map commits to tasks by reference id; a commit is
    evidence, never completion. Commits referencing no task are recorded as untracked work, so
@@ -171,10 +172,12 @@ run; refresh it on every later run.
    test data into it.
 
    **`board.db` is one person's board.** It is gitignored because it holds names, and it is a binary
-   file git cannot merge, so it is not shared between clones. Say so once, on the first run, if
-   `git log` shows authors beyond the project's own: in a team, one person runs `/setup` and holds
-   the board. **Never** clear a row a person authored: a task id
-   that has left `.idea/` is marked orphaned, not deleted.
+   file git cannot merge, so it is not shared between clones. Say so once, on the first run, if the
+   same commit range (`--not tateru/base …`) shows more than one author: in a team, one person runs
+   `/setup` and holds the board.
+
+   **Never** clear a row a person authored: a task id that has left `.idea/` is marked orphaned, not
+   deleted.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
    each row not yet consumed, record the advance in `ROADMAP.md`, open the next phase, and stamp
    `consumed_at` so it is applied once. Either kind of advance sets the phase `verified` — `/ship`

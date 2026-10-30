@@ -58,7 +58,7 @@ for the same fact is clutter.
 | **Unassigned** | A dashed circle that **is itself the assign control**, so assigning costs one click. See [[Board]] |
 | **Points** | Pushed to the right of the row. `3 pts`, `1 pt`, `0 pts`. **Omitted entirely when unset** — a badge reading `no pts` is noise on a card that has enough of it. The gap surfaces on [[Team]], where it actually distorts a number |
 | **Estimate / actual** | `2h / 3.5h`. Actual is emphasised in `warn` when it exceeds the estimate — that contrast is the whole reason to show both. `2h / —` when no time is logged. **The pair is omitted when neither is set** |
-| **Unverified** | `done · unverified` in `warn`, on a derived card a person dropped into Done with no verified criterion behind it |
+| **Unverified** | `done · unverified` in `warn`, on a derived card a person dropped into Done, or whose agent completion a person confirmed, with no verified criterion behind it |
 
 Durations are always human units — `30m`, `2h`, `3.5h`, `2d`. Never raw minutes in the UI.
 
