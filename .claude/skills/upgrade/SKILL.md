@@ -26,17 +26,24 @@ silently** — that is the one way this skill can destroy work.
 
 ## Phase 1 — Where are we
 
-1. Read `.claude/TATERU_VERSION`. Missing means the project predates versioning: say so, and treat every
-   workflow file as possibly edited (Phase 3 asks about each one that differs).
-2. Find the upstream remote: `git remote -v`, looking for `jamesm-dev/tateru.dev`. If none exists,
-   **ask before adding one**:
+1. Read `.claude/TATERU_VERSION`. Missing means the project predates versioning: say so. Phase 3
+   then finds its starting point from the git history it shares with tateru.
+2. Find the remote that points at tateru, whatever it is called. A plain `git clone` names it
+   `origin`, so never assume `tateru`:
+
+   ```bash
+   git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }'
+   ```
+
+   Use that name everywhere below, written `<up>` here. If no remote matches, **ask before adding
+   one**, then use `tateru`:
 
    ```bash
    git remote add tateru https://github.com/jamesm-dev/tateru.dev.git
    ```
 
-3. `git fetch tateru --tags`. Read the upstream `.claude/TATERU_VERSION` and the `.claude/CHANGELOG.md` entries
-   between the two versions, with `git show tateru/main:.claude/CHANGELOG.md`.
+3. `git fetch <up> --tags`. Read the upstream `.claude/TATERU_VERSION` and the `.claude/CHANGELOG.md`
+   entries between the two versions, with `git show <up>/main:.claude/CHANGELOG.md`.
 4. Already current → say so and stop.
 5. Refuse to start on a dirty working tree (`git status --porcelain`). Ask the user to commit or
    stash first, so the upgrade is one reviewable diff they can throw away.
@@ -49,30 +56,31 @@ words, not pasted), and any entry marked **Breaking**. Ask whether to proceed.
 ## Phase 3 — Apply, file by file
 
 The base is the upstream tag for the local version, `v<local version>`. For every workflow path that
-differs between that tag and `tateru/main`:
+differs between that tag and `<up>/main`:
 
 | Local file vs. base | Do |
 |---|---|
-| Identical — never edited | Take the upstream version: `git checkout tateru/main -- <path>` |
+| Identical — never edited | Take the upstream version: `git checkout <up>/main -- <path>` |
 | Edited locally, unchanged upstream | Keep the local file. Nothing to do |
 | Edited locally **and** changed upstream | Three-way merge with `git merge-file`. Clean merge → keep it and say so. Conflict → show both changes and ask: take upstream, keep local, or leave the conflict markers for the user |
 | Deleted upstream | Ask before deleting a file the user may still use |
 | New upstream | Add it |
 
 No base tag (a project cloned before versioning, or the tag was never fetched): use the last
-commit the project shares with upstream, `git merge-base HEAD tateru/main`. A normal clone keeps
+commit the project shares with upstream, `git merge-base HEAD <up>/main`. A normal clone keeps
 tateru's history, so this finds the exact version it started from, and only the files the user
-really edited need a decision. Comparing against `tateru/main` directly instead would flag every
+really edited need a decision. Comparing against `<up>/main` directly instead would flag every
 file upstream changed as a possible local edit — in testing, 19 questions for one real edit.
 
 No shared history at all (a "Use this template" copy): then, and only then, compare local against
-`tateru/main` directly, take files that are identical or missing, and ask about each one that
+`<up>/main` directly, take files that are identical or missing, and ask about each one that
 differs.
 
 Then:
 
 - **`CLAUDE.md`**: show the upstream diff since the base, and apply only the workflow sections it
-  changed. Keep the project's stack, commands and conventions as written.
+  changed. Keep the project's stack, commands and conventions as written. Once `app/` exists, never
+  bring back the `<!-- tateru:before-setup -->` block — `/setup` replaced it on purpose.
 - **Executable bits**: after checking out scripts, confirm `git ls-files -s .githooks .claude/hooks
   .claude/scripts` shows `100755`, and fix with `git update-index --chmod=+x` if not.
 - Write the new version into `.claude/TATERU_VERSION`.

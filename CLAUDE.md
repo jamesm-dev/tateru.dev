@@ -104,6 +104,7 @@ Commands stay thin — they name the skill, pass `$ARGUMENTS`, and handle invoca
 Method and detail live in the skill and its `references/`, which load only when that phase is
 active. Preserve that split: depth added to a command file rather than its skill is a regression.
 
+<!-- tateru:before-setup -->
 ## No app exists yet
 
 **Assume nothing has been built.** There is no `app/` directory, `/setup` has not run, and no stack
@@ -130,6 +131,7 @@ cd app && <the verify command /setup wired up>
 Git hooks live in [.githooks/](.githooks/) and are wired by the install step `/setup` runs inside
 `app/`, which sets `core.hooksPath`. Husky is deliberately not used: it installs beside the manifest
 in `app/`, cannot find `.git` at the root, and would be a dependency that does nothing.
+<!-- /tateru:before-setup -->
 
 ## Conventions
 

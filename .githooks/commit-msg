@@ -7,7 +7,8 @@
 #
 # Blocks only on a reference that does not exist, because silently losing the
 # link is worse than one rejected commit:
-#   TSK-xxxxxx  a planned task, from an epic; checked against state.json
+#   TSK-xxxxxx  a planned task; found in state.json, or as ^tsk-xxxxxx in an
+#               epic in .idea/epics/ (a task /epic added since the last /setup)
 #   ADH-xxxx    an ad-hoc task authored on the dashboard; checked against
 #               board.db, when sqlite3 is installed to read it
 #
@@ -35,7 +36,10 @@ for id in $IDS; do
       # Without a board there is nothing to validate against; the reference is
       # still recorded by post-commit and /setup backfills it later.
       [ -f "$STATE" ] || continue
-      grep -qi "$id" "$STATE" || UNKNOWN="$UNKNOWN $id"
+      grep -qi "$id" "$STATE" && continue
+      hex=${id#tsk-}
+      grep -rqi "\^tsk-$hex" .idea/epics 2>/dev/null && continue
+      UNKNOWN="$UNKNOWN $id"
       ;;
     adh-*)
       [ -f "$BOARD" ] && command -v sqlite3 >/dev/null 2>&1 || continue

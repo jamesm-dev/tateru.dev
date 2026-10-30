@@ -59,6 +59,11 @@ Required on every such update, without exception:
 Write it via `sqlite3` against `.management/board.db`, per the `task_status` table in
 `.management/design/Database Schema.md`.
 
+**If `sqlite3` is not installed** (`command -v sqlite3` fails — Git Bash on Windows does not ship it),
+do not try another way in. Report each task you *would* mark done, with the same note and SHAs, under
+`Updated` as `not written: sqlite3 is not installed`, so a person can apply it. Never claim a write
+that did not happen.
+
 **A commit is evidence, not proof.** Set a task done only when the commit clearly implements what
 the acceptance criterion asks — the code touches the right thing and, ideally, a test covers it. A
 message that merely mentions the id is not enough. When it is ambiguous, leave it and say so in your

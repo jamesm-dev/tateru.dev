@@ -24,7 +24,7 @@ status, dates, blockers, and what actually shipped.
 
 ```
 .management/
-  README.md        what this folder is and how it syncs
+  README.md        what this folder is and how it syncs (ships with tateru)
   BOARD.md         every task by status, each linked to its epic
   PROGRESS.md      per-phase rollup with exit criteria
   BLOCKERS.md      what is stuck, since when, and the next action
@@ -116,16 +116,24 @@ block reference gets `"id": null` — never a generated one, and never a fallbac
 
 ## File templates
 
-**`README.md`** — frontmatter `tags: [meta, management]`. Explains the `.idea/` vs `.management/`
-split, the sync rules above, that `state.json` is generated, and how to view the dashboard if one
-was built.
+**`README.md`** — not generated. It ships with tateru and explains this folder; `/upgrade` keeps it
+current, and `/setup` never writes it. Project-specific facts go in the generated files below.
 
 **`BOARD.md`** — frontmatter `tags: [board, management]`. Four `##` sections: Blocked, In progress,
 Next up, Done. Each task as `- [ ] Task text — [Epic Title](../.idea/epics/Epic%20Title.md) (Phase N)`
 — a relative link, never a wikilink, since the epic lives in the other vault. Done tasks keep their
 completion date. Sorted by phase, then epic.
 
-**`PROGRESS.md`** — frontmatter `tags: [progress, management]`. A summary table:
+**`PROGRESS.md`** — frontmatter `tags: [progress, management]`. Two status lines first — the
+`pre-push` hook prints them at every push, so keep the exact shape:
+
+```markdown
+**Phase 1 - Core loop:** 12/19 tasks, 3 of 4 exit criteria met
+**Readiness:** 5 of 7 gates met. Open: Tests, Deploy path
+```
+
+If a dashboard was built, add one line saying where (`Dashboard: /management, dev only`). Then a
+summary table:
 
 ```markdown
 | Phase | Goal | Tasks | Status |
@@ -313,16 +321,19 @@ management/
 | Auth-gated | Reuse the project's existing auth. If there is none yet, say so and fall back to dev-only rather than inventing one. |
 | Public | Build it, and state once that the roadmap and unshipped plans become publicly readable. |
 
-**Route location by framework** — verify against the project's actual structure before writing:
+**Route location by framework** — every path is relative to the project's own root, which is
+`app/` in this repository, so Next.js's `app/management/page.tsx` lands at
+`app/app/management/page.tsx` (or `app/src/app/...` when the project uses `src/`). Verify against
+the project's actual structure before writing:
 
 | Framework | Route |
 |---|---|
 | Next.js (app router) | `app/management/page.tsx` |
 | Next.js (pages router) | `pages/management.tsx` |
 | Nuxt | `pages/management.vue` |
-| SvelteKit | `app/src/routes/management/+page.svelte` |
+| SvelteKit | `src/routes/management/+page.svelte` |
 | Remix / React Router | `app/routes/management.tsx` |
-| Astro | `app/src/pages/management.astro` |
+| Astro | `src/pages/management.astro` |
 | Vite SPA | A route in the existing router, importing `state.json` |
 | Express / Fastify / Hono | A `GET /management` handler rendering server-side |
 | Django / Rails / Laravel | A route plus template, following the project's own conventions |

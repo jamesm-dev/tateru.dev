@@ -134,10 +134,25 @@ else
 fi
 
 # --- body -------------------------------------------------------------------
-h1=$(grep -c '^# ' "$fp" || true)
+# Headings are counted outside the frontmatter and outside fenced code blocks:
+# a "# install" comment in a bash sample is code, not a second H1.
+body=$(awk '
+  NR == 1 && /^---[[:space:]]*$/ { infm = 1; next }
+  infm { if (/^---[[:space:]]*$/) infm = 0; next }
+  /^[[:space:]]*(```|~~~)/ { infence = !infence; next }
+  !infence { print }
+' "$fp")
+h1=$(printf '%s\n' "$body" | grep -c '^# ' || true)
 [ "$h1" -eq 1 ] || add "A note needs exactly one H1 heading matching its title, found $h1."
+# A fixed-name system file (README, INDEX, DESIGN...) may give its H1 a
+# description, because its filename is a role, not a subject.
+case "$base" in *[!A-Z_]*) system=0 ;; *) system=1 ;; esac
+if [ "$h1" -eq 1 ] && [ -n "${t:-}" ] && [ "$system" -eq 0 ]; then
+  heading=$(printf '%s\n' "$body" | sed -n 's/^# //p' | head -1 | sed 's/[[:space:]]*$//')
+  [ "$heading" = "$t" ] || add "The H1 ($heading) does not match the frontmatter title ($t). Make them identical."
+fi
 
-grep -qn '^#[A-Za-z]' "$fp" && \
+printf '%s\n' "$body" | grep -q '^#[A-Za-z]' && \
   add "A line starts with an inline tag. Obsidian parses that as a heading. Indent it or put it after text."
 
 grep -q "$(printf '\t')" "$fp" && add "File contains tab characters. Use spaces."

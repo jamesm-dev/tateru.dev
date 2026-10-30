@@ -24,8 +24,14 @@ if [ ! -f "$CHECKS" ]; then
 fi
 
 LINT="" TYPECHECK="" TEST="" TRAIL=""
+# Strip carriage returns before sourcing: a CRLF checkout turns LINT="npm run lint"
+# into a command ending in \r, which fails as a missing script on every push.
+# .gitattributes pins the file to LF; this covers a copy made outside git.
+CLEAN="${TMPDIR:-/tmp}/prepush-checks.$$"
+tr -d '\r' < "$CHECKS" > "$CLEAN"
 # shellcheck disable=SC1090
-. "./$CHECKS"
+. "$CLEAN"
+rm -f "$CLEAN"
 
 echo "pre-push: running checks in $APP/ ..."
 
@@ -51,12 +57,13 @@ run lint      "$LINT"      || exit 1
 run typecheck "$TYPECHECK" || exit 1
 run test      "$TEST"      || exit 1
 
-# Record the trail at the moment the tests actually ran, rather than
-# reconstructing it later. Data only: the hook never writes Markdown.
+# Save the test report at the moment the tests actually ran, rather than
+# reconstructing it later. /setup records it in board.db; the hook never
+# writes Markdown or the database.
 if [ -n "$TRAIL" ] && (cd "$APP" && sh -c "$TRAIL" >/dev/null 2>&1); then
-  echo "  trail       recorded"
+  echo "  trail       report saved"
 else
-  echo "  trail       not recorded (no report, or no database yet)"
+  echo "  trail       no report saved"
 fi
 
 # Take stock. Readiness is computed by /setup into .management/PROGRESS.md; the
@@ -65,7 +72,7 @@ PROGRESS=".management/PROGRESS.md"
 if [ -f "$PROGRESS" ]; then
   echo
   grep -m1 -E '^\*\*Phase' "$PROGRESS" 2>/dev/null || true
-  grep -m1 -E 'gates met' "$PROGRESS" 2>/dev/null || true
+  grep -m1 -E '^\*\*Readiness' "$PROGRESS" 2>/dev/null || true
 fi
 
 echo

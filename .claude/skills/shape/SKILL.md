@@ -75,7 +75,7 @@ An idea is a bet. An epic is deliverable work. The conversion:
    rewritten from there.
 
 8. **Give every acceptance criterion a task reference id** as an Obsidian block reference:
-   `- [ ] A document survives a restart ^tsk-7f3a21`. Six lowercase hex characters, unique across
+   `- [ ] A document survives a restart (3 pts) ^tsk-7f3a21`. Six lowercase hex characters, unique across
    the vault. Assign once and **never reassign** - the management dashboard keys assignees, effort,
    and pull requests on it, so a changed id orphans real data. When amending an epic, add ids only
    to criteria that lack one; leave existing ids alone even if the wording changed.

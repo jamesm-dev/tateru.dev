@@ -89,9 +89,12 @@ outcome — **split it** and say why. Two honest epics beat one that hides its s
 Acceptance criteria are the tasks. For each:
 
 - One observable outcome, finishable in a day or so.
-- **A task reference id as a block ref**: `- [ ] The document reopens after a restart ^tsk-4b91c2`.
-  Six lowercase hex characters, unique across the vault. Assign once, never reassign — assignees,
-  effort, and pull requests key on it.
+- **Points, then a task reference id as a block ref**:
+  `- [ ] The document reopens after a restart (3 pts) ^tsk-4b91c2`. Size relative effort on the
+  1, 2, 3, 5, 8, 13 scale, as `/shape` does; a 13 is a criterion to split. When a size is not
+  obvious from the notes, ask rather than guess. The validator rejects a criterion with no points.
+- The id is six lowercase hex characters, unique across the vault. Assign once, never reassign —
+  assignees, effort, and pull requests key on it.
 - **Surface the invisible work** the idea note never mentions: migrations, auth, error states, seed
   data, tests, the deploy path. An epic without them is optimistic fiction.
 - If confidence in the approach is low, the first task is a **timeboxed spike** whose exit criterion

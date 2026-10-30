@@ -34,7 +34,7 @@ anything. Structure stays derived; that data does not.
 
 | File | Holds | Written by |
 |---|---|---|
-| `README.md` | This file | By hand |
+| `README.md` | This file | Ships with tateru; `/upgrade` keeps it current |
 | `DESIGN.md` | Index of the dashboard design | By hand |
 | `design/` | The design spec, one concern per note | By hand |
 | `contract/` | The machine-checkable half of that spec: strings, measurements, order, fixtures | By hand |
@@ -46,8 +46,8 @@ anything. Structure stays derived; that data does not.
 | `state.json` | Machine-readable snapshot — the dashboard's data source | Generated |
 | `commits.jsonl` | Append-only commit log | The post-commit git hook |
 
-**Only `README.md`, `DESIGN.md`, `design/`, and `contract/` exist.** Every other row above is created by
-`/setup`, once there are real epics to derive it from — writing one now would mean inventing
+**Before `/setup` has run, only `README.md`, `DESIGN.md`, `design/`, and `contract/` exist.** Every
+other row above is created by `/setup`, once there are real epics to derive it from — writing one now would mean inventing
 progress that has not happened. Until then, do not read, link to, or cite any of them; if a question
 needs `BOARD.md` or `PROGRESS.md`, the answer is that the work has not started.
 
