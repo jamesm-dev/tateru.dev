@@ -112,9 +112,26 @@ check ".gitattributes pins checks.env to LF" "git check-attr eol .claude/team/ch
 rm -rf app .claude/team
 
 git rev-parse HEAD > .claude/TATERU_BASE
+# Stand-ins for tateru history that arrives later: a fetched release tag, and a
+# branch on a remote whose URL names tateru (as an older project's "origin" does).
+# Each on its own commit, so each exclusion is tested on its own.
+git commit -q --allow-empty -m "tateru release" >/dev/null 2>&1
+git tag tateru/v9.9.9 HEAD
+git reset -q --hard HEAD~1
+git commit -q --allow-empty -m "tateru unreleased" >/dev/null 2>&1
+git update-ref refs/remotes/upstream/main HEAD
+git reset -q --hard HEAD~1
+git remote add upstream https://github.com/jamesm-dev/tateru.dev.git
 git commit -q --allow-empty -m "project work after the base" >/dev/null 2>&1
-n=$(git log --oneline --exclude='refs/remotes/tateru/*' --all --not "$(cat .claude/TATERU_BASE)" | wc -l | tr -d ' ')
-check "the commit range from TATERU_BASE sees only the project's commits" "[ '$n' = 1 ]"
+log=$(bash .claude/scripts/project-log.sh --format=%s 2>&1)
+check "project-log.sh sees only the project's commits" "[ '$log' = 'project work after the base' ]"
+printf '%s\r\n' "$(tr -d '\r\n' < .claude/TATERU_BASE)" > .claude/TATERU_BASE
+check "project-log.sh survives a TATERU_BASE with Windows line endings" "[ \"\$(bash .claude/scripts/project-log.sh --format=%s)\" = 'project work after the base' ]"
+mkdir -p app
+check "project-log.sh works from app/" "[ \"\$(cd app && bash ../.claude/scripts/project-log.sh --format=%s)\" = 'project work after the base' ]"
+rmdir app
+check ".gitattributes pins TATERU_BASE to LF" "git check-attr eol .claude/TATERU_BASE | grep -q 'eol: lf'"
+git tag -d tateru/v9.9.9 >/dev/null; git update-ref -d refs/remotes/upstream/main; git remote remove upstream
 rm -f .claude/TATERU_BASE
 
 echo "Claude hooks"

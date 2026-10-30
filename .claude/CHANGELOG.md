@@ -119,6 +119,8 @@ after upgrading as **Breaking**, and say what to do.
 - **Fixed:** commit history excludes tateru's own commits. The first `/setup` records where the
   project began in `.claude/TATERU_BASE` (a committed file, so every clone has it) and renames a
   plain clone's `origin` remote to `tateru`. An older project gets the file on its next `/setup`.
+  Everything reads commits through `.claude/scripts/project-log.sh`, which also excludes tateru's
+  fetched release tags and its remote, whatever that remote is called.
 - **Fixed:** a consumed advance no longer moves the dashboard; a parked criterion keeps its text;
   `/ship` and `/maintain` refresh `.management/` the way `/setup` does.
 

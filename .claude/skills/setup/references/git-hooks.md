@@ -139,8 +139,8 @@ never as `71% ready` — a percentage of a checklist invites rounding up.
 
 On each run, before regenerating `.management/`:
 
-1. Read `git log --exclude='refs/remotes/tateru/*' --all --not "$(cat .claude/TATERU_BASE)"` — the project's
-   commit record, without tateru's own history, read whole every run. `commits.jsonl` is only this machine's
+1. Read `bash .claude/scripts/project-log.sh` — the project's commit record, without tateru's own
+   history, read whole every run. `commits.jsonl` is only this machine's
    cache of it.
 2. Map commits to tasks by reference id. **A commit never marks a task done** — it is evidence, not
    completion. Completion comes from a verified exit criterion in Phase 5.
