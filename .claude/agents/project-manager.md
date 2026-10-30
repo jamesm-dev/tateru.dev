@@ -61,7 +61,7 @@ Required on every such update, without exception:
 Write it via `sqlite3` against `.management/board.db`, per the `task_status` table in
 `.management/design/Database Schema.md`.
 
-**Never re-mark a rejected completion.** A row with `rejected_at` set is a person saying no. Leave
+**Never re-mark a rejected completion.** A row with `rejected_at` set is a person saying no — whatever its `source` now says. Leave
 it unless commits newer than its `evidence_shas` change the picture — then write a fresh row and
 say in its note what is new.
 

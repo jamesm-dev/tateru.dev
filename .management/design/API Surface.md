@@ -46,7 +46,7 @@ Each writes to `board.db` only. **None of them touches `.idea/`.**
 | `POST /authored` | `title, epic, description?, priority?` | Creates an ad-hoc task, returns its `ADH-` id |
 | `POST /authored/delete` | `taskId` | Only ad-hoc tasks can be deleted |
 | `POST /authored/status` | `taskId, status` | Status of an ad-hoc task |
-| `POST /status` | `taskId, status` | A drop, or the drawer's Move control. **`null` clears the override** |
+| `POST /status` | `taskId, status` | A drop, or the drawer's Move control. **`null` clears the override**. On a row carrying `rejected_at`, both keep the rejection: a drop writes the person's status with `source = 'human'` and leaves `rejected_at` and `evidence_shas` in place; `null` sets the row back to `source = 'agent'`, so it is ignored again and the agent still knows it was rejected |
 | `POST /priority` | `taskId, priority` | `null` reverts to the phase-derived priority |
 | `POST /pr` | `taskId, url` | Attaches a pull request |
 | `POST /sprint` | `name, startsOn, endsOn, goal?` | End after start, no overlap, unique name |

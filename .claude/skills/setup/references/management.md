@@ -52,7 +52,7 @@ The single machine-readable snapshot. Regenerate wholesale; never hand-edit.
 {
   "generatedAt": "2026-08-30T12:00:00Z",
   "project": { "name": "", "description": "", "currentPhase": 0 },
-  "_currentPhase": "the lowest phase that is neither verified nor done - the phase /setup builds next",
+  "_currentPhase": "the lowest phase that is neither verified nor done - the phase /setup builds next - or the last phase once every phase is",
   "phases": [
     {
       "n": 0,

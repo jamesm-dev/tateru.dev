@@ -44,7 +44,8 @@ ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 ## Phase 2 — Pick the phase
 
 Report where the roadmap stands and name the target phase — the lowest-numbered one that is neither
-`verified` nor `done`. **First read any unconsumed `phase_advance` rows in `board.db`**: an advance
+`verified` nor `done`. If there is none, the roadmap is complete: say so and offer `/ship` for any
+phase still at `verified`, `/epic` for new work, or `/maintain`. **First read any unconsumed `phase_advance` rows in `board.db`**: an advance
 made on the dashboard moves the effective phase before `ROADMAP.md` knows it, and building the phase
 the user already left (parked work included) is the wrong build. Target the phase they imply, and
 apply them properly in Phase 6. Phases move `planned → in-progress → verified → done`: **`/setup` sets
@@ -181,7 +182,7 @@ run; refresh it on every later run.
    leave each unmet criterion as `- [ ] <text> — unmet at advance <date>`, which `/ship`'s Exit
    criteria gate then reports. Leave criteria ending ` — at release` exactly as they are: they are
    `/ship`'s to prove, and are not unmet work. Write `state.json` `currentPhase` as the lowest phase that is neither
-   `verified` nor `done`, so the dashboard does not fall back once the row is consumed.
+   `verified` nor `done` — or the last phase, once every phase is — so the dashboard does not fall back once the row is consumed.
 
    Carry the **parked** items into the record rather than dropping them: a criterion in
    `criterion_park` is written into `ROADMAP.md` as `- [~] <text>`, its text unchanged — the park is
@@ -335,7 +336,8 @@ Add no new dependencies beyond the one database driver, and apply the gate the u
 Two checks, in this order, and **report both**:
 
 1. **Conformance.** Write `.management/contract/sources.txt` (including the server side) and
-   `tokens.map`, write the derivation goldens from `.management/contract/fixtures/` as tests in the
+   `tokens.map`, write the derivation goldens from `.management/contract/fixtures/` (both the main set and
+   `lifecycle/`) as tests in the
    project's own runner, then run them and:
 
    ```bash
@@ -351,6 +353,11 @@ Two checks, in this order, and **report both**:
 
 If the project has no web surface — a CLI, a library — say so and offer the reference's fallback
 instead: a self-contained `.management/dashboard.html` plus a `board` script that prints progress.
+
+**On every later run, re-check a built dashboard.** If `.management/contract/sources.txt` lists
+files, the dashboard exists: run its derivation goldens and `dashboard-conformance.sh` again, and
+report both. A `/upgrade` can change `Derivations.md` or the contract while the code in `app/`
+stays as it was; this is where the difference shows.
 
 ## Phase 7 — Record and hand off
 

@@ -119,11 +119,16 @@ branch, branch first.
 
 **On the first run, move tateru's own tags out of the project's way.** A plain `git clone` of tateru
 brings its release tags (`v0.1.0`, …) along, and the project's first `/ship` would collide with
-them, or mistake one for its own previous release. The project has shipped nothing yet, so every
-`v*` tag here is tateru's:
+them, or mistake one for its own previous release. Move only the tags that **are** tateru's — the
+same name pointing at the same object as on tateru — so a project's own release is never touched:
 
 ```bash
-for t in $(git tag -l 'v*'); do git tag "tateru/$t" "$t" && git tag -d "$t"; done
+git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
+  while read -r sha ref; do
+    t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
+    [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] &&
+      git tag "tateru/$t" "$t" && git tag -d "$t"
+  done
 ```
 
 Say what was moved. These are local tags; `/upgrade` reads the same `tateru/v*` names.

@@ -60,6 +60,9 @@ git ls-files -z --cached --others --exclude-standard \
       cp -p "$f" "$tmp/repo/$f"
     done
 cd "$tmp/repo" || exit 1
+# A team may commit its real board.db (/setup offers it). The hook tests build
+# their own, so a copied one must not leak in.
+rm -f .management/board.db .management/commits.jsonl .management/state.json
 git init -q
 git -c core.hooksPath=/dev/null -c user.name=selftest -c user.email=selftest@example.com \
   -c core.fileMode=true add -A >/dev/null 2>&1
@@ -160,6 +163,11 @@ check "/upgrade reads tateru's tags from their own namespace" "grep -q 'refs/tag
 check "/upgrade installs release tags, never main" "grep -q 'never \`<up>/main\`' .claude/skills/upgrade/SKILL.md && ! grep -q 'checkout <up>/main' .claude/skills/upgrade/SKILL.md"
 check "/setup moves inherited tateru tags out of the project's way" "grep -q 'git tag \"tateru/\$t\"' .claude/skills/setup/references/execution.md"
 check "every Copy Deck status label is in the machine contract" "grep -q 'done · unconfirmed' .management/contract/strings.txt && grep -q 'verified · not shipped' .management/contract/strings.txt"
+if command -v python3 >/dev/null 2>&1; then
+  for f in .management/contract/fixtures/*.json .management/contract/fixtures/*/*.json; do
+    check "$f is valid JSON" "python3 -c 'import json,sys; json.load(open(sys.argv[1]))' '$f'"
+  done
+fi
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
   # /setup has run: it replaces the block, so the markers must be gone.

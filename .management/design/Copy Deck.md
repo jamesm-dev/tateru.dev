@@ -160,7 +160,7 @@ not once per phase.
 | Attention meta | `Since {date} · holds up {epic}` |
 | Attention command | `/epic {ref}` and `creates the epic and tasks that address this`; the reference button is titled `Copy the reference` and reads ` copied` |
 | Readiness | `{n} of {m} gates met.` |
-| Gate freshness | `Exit criteria, tasks and risks are computed live, so parking something updates them at once. {stale gates} come from the last /setup run ({date}) — a browser cannot see a test run, a pull request, or whether a deploy happened, and guessing would be worse than deferring. A gate with no evidence stays unmet, never assumed green.` |
+| Gate freshness | `Exit criteria and tasks are computed live, so parking something updates them at once. {stale gates} come from the last /setup run ({date}) — a browser cannot see a test run, a pull request, or whether a deploy happened, and guessing would be worse than deferring. A gate with no evidence stays unmet, never assumed green.` |
 | No sprints | `No sprints yet. A project without them is perfectly normal — create one below when a dated window is useful.` |
 | Sprint table | `Sprint` · `Dates` · `Status` · `Tasks` · `Points` · `Remove` |
 | Sprint footnote | `Completed over committed points. A task with no points still counts as a task — points alone would hide the unestimated work.` |

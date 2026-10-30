@@ -93,7 +93,7 @@ Then:
 - **`CLAUDE.md`**: show the upstream diff since the base, and apply only the workflow sections it
   changed. Keep the project's stack, commands and conventions as written. Once `app/` exists, never
   bring back the `<!-- tateru:before-setup -->` block — `/setup` replaced it on purpose.
-  **A project set up before 0.1.1** still has that section without markers ("No app exists yet"),
+  **A project set up at 0.1.0 or earlier** still has that section without markers ("No app exists yet"),
   and its stack under some other heading. Offer to convert it: remove the stale section, and gather
   the stack and commands under `## Stack and commands`, which the self-test checks for. Show the
   diff and ask; never rewrite the project's own wording silently.

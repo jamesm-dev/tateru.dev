@@ -61,8 +61,10 @@ function buildTaskIndex(plan, board) -> Map<id, TaskState>
     put(a.task_id, a.epic, phase, a.status, null, null, authored = true)
 
   where put(...) records:
-    explicit  = statusById[id] unless it has rejected_at   # may be absent; a rejected
-                                            # agent completion is kept, but never applied
+    explicit  = statusById[id] unless (its source == 'agent' and it has rejected_at)
+                                            # may be absent; a rejected agent completion is
+                                            # kept, but never applied. A person's later drop
+                                            # on that task applies as usual.
     status    = explicit ?? planStatus
     unconfirmed = explicit.source == 'agent' and explicit.confirmed_by is null
                   and status == 'done'      # the agent's reading, not yet a person's

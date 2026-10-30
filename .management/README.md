@@ -80,8 +80,8 @@ That makes `.idea/` and `.management/` two separate vaults.
 
 ## The dashboard
 
-There is no dashboard yet, because there is no app to serve it from — `/setup` has not run and
-there is no `app/` directory.
+Until `/setup` has run there is no dashboard, because there is no app to serve it from. Whether one
+exists after that is the project's choice: `/setup` records it in `PROGRESS.md`.
 
 When `/setup` does run, it offers to serve this folder at a `/management` route — **after** the app
 is built and verified, never alongside it, because the page is assembled from the app's own theme,

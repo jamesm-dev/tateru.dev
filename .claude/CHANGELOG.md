@@ -39,10 +39,33 @@ after upgrading as **Breaking**, and say what to do.
   an older `/setup` marked `done` that was never released: set it back to `verified` in
   `ROADMAP.md`, so `/ship` can release it.
 - **Breaking for clones:** a plain `git clone` brings tateru's own `v*` tags. The first `/setup` now
-  moves them to `tateru/v*`; in a project that already ran `/setup`, do it by hand before the next
-  `/ship`: `for t in $(git tag -l 'v*'); do git tag "tateru/$t" "$t" && git tag -d "$t"; done` —
-  only for tags that are tateru's, never your own releases.
-- **Changed:** phases now go `planned → in-progress → verified → done`. `/setup` sets `verified`;
+  moves them to `tateru/v*`. In a project that already ran `/setup`, run this once before the next
+  `/ship`. It moves only tags that match tateru's exactly, never your own releases:
+
+  ```bash
+  git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
+    while read -r sha ref; do
+      t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
+      [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] &&
+        git tag "tateru/$t" "$t" && git tag -d "$t"
+    done
+  ```
+
+- **Breaking for 0.1.0 projects running `/upgrade`:** the 0.1.0 `/upgrade` fetches tags the old way
+  and would collide with your own. Fetch the new skill first, then run `/upgrade`:
+
+  ```bash
+  git fetch tateru --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
+  git checkout tateru/v<new version> -- .claude/skills/upgrade .claude/commands/upgrade.md
+  ```
+
+- **Breaking for a dashboard built at 0.1.0:** its derivations predate the confirm, unverified,
+  rejected and advance fixes, so it counts unconfirmed work as done. `/upgrade` never touches
+  `app/`: after upgrading, update the dashboard's derivation code to match
+  `.management/design/Derivations.md`, then run the goldens (including the new
+  `fixtures/lifecycle/`) and `dashboard-conformance.sh`. `/setup` now runs them on every run.
+- **Changed:** phases now go `planned → in-progress → verified → done`. Once every phase is
+  `verified` or `done`, `currentPhase` is the last phase and `/setup` reports the roadmap complete. `/setup` sets `verified`;
   only `/ship` sets `done`, after the release is live. Phase 0's "deployed" criterion is met by its
   first `/ship`, which was otherwise impossible to satisfy.
 - **Fixed:** a task the agent marked done counts as not done until you confirm it. `/setup` now asks
@@ -85,6 +108,8 @@ after upgrading as **Breaking**, and say what to do.
   agree.
 - **Changed:** `/setup` asks a team whether to commit `board.db`. It is not regenerable: parks,
   advances and confirmations live only there.
+- **Added:** `contract/fixtures/lifecycle/`, goldens for the confirm, unverified, rejected,
+  consumed-advance, at-release and readiness-phase rules, so a rebuilt dashboard cannot skip them.
 - **Fixed:** a consumed advance no longer moves the dashboard; a parked criterion keeps its text;
   `/ship` and `/maintain` refresh `.management/` the way `/setup` does.
 
