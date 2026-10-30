@@ -39,18 +39,32 @@ fi
 
 echo "Docs"
 # The sync rule in CLAUDE.md, made checkable: every command is listed where a
-# reader would look for it.
+# reader would look for it. Not README.md: in a cloned project that is the
+# project's own file.
 for c in .claude/commands/*.md; do
   name=$(basename "$c" .md)
   check "/$name is in CLAUDE.md" "grep -q '\[/$name\]' CLAUDE.md"
-  check "/$name is in README.md" "grep -q '/$name' README.md"
   [ -f ".claude/skills/$name/SKILL.md" ] && check "/$name is in AGENTS.md" "grep -q '\`/$name\`' AGENTS.md"
 done
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
-git clone -q "$root" "$tmp/repo"
+# Test the working tree, not the last commit: /upgrade leaves its changes
+# uncommitted and runs this to verify them. Copy every tracked and untracked
+# (not ignored) file, keeping executable bits, into a fresh repository.
+mkdir -p "$tmp/repo"
+git ls-files -z --cached --others --exclude-standard \
+  | while IFS= read -r -d '' f; do
+      [ -e "$f" ] || continue
+      mkdir -p "$tmp/repo/$(dirname "$f")"
+      cp -p "$f" "$tmp/repo/$f"
+    done
 cd "$tmp/repo" || exit 1
+git init -q
+git -c core.hooksPath=/dev/null -c user.name=selftest -c user.email=selftest@example.com \
+  -c core.fileMode=true add -A >/dev/null 2>&1
+git -c core.hooksPath=/dev/null -c user.name=selftest -c user.email=selftest@example.com \
+  commit -q -m "selftest snapshot" >/dev/null 2>&1
 git config core.hooksPath .githooks
 git config user.name selftest
 git config user.email selftest@example.com
@@ -94,7 +108,14 @@ printf '# One\n\n# Two\n' > ".idea/notes/Broken Note.md"
 check "the validator rejects a note with no frontmatter" "! bash $validator --check '.idea/notes/Broken Note.md'"
 check "the session audit names the broken note" "bash .claude/hooks/vault-preflight.sh | grep -q 'Broken Note'"
 rm ".idea/notes/Broken Note.md"
-check "the session audit passes a clean vault" "bash .claude/hooks/vault-preflight.sh | grep -q 'satisfy the vault contract'"
+# A clean vault built here, so the project's own notes - which the session
+# audit reports on separately - never decide this check.
+clean="$tmp/clean"
+mkdir -p "$clean/.idea" "$clean/.management"
+cp -R .claude "$clean/"
+cp -R .management/design "$clean/.management/"
+for f in .management/README.md .management/DESIGN.md .idea/README.md; do [ -f "$f" ] && cp "$f" "$clean/$f"; done
+check "the session audit passes a clean vault" "CLAUDE_PROJECT_DIR='$clean' bash .claude/hooks/vault-preflight.sh | grep -q 'satisfy the vault contract'"
 mkdir -p app
 git config --unset core.hooksPath
 check "the session audit warns about unwired hooks" "bash .claude/hooks/vault-preflight.sh | grep -q 'not wired'"
