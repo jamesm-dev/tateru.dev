@@ -101,6 +101,9 @@ printf 'LINT="true"\nTEST="true"\n' > .claude/team/checks.env
 check "pre-push passes when the checks pass" "sh .githooks/pre-push"
 printf 'LINT="false"\n' > .claude/team/checks.env
 check "pre-push blocks when a check fails" "! sh .githooks/pre-push"
+printf 'LINT="true"\r\nTEST="true"\r\n' > .claude/team/checks.env
+check "pre-push survives a checks.env with Windows line endings" "sh .githooks/pre-push"
+check ".gitattributes pins checks.env to LF" "git check-attr eol .claude/team/checks.env | grep -q 'eol: lf'"
 rm -rf app .claude/team
 
 echo "Claude hooks"

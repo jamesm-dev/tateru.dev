@@ -122,8 +122,11 @@ run; refresh it on every later run.
    and the whole commit record; there is no table. Map commits to tasks by reference id; a commit is
    evidence, never completion. Commits referencing no task are recorded as untracked work, so
    unplanned effort is not lost.
-2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`.
-3. Derive tasks from epic acceptance criteria. Never invent a task with no epic behind it, and never
+2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`. **Skip epics at `status: suggested`** —
+   the `project-manager` agent's proposals count toward nothing until a person accepts one with
+   `/epic accept` (vault contract). List them in the run report as awaiting a decision instead, and
+   never report their missing points as gaps.
+3. Derive tasks from the remaining epics' acceptance criteria. Never invent a task with no epic behind it, and never
    quietly drop one — an epic with no criteria is a gap, so report it.
 
    **Carry each criterion's `(N pts)` into `state.json` as the task's points.** A task must never
@@ -136,8 +139,12 @@ run; refresh it on every later run.
    hold assignees or effort.
 5. Mark done only what Phase 5 actually verified. Progress you cannot evidence is fiction.
 6. Preserve hand-written notes in `BLOCKERS.md` and `CHANGELOG.md`; rewrite only derived sections.
-7. If the dashboard exists, create or migrate `board.db` per `.management/design/Database Schema.md`,
-   then sync pull request and test data into it. **Never** clear a row a person authored: a task id
+7. **Create or migrate `board.db`** per `.management/design/Database Schema.md` — whether or not the
+   dashboard is built. The test trail, assignees and the `project-manager` agent's task updates all
+   live there, so a deferred dashboard must not mean an untracked project. Use the `sqlite3` CLI, or
+   the app's own SQLite driver where the CLI is missing (Git Bash on Windows does not ship it). If
+   neither exists, say so plainly; the Markdown tracking still works. Then sync pull request and
+   test data into it. **Never** clear a row a person authored: a task id
    that has left `.idea/` is marked orphaned, not deleted.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
    each row not yet consumed, set that phase `done` in `ROADMAP.md`, open the next one, and stamp

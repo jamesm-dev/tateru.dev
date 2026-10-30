@@ -2,7 +2,8 @@
 
 The `/work-on` agents are written stack-agnostic. What turns them into specialists is one generated
 file, **`.claude/team/stack.md`**, plus its machine-readable twin **`.claude/team/checks.env`**.
-`/setup` writes both in Phase 7, once the stack is chosen *and verified*; every agent reads only the
+`/setup` writes `checks.env` when it wires the git hooks and both files in Phase 7, once the stack is
+chosen *and verified*; every agent reads only the
 sections for its own role.
 
 Neither file exists in a fresh clone. Until they do, every agent works as a generalist, says so in its
@@ -111,7 +112,8 @@ Shell-sourceable, so the `pre-push` hook can run the real checks without knowing
 LINT=""
 TYPECHECK=""
 TEST=""
-# Records the machine-readable test report into board.db. Optional.
+# Optional. Makes the test runner leave its machine-readable report (JUnit or
+# JSON) where /setup reads it. Never writes board.db - hooks do not.
 TRAIL=""
 ```
 

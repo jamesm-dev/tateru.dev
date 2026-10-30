@@ -79,12 +79,16 @@ git config core.hooksPath .githooks
 Do it from the project's own install step so a fresh clone gets them without anyone remembering.
 **Do not install Husky or another hook runner** — see `git-hooks.md` for why.
 
+Write `.claude/team/checks.env` now, from the scripts step 6 created, in the format in
+`.claude/skills/work-on/references/stack-profile.md` — `pre-push` runs nothing until it exists.
+Phase 7 refreshes it from the commands Phase 5 verified.
+
 Verify by making a throwaway commit and confirming a line appears in `.management/commits.jsonl`,
 then confirm `pre-push` blocks on a deliberately failing check. A hook nobody proved fires is a hook
 that does not fire.
 
 Hooks write data only — `commits.jsonl` — never Markdown in `.idea/` or `.management/`, and never
-into `board.db`: a shell script with a database driver is a dependency bought for rows nothing
+`board.db` (they may read it): a shell script with a database driver is a dependency bought for rows nothing
 reads yet.
 
 ## 10. Docs

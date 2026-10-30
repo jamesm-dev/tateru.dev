@@ -43,8 +43,10 @@ of it.
 > A git hook is a shell script running outside Claude, so anything it wrote to the vault would skip
 > the `PostToolUse` validator and could silently break the contract that keeps those notes valid.
 >
-> Hooks write to **`.management/board.db`** and **`.management/commits.jsonl`** only. Both are data,
-> not notes. `/setup` reads them and regenerates the Markdown properly.
+> Hooks write **`.management/commits.jsonl`** and nothing else. They may *read* `board.db` — to
+> check an `ADH-` id — but never write it: a shell script with a database driver is a dependency
+> bought for rows nothing reads yet. `/setup` reads the log, writes the database, and regenerates the
+> Markdown properly.
 
 They must also be fast and never block on network. A hook that takes ten seconds gets disabled by
 the third developer who hits it.
@@ -92,13 +94,14 @@ and giving it a database driver to write rows nothing yet reads buys complexity 
 1. Run the project's real checks: lint, typecheck, test. **Block the push if they fail.** This is the
    one hook that should stop you, because a red push is what turns into a broken deploy.
 
-   The commands come from **`.claude/team/checks.env`**, which Phase 7 writes from the verified
-   commands — the hook itself names no package manager, so it works for any stack. Until that file
+   The commands come from **`.claude/team/checks.env`**, which `/setup` writes when it wires the
+   hooks (execution step 9) and refreshes in Phase 7 from the verified commands — the hook itself names no package manager, so it works for any stack. Until that file
    exists the hook skips the checks and says so.
 
-   Leave the machine-readable report where the runner wrote it. `/setup` reads it and writes the
-   runs into `board.db`'s `test_run` table, because that is where a database driver already exists;
-   the hook stays a shell script with no dependencies.
+   Leave the machine-readable report where the runner wrote it — the optional `TRAIL` command in
+   `checks.env` only makes sure the runner writes one. `/setup` reads it and records the runs in
+   `board.db`'s `test_run` table, because that is where a database driver already exists; the hook
+   stays a shell script with no dependencies.
 2. Print a two-line summary so the developer sees where the phase stands as they push:
 
 ```
