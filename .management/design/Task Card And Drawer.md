@@ -141,7 +141,7 @@ scroll.
 | Absent | Why |
 |---|---|
 | PR badge and test glyph on the card | The card already carries seven fields. Both live in the drawer, where there is room to say what they mean |
-| `done · unconfirmed` and the agent-provenance block | The `project-manager` agent's confirm flow has no writer yet. The schema keeps room for it; the UI does not pretend it exists |
+| The agent-provenance block | Who confirmed what, and when, is `/setup`'s conversation, not the card's. The card shows the `done · unconfirmed` status label (Copy Deck) for an agent completion no person has confirmed yet; `/setup` Phase 6 is where a person confirms or rejects it |
 | An assignee **list** on a task | One assignee is set from the drawer's select. The card renders several because the schema allows them, and a rebuild must keep that read path |
 | A rendered-Markdown description | Descriptions are one line of plain text |
 | Created and updated timestamps | Nothing on the page acts on them |

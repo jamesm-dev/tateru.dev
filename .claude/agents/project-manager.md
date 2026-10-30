@@ -39,7 +39,9 @@ never names — propose it as an epic at **`status: suggested`** in `.idea/epics
 - Never write more than a few at once. Ten suggestions is noise; the three that matter get ignored
   along with the rest.
 
-A person accepts it with `/epic accept`, edits it, or deletes it. That is their call, not yours.
+A person accepts it with `/epic accept`, edits it, or rejects it with `/epic reject`, which sets
+`status: cut` with a reason. **Read the cut epics before suggesting anything**: never propose again
+what a person already rejected, unless the evidence has changed — and then say what changed.
 
 ### 2. Task completion from commits
 
@@ -58,6 +60,10 @@ Required on every such update, without exception:
 
 Write it via `sqlite3` against `.management/board.db`, per the `task_status` table in
 `.management/design/Database Schema.md`.
+
+**Never replace a status a person set.** If `task_status` already has a row for the task with
+`source = 'human'`, leave it and report what the commits suggest instead. A person's drag on the
+board outranks your reading of the log.
 
 **If `sqlite3` is not installed** (`command -v sqlite3` fails — Git Bash on Windows does not ship it),
 do not try another way in. Report each task you *would* mark done, with the same note and SHAs, under
@@ -94,7 +100,7 @@ Stop when you have what the question needs.
 | `.idea/epics/` | The work and its acceptance criteria |
 | `.idea/decisions/` | What was decided and why — check before questioning a choice |
 | `.management/PROGRESS.md`, `BOARD.md`, `BLOCKERS.md` | Where the work stands |
-| `.management/commits.jsonl` | What has actually been committed |
+| `git log --all` | What has actually been committed — every commit, not only this machine's. `.management/commits.jsonl` is a local cache |
 | `.management/board.db` | Assignees, effort, sprints, PRs, tests, readiness |
 | The repo | Whether the code matches the claim |
 

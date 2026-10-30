@@ -63,7 +63,9 @@ function buildTaskIndex(plan, board) -> Map<id, TaskState>
   where put(...) records:
     explicit  = statusById[id]              # may be absent
     status    = explicit ?? planStatus
-    done      = status == 'done'
+    unconfirmed = explicit.source == 'agent' and explicit.confirmed_by is null
+                  and status == 'done'      # the agent's reading, not yet a person's
+    done      = status == 'done' and not unconfirmed
     parked    = status == 'parked'
     overridden= explicit is present
     points    = metaById[id].points ?? planPoints

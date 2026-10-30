@@ -13,9 +13,9 @@ date and leaves everything the project owns exactly where it was.
 
 | Owned by the workflow — upgraded | Owned by the project — never touched |
 |---|---|
-| `.claude/commands/`, `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/scripts/`, `.claude/settings.json` | `.idea/` — the plan |
+| `.claude/commands/`, `.claude/skills/`, `.claude/agents/` (except `project-manager.md`), `.claude/hooks/`, `.claude/scripts/`, `.claude/settings.json` | `.idea/` — the plan |
 | `.githooks/`, `.gitattributes`, `.github/workflows/selftest.yml` | `app/` — the code |
-| `.management/README.md`, `.management/DESIGN.md`, `.management/design/`, `.management/contract/` | `.claude/team/` — the generated stack profile |
+| `.management/README.md`, `.management/DESIGN.md`, `.management/design/`, `.management/contract/` (except `sources.txt` and `tokens.map`) | `.claude/team/` — the generated stack profile; `.claude/agents/project-manager.md` and `.management/contract/sources.txt` and `tokens.map`, which `/setup` writes for this project |
 | `AGENTS.md`, `.claude/TATERU_VERSION`, `.claude/CHANGELOG.md` | Every other file in `.management/`, and the root `README.md` |
 
 `CLAUDE.md` is shared: `/setup` writes the project's stack and commands into it. It is merged, never

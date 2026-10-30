@@ -34,7 +34,8 @@ The second column is what the pre-flight visibility check below is for.
 
 ## Phase 1 — Establish where things stand
 
-Read `.idea/ROADMAP.md` for the current phase and its exit criteria, `.management/PROGRESS.md` and
+Read `.idea/ROADMAP.md` for the phase to ship — the lowest-numbered one at `verified` — and its exit
+criteria, `.management/PROGRESS.md` and
 `BLOCKERS.md`, and the repo's deploy configuration — CI workflow, Dockerfile, host config, whatever
 `SPECS.md` named as the target.
 
@@ -53,7 +54,7 @@ something**, not by reading a status file — a file can be stale, a command can
 | Checks | Run lint, typecheck, build now |
 | Pull requests | None open against this phase's epics, or all approved |
 | Risks | No `critical` rule firing |
-| Deploy path | Exercised — the skeleton reached the real target at least once |
+| Deploy path | Exercised — the skeleton reached the real target at least once. **On the first release this gate is met by the release itself**: Phase 0's skeleton is deployed by its first `/ship`, and step 5 below is the evidence. Say so, rather than waiving it |
 
 Report `N of 7 gates met`, then each unmet gate with what is blocking it.
 
@@ -116,7 +117,9 @@ Ask before each outward-facing step. Do not chain them.
 - Append the release to `.management/CHANGELOG.md`: version, date, what shipped, any gate that was
   waived, and **what was published** — the output directory, so a later reader can tell at a glance
   that the vault was never part of the release.
-- Mark the phase `done` in `ROADMAP.md`, with its exit criteria ticked against evidence.
+- Mark the phase `done` in `ROADMAP.md` — only `/ship` does this — and tick the criteria only a live
+  release could prove ("deployed and reachable", the budget measured on the real target), with the
+  step 5 evidence.
 - Set its epics to `done`.
 - Write an ADR for anything decided under pressure during the release — those are the decisions
   most likely to be forgotten and most expensive to rediscover.
@@ -128,4 +131,11 @@ Close with: what shipped, where it is live, what was waived, how to roll back, a
 
 Say so immediately and plainly, with the error. Roll back first, diagnose second — a broken
 production is not the place to be curious. Then record what happened in the changelog, because the
-next release will want to know.
+next release will want to know. Leave the phase at `verified`: it is not `done` until a release
+actually lands.
+
+**Re-running after a failed release.** Phase 4 may have bumped the version and created the tag
+before the deploy failed. Check first (`git tag --points-at HEAD`, the version file) and never bump
+twice. If the fix needed new commits, the old tag points at the wrong code: ask whether to move it
+(only if it was never pushed) or release under the next version, and record the abandoned one in the
+changelog.

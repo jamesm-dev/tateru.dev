@@ -125,4 +125,7 @@ Commit:    <message(s), with TSK ids>
 Next:      <the one thing to do next>
 ```
 
+Finished criteria are ticked in the epic by the next `/setup`, which records the evidence; `/work-on`
+never writes `.idea/`. Say so in `Next` when a task id was finished.
+
 Never paste file contents, diffs, or full logs into the report.

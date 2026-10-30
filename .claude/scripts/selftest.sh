@@ -101,6 +101,8 @@ printf 'LINT="true"\nTEST="true"\n' > .claude/team/checks.env
 check "pre-push passes when the checks pass" "sh .githooks/pre-push"
 printf 'LINT="false"\n' > .claude/team/checks.env
 check "pre-push blocks when a check fails" "! sh .githooks/pre-push"
+printf 'LINT="true"\nTEST="true"\nBUILD="false"\n' > .claude/team/checks.env
+check "pre-push blocks when the build fails" "! sh .githooks/pre-push"
 printf 'LINT="true"\r\nTEST="true"\r\n' > .claude/team/checks.env
 check "pre-push survives a checks.env with Windows line endings" "sh .githooks/pre-push"
 check ".gitattributes pins checks.env to LF" "git check-attr eol .claude/team/checks.env | grep -q 'eol: lf'"
@@ -148,6 +150,8 @@ rmdir app
 check "the prompt hook reports the vault" "bash .claude/hooks/idea-context.sh </dev/null | grep -q 'SPECS.md'"
 
 echo "Workflow contracts"
+check "phase status vocabulary includes verified in /shape, /setup and /ship" "grep -q 'verified' .claude/skills/shape/references/templates.md && grep -q 'only \`/ship\` sets \`done\`' .claude/skills/setup/SKILL.md && grep -q 'only \`/ship\` does this' .claude/skills/ship/SKILL.md"
+check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 check "CLAUDE.md marks the before-setup block for /setup to replace" "grep -q '<!-- tateru:before-setup -->' CLAUDE.md && grep -q '<!-- /tateru:before-setup -->' CLAUDE.md"
 git remote add origin https://github.com/jamesm-dev/tateru.dev.git 2>/dev/null
 up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')

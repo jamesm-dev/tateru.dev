@@ -136,8 +136,9 @@ It is the **only** thing that agent may write, and the only status it may write.
 
 - It never counts toward progress, readiness, or any total.
 - It belongs to no phase until a person accepts it.
-- A person accepts it (`/epic accept`), edits it, or deletes it. Deleting a suggestion is the one
-  exception to "never delete a note" — it was never part of the record.
+- A person accepts it (`/epic accept`), edits it, or rejects it (`/epic reject`), which sets
+  `status: cut` with a `## Why rejected` section. Nothing is deleted — a rejection is a decision,
+  and the agent reads it so it never proposes the same thing twice.
 - Nothing else may be written at `suggested`. An idea note uses `seed`; a spec uses `draft`.
 
 ## Invariants

@@ -84,14 +84,16 @@ Append one line to `.management/commits.jsonl`:
 Append-only, one JSON object per line, never rewritten. It survives rebases badly on purpose: it is
 a log of what happened locally, not a mirror of history.
 
-**The JSONL is the only store.** There are no `commit_log` or `task_commit` tables, deliberately —
-see the *not tables* section of `.management/design/Database Schema.md`. A hook is a shell script,
-and giving it a database driver to write rows nothing yet reads buys complexity and no information.
-`/setup` reads the JSONL.
+**The JSONL is a local cache, not the record.** It only sees commits made on this machine after the
+hooks were wired. The record is `git log --all`, which `/setup` and the `project-manager` agent
+parse for task ids — so pulled commits, GitHub squash-merges and a teammate's work all count. There
+are still no `commit_log` or `task_commit` tables, deliberately — see the *not tables* section of
+`.management/design/Database Schema.md`.
 
 ### `pre-push` — verify, then take stock
 
-1. Run the project's real checks: lint, typecheck, test. **Block the push if they fail.** This is the
+1. Run the project's real checks: lint, typecheck, test, build — the same as CI. **Block the push if
+   they fail.** This is the
    one hook that should stop you, because a red push is what turns into a broken deploy.
 
    The commands come from **`.claude/team/checks.env`**, which `/setup` writes when it wires the

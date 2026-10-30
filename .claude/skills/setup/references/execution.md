@@ -83,8 +83,10 @@ Write `.claude/team/checks.env` now, from the scripts step 6 created, in the for
 `.claude/skills/work-on/references/stack-profile.md` — `pre-push` runs nothing until it exists.
 Phase 7 refreshes it from the commands Phase 5 verified.
 
-Verify by making a throwaway commit and confirming a line appears in `.management/commits.jsonl`,
-then confirm `pre-push` blocks on a deliberately failing check. A hook nobody proved fires is a hook
+Verify the hooks fire. Ask before the throwaway commit — "commit only if the user asks" holds here
+too. With a yes, make one (`git commit --allow-empty -m "chore: verify hooks"`) and confirm a line
+appears in `.management/commits.jsonl`; without one, run `sh .githooks/commit-msg` on a sample
+message instead. Then confirm `sh .githooks/pre-push` blocks on a deliberately failing check. A hook nobody proved fires is a hook
 that does not fire.
 
 Hooks write data only — `commits.jsonl` — never Markdown in `.idea/` or `.management/`, and never

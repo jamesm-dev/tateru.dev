@@ -43,7 +43,12 @@ ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 
 ## Phase 2 — Pick the phase
 
-Report where the roadmap stands and name the target phase — the lowest-numbered one not `done`.
+Report where the roadmap stands and name the target phase — the lowest-numbered one that is neither
+`verified` nor `done`. Phases move `planned → in-progress → verified → done`: **`/setup` sets
+`verified`** when every exit criterion it can check is met; **only `/ship` sets `done`**, after the
+release is live. Criteria that only a real release can prove — "deployed and reachable", the
+performance budget "on the real target" — stay open at `verified` and are ticked by `/ship`. That is
+how Phase 0's walking skeleton gets deployed: its first `/ship`.
 State its Goal, Exit criteria and Non-goals back to the user, and confirm that is the target.
 
 First run always includes the Phase 0 walking skeleton, even if the user asks to jump ahead:
@@ -111,15 +116,21 @@ reported as complete with a failing check is worse than an honest partial.
 
 ## Phase 6 — Project management
 
-Once the phase is built and verified, stand up `.management/` — the execution tracker.
+Run this phase on **every** run, green or not — "tracking starts on day one" includes the day the
+checks failed. A red run still ingests commits, records the failing test runs and recomputes
+readiness; it simply marks nothing done. Only the dashboard build, at the end, waits for green.
+
+Stand up or refresh `.management/` — the execution tracker.
 Load `references/management.md` for the layout, templates, and the `state.json` schema.
 
 It is **derived from `.idea/`**, never a second source of truth. `.idea/` holds intent (what and
 why); `.management/` holds state (progress, blockers, dates, what shipped). Create it on the first
 run; refresh it on every later run.
 
-1. **Ingest commits first.** Read `.management/commits.jsonl` — written by the `post-commit` hook,
-   and the whole commit record; there is no table. Map commits to tasks by reference id; a commit is
+1. **Ingest commits first.** The record is `git log --all` itself — every commit, including pulled
+   ones, squash-merges from GitHub and a teammate's work. Parse task ids from each message the way
+   the `post-commit` hook does (`TSK-` and `ADH-` ids, case-insensitive). `.management/commits.jsonl`
+   is a local cache of this machine's commits, useful for timing, never the whole record. Map commits to tasks by reference id; a commit is
    evidence, never completion. Commits referencing no task are recorded as untracked work, so
    unplanned effort is not lost.
 2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`. **Skip epics at `status: suggested`** —
@@ -149,8 +160,11 @@ run; refresh it on every later run.
    test data into it. **Never** clear a row a person authored: a task id
    that has left `.idea/` is marked orphaned, not deleted.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
-   each row not yet consumed, set that phase `done` in `ROADMAP.md`, open the next one, and stamp
-   `consumed_at` so it is applied once.
+   each row not yet consumed, record the advance in `ROADMAP.md`, open the next phase, and stamp
+   `consumed_at` so it is applied once. A **clean** advance (every criterion met) sets the phase
+   `verified` — `/ship` still owns `done`. A **forced** advance (`eligible = 0`) never reads as a
+   finished phase: write a `> [!warning] Advanced on <date> with N exit criteria unmet` callout in
+   its section and leave each unmet criterion as `- [ ] <text> — unmet at advance <date>`.
 
    Carry the **parked** items into the record rather than dropping them: a criterion in
    `criterion_park` is written into `ROADMAP.md` as `- [~] <text> — parked <date>`, not ticked, and
@@ -161,7 +175,13 @@ run; refresh it on every later run.
    If the roadmap and the dashboard disagree because someone edited `ROADMAP.md` by hand, say so and
    ask. Never silently overwrite a phase status a person set.
 
-9. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
+9. **Confirm the agent's completions.** List every `task_status` row with `source = 'agent'`,
+   `status = 'done'` and `confirmed_by IS NULL`, with its note and commits, and ask the person
+   (`AskUserQuestion`) to confirm or reject each. Confirm sets `confirmed_by` (their member id —
+   ask once which member they are) and `confirmed_at`; reject deletes that row, so the task falls
+   back to its plan status. This is the only writer of `confirmed_by`. Until confirmed, such a task
+   reads as `done · unconfirmed` and counts as not done everywhere.
+10. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
    the runner's own output — and write each run into `board.db`'s `test_run` table, linked to a task
    by its reference id where the test names one, and to the epic otherwise.
 
@@ -173,7 +193,7 @@ run; refresh it on every later run.
    Never write a passing run that did not happen. If the reporter produced nothing, record nothing
    and say so.
 
-10. **Recompute deployment readiness** — the seven gates in `references/git-hooks.md` — and write it
+11. **Recompute deployment readiness** — the seven gates in `references/git-hooks.md` — and write it
    into `PROGRESS.md` as a checklist. Report gates met over gates total, never a percentage.
 
 ### Install the project management agent
@@ -314,7 +334,12 @@ instead: a self-contained `.management/dashboard.html` plus a `board` script tha
 ## Phase 7 — Record and hand off
 
 - Append a dated entry to `## Setup log` in `SPECS.md`; set `status: active` and bump `updated`.
-- In `ROADMAP.md`, tick met exit criteria and set the phase `status`.
+- In `ROADMAP.md`, tick met exit criteria with their evidence. Set the phase `in-progress`, or
+  `verified` once every criterion that does not need a live release is met — never `done`, which is
+  `/ship`'s.
+- **Tick each epic acceptance criterion this run verified** — `- [x] … (3 pts) ^tsk-…` — with the
+  evidence beside it (the test, check or commit). This includes work `/work-on` finished since the
+  last run, which leaves `.idea/` alone and relies on this step to record it.
 - Set the built epics to `done` or `in-progress`; bump their `updated`.
 - Write an ADR for any decision you had to make that SPECS.md did not cover.
 - Regenerate `INDEX.md`.

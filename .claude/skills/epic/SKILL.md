@@ -122,11 +122,12 @@ no phase, count toward nothing, and are never built until a person accepts one.
 |---|---|
 | `/epic list` | Every suggested epic, with why the agent proposed it and the evidence it cited |
 | `/epic accept <name>` | Review it with the user, edit as needed, set `status: planned`, assign a phase, generate task ids — Phases 2 to 5 above |
-| `/epic reject <name>` | Delete the note, after confirming |
+| `/epic reject <name>` | Set `status: cut` and add a `## Why rejected` section, after confirming |
 
 Accepting is not rubber-stamping. Run Phase 2 on a suggestion exactly as on a user's idea — the
 agent proposed it from evidence, but it did not weigh it against everything else competing for the
 phase. Say plainly when you think a suggestion is wrong.
 
-Rejecting **deletes** the note. This is the one exception to the vault's never-delete rule: a
-suggestion was never part of the record. Confirm before deleting, and say what is being discarded.
+Rejecting **keeps** the note, at `status: cut`, with a `## Why rejected` section in the person's
+words. Nothing in the vault is deleted, and this one matters more than most: the `project-manager`
+agent reads cut epics before suggesting, so a deleted rejection would simply be proposed again.

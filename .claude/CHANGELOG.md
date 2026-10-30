@@ -33,6 +33,23 @@ after upgrading as **Breaking**, and say what to do.
 - **Changed:** hooks never write `board.db`; `.management/README.md` ships with tateru and `/setup`
   leaves it alone.
 - **Added:** this release process, and CI that blocks on macOS and Windows as well as Linux.
+- **Changed:** phases now go `planned → in-progress → verified → done`. `/setup` sets `verified`;
+  only `/ship` sets `done`, after the release is live. Phase 0's "deployed" criterion is met by its
+  first `/ship`, which was otherwise impossible to satisfy.
+- **Fixed:** a task the agent marked done counts as not done until you confirm it. `/setup` now asks
+  you to confirm or reject each one; nothing could set `confirmed_by` before.
+- **Fixed:** a dashboard advance with unmet exit criteria is recorded as such in `ROADMAP.md`, not
+  as a finished phase.
+- **Fixed:** `/setup` ticks the epic criteria it verified, including work done through `/work-on`;
+  nothing ticked them before.
+- **Fixed:** `/setup` tracks progress on a red run too, and reads commits from `git log`, so pulled
+  and squash-merged commits count, not only this machine's.
+- **Changed:** `/epic reject` keeps the note at `status: cut` with a reason, so nothing in the vault
+  is deleted and the agent never re-suggests a rejected epic.
+- **Fixed:** `/upgrade` leaves project-written files alone: `project-manager.md`, and the dashboard's
+  `sources.txt` and `tokens.map`.
+- **Added:** `/ship` handles a re-run after a failed release without bumping the version twice.
+- **Added:** `pre-push` runs an optional `BUILD` check, like CI.
 
 ## 0.1.0 — 2026-10-30
 
