@@ -13,13 +13,14 @@ date and leaves everything the project owns exactly where it was.
 
 | Owned by the workflow — upgraded | Owned by the project — never touched |
 |---|---|
-| `.claude/commands/`, `.claude/skills/`, `.claude/agents/` (except `project-manager.md`), `.claude/hooks/`, `.claude/scripts/`, `.claude/settings.json` | `.idea/` — the plan |
+| `.claude/commands/`, `.claude/skills/`, `.claude/agents/`, `.claude/hooks/`, `.claude/scripts/`, `.claude/settings.json` | `.idea/` — the plan |
 | `.githooks/`, `.gitattributes`, `.github/workflows/selftest.yml` | `app/` — the code |
-| `.management/README.md`, `.management/DESIGN.md`, `.management/design/`, `.management/contract/` (except `sources.txt` and `tokens.map`) | `.claude/team/` — the generated stack profile; `.claude/agents/project-manager.md` and `.management/contract/sources.txt` and `tokens.map`, which `/setup` writes for this project |
+| `.management/README.md`, `.management/DESIGN.md`, `.management/design/`, `.management/contract/` (except `sources.txt` and `tokens.map`) | `.claude/team/` — the generated stack profile; `.management/contract/sources.txt` and `tokens.map`, which `/setup` writes for this project |
 | `AGENTS.md`, `.claude/TATERU_VERSION`, `.claude/CHANGELOG.md` | Every other file in `.management/`, and the root `README.md` |
 
 `CLAUDE.md` is shared: `/setup` writes the project's stack and commands into it. It is merged, never
-replaced.
+replaced. So is `.claude/agents/project-manager.md`, which `/setup` tailors per project: the
+three-way merge below keeps that tailoring and still brings in tateru's fixes to the agent.
 
 A workflow file the user has edited is still theirs to decide on. **Never overwrite a local edit
 silently** — that is the one way this skill can destroy work.
@@ -42,9 +43,18 @@ silently** — that is the one way this skill can destroy work.
    git remote add tateru https://github.com/jamesm-dev/tateru.dev.git
    ```
 
-3. `git fetch <up> --tags`. Read the upstream version from the newest release tag (`git tag -l 'v*' --sort=-v:refname | head -1`)
-   and the `.claude/CHANGELOG.md` entries between the two versions, with
-   `git show <newest tag>:.claude/CHANGELOG.md`. Unreleased work on `<up>/main` is never installed.
+3. Fetch tateru's release tags **into their own namespace**, so they can never collide with the
+   project's own `v*` tags from `/ship`:
+
+   ```bash
+   git fetch <up> --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
+   git tag -l 'tateru/v*' --sort=-v:refname | head -1
+   ```
+
+   That newest `tateru/v<version>` is the **target tag**; read the changelog entries between the two
+   versions with `git show tateru/v<version>:.claude/CHANGELOG.md`. Never use a bare `v*` tag here —
+   in a project that has released, that is the project's own version, not tateru's. Unreleased work
+   on `<up>/main` is never installed.
 4. Already current → say so and stop.
 5. Refuse to start on a dirty working tree (`git status --porcelain`). Ask the user to commit or
    stash first, so the upgrade is one reviewable diff they can throw away.
@@ -56,20 +66,20 @@ words, not pasted), and any entry marked **Breaking**. Ask whether to proceed.
 
 ## Phase 3 — Apply, file by file
 
-The base is the upstream tag for the local version, `v<local version>`. For every workflow path that
-differs between that tag and the **target tag** `v<upstream version>` — never `<up>/main`, which can
+The base is tateru's tag for the local version, `tateru/v<local version>`. For every workflow path that
+differs between that tag and the **target tag** `tateru/v<upstream version>` — never `<up>/main`, which can
 carry unreleased work:
 
 | Local file vs. base | Do |
 |---|---|
-| Identical — never edited | Take the upstream version: `git checkout v<upstream version> -- <path>` |
+| Identical — never edited | Take the upstream version: `git checkout tateru/v<upstream version> -- <path>` |
 | Edited locally, unchanged upstream | Keep the local file. Nothing to do |
 | Edited locally **and** changed upstream | Three-way merge with `git merge-file`. Clean merge → keep it and say so. Conflict → show both changes and ask: take upstream, keep local, or leave the conflict markers for the user |
 | Deleted upstream | Ask before deleting a file the user may still use |
 | New upstream | Add it |
 
 No base tag (a project cloned before versioning, or the tag was never fetched): use the last
-commit the project shares with upstream, `git merge-base HEAD v<upstream version>`. A normal clone keeps
+commit the project shares with upstream, `git merge-base HEAD tateru/v<upstream version>`. A normal clone keeps
 tateru's history, so this finds the exact version it started from, and only the files the user
 really edited need a decision. Comparing against the target tag directly instead would flag every
 file upstream changed as a possible local edit — in testing, 19 questions for one real edit.

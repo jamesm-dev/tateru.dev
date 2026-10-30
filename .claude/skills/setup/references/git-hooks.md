@@ -119,9 +119,12 @@ Never push, tag, or deploy from a hook.
 The answer to "how much more before this can ship". Computed from `.idea/` and `.management/`, never
 guessed, and expressed as a checklist rather than a percentage.
 
+The **readiness phase** is the one waiting to ship — the lowest phase at `verified` — and otherwise
+the current phase. Readiness answers "can we ship yet", so it must look at what `/ship` would ship.
+
 | Gate | Met when |
 |---|---|
-| Phase exit criteria | Every criterion of the current phase is met, with evidence |
+| Exit criteria | Every criterion of the readiness phase is met, with evidence |
 | Tasks | No task in the phase is blocked or in progress |
 | Tests | The latest run passed, and every epic in the phase has at least one linked run |
 | Checks | Lint, typecheck, build all pass |

@@ -62,6 +62,15 @@ after upgrading as **Breaking**, and say what to do.
 - **Fixed:** rejecting the agent's completion keeps a record, so it is not re-marked; confirming
   names an assignee; an accepted suggestion gets linked into the vault.
 - **Fixed:** `/upgrade` installs the newest release tag, never unreleased work on `main`.
+- **Fixed:** `/upgrade` keeps tateru's tags under `tateru/v*`, so a project's own release tags can
+  never be mistaken for tateru's, or block the fetch.
+- **Fixed:** the self-test passes after `/setup` has replaced the before-setup block in `CLAUDE.md`;
+  it failed on every project that had run `/setup`.
+- **Fixed:** readiness and the dashboard look at the phase waiting to ship, not the next one; `/setup`
+  picks up a dashboard advance before choosing what to build; criteria marked ` — at release` no
+  longer make every advance look forced.
+- **Changed:** `/upgrade` three-way merges `project-manager.md` instead of skipping it, so fixes to
+  the agent reach projects that tailored it.
 
 ## 0.1.0 — 2026-10-30
 
@@ -71,7 +80,7 @@ edited locally from the git history the project shares with tateru:
 
 ```bash
 git remote add tateru https://github.com/jamesm-dev/tateru.dev.git
-git fetch tateru --tags
+git fetch tateru main
 git checkout tateru/main -- .claude/commands/upgrade.md .claude/skills/upgrade
 ```
 

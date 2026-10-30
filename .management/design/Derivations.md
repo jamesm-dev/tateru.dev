@@ -105,10 +105,16 @@ Clamping to `last` is what stops the project advancing past its final phase.
 function criteriaOf(plan, board, phase) -> CriterionState[]
   parked = { c.text for c in board.parkedCriteria where c.phase == phase }
   for each c in plan.phases[phase].exitCriteria:
+    atRelease = c.text ends with ' — at release'   # /ship proves it after the deploy
     yield { text: c.text, done: c.done,
             parked:    c.text in parked,
-            satisfied: c.done or (c.text in parked) }
+            atRelease: atRelease,
+            satisfied: c.done or (c.text in parked) or atRelease }
 ```
+
+A criterion marked ` — at release` (see `/shape`'s phases reference) counts as satisfied here: no
+amount of work before the release can meet it, so it must not make every advance look forced.
+`/ship` checks it against the live release.
 
 Parking a criterion is how a phase moves on without it. It is **never** a claim the criterion was
 met: it is recorded, counted and displayed as set aside, so `done` keeps meaning done. Criteria are

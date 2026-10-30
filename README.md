@@ -174,7 +174,7 @@ Structure comes from `.idea/`. Assignees and effort live in a database the dashb
 
 **It's built last, after your app works.** The page borrows your tokens, your components, your dark mode — so `/setup` waits until the app is built and verified, checks what's actually there, and offers to *defer* if there's nothing yet to inherit. Tracking starts on day one either way; only the page waits. A dashboard built against an empty skeleton has to invent a card, a badge and a drawer, and every one of them is wrong the moment you add the real ones.
 
-**And it's rebuildable.** The design isn't only prose — every string, measurement and ordering lives as data in `.management/contract/`, with fixtures pinning every derived number. One command checks a build's strings, measurements and ordering against it, and the fixtures become tests in your app's own runner:
+**And it's rebuildable.** The design isn't only prose — every string, measurement and ordering lives as data in `.management/contract/`, with fixtures pinning the derived numbers. One command checks a build's strings, measurements and ordering against it, and the fixtures become tests in your app's own runner:
 
 ```bash
 bash .claude/scripts/dashboard-conformance.sh

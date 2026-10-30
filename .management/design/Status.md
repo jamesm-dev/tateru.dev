@@ -86,6 +86,10 @@ Spike both options and record an ADR by Friday.
 A **checklist, never a percentage**. The heading reads `{n} of {m} gates met` — a percentage of a
 checklist invites rounding up, and shipping is not a rounding decision.
 
+The gates are for the **readiness phase**: the lowest phase at `verified`, waiting for `/ship`, and
+otherwise the current one. Readiness answers *can we ship yet*, so it looks at what `/ship` would
+ship — not at the next phase's unmet work.
+
 ```
 [x] Exit criteria    4 of 7 met, 3 parked
 [x] Tasks            none blocked or in progress
@@ -117,7 +121,7 @@ unmet, never assumed green.**
 > blockers, which are not the risk rules. A gate that computes something adjacent to its name is
 > worse than one that admits it is stale, because it looks fresh.
 >
-> With no readiness written yet, the list falls back to the three gate names, all unmet.
+> With no readiness written yet, the list falls back to the seven gate names, all unmet.
 
 ## 4. Sprint progress
 
@@ -153,6 +157,7 @@ itself at you:
 
 | Phase | Pill |
 |---|---|
+| Verified, not yet shipped | `verified · not shipped` in `warn`. **This row wins** over "before the current one" |
 | Before the current one | `advanced past` in `ok`, or `advanced past, roadmap pending` |
 | The current one | `current` in `accent` |
 | Later | Its own status from the roadmap |

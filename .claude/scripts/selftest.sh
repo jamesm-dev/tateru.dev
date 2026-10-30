@@ -156,9 +156,15 @@ check "the prompt hook reports the vault" "bash .claude/hooks/idea-context.sh </
 echo "Workflow contracts"
 check "phase status vocabulary includes verified in /shape, /setup and /ship" "grep -q 'verified' .claude/skills/shape/references/templates.md && grep -q 'only \`/ship\` sets \`done\`' .claude/skills/setup/SKILL.md && grep -q 'only \`/ship\` does this' .claude/skills/ship/SKILL.md"
 check "verified is a phase status in the vault contract and state.json schema" "grep -q 'verified' .claude/skills/shared/vault-contract.md && grep -q 'in-progress | verified | done' .claude/skills/setup/references/management.md"
+check "/upgrade reads tateru's tags from their own namespace" "grep -q 'refs/tags/tateru/v' .claude/skills/upgrade/SKILL.md && ! grep -qE 'checkout v<|HEAD v<' .claude/skills/upgrade/SKILL.md"
 check "/upgrade installs release tags, never main" "grep -q 'never \`<up>/main\`' .claude/skills/upgrade/SKILL.md && ! grep -q 'checkout <up>/main' .claude/skills/upgrade/SKILL.md"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
-check "CLAUDE.md marks the before-setup block for /setup to replace" "grep -q '<!-- tateru:before-setup -->' CLAUDE.md && grep -q '<!-- /tateru:before-setup -->' CLAUDE.md"
+if [ -d "$root/app" ]; then
+  # /setup has run: it replaces the block, so the markers must be gone.
+  check "CLAUDE.md has /setup's Stack and commands, not the before-setup block" "! grep -q 'tateru:before-setup' CLAUDE.md && grep -q '^## Stack and commands' CLAUDE.md"
+else
+  check "CLAUDE.md marks the before-setup block for /setup to replace" "grep -q '<!-- tateru:before-setup -->' CLAUDE.md && grep -q '<!-- /tateru:before-setup -->' CLAUDE.md"
+fi
 git remote add origin https://github.com/jamesm-dev/tateru.dev.git 2>/dev/null
 up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')
 check "/upgrade finds the tateru remote when it is called origin" "[ '$up' = origin ]"

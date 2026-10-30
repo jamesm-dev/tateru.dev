@@ -34,10 +34,10 @@ Each phase is an `h3` reading `Phase {n} — {name}`, carrying exactly one statu
 
 | Phase | Pill |
 |---|---|
+| Verified, not yet shipped | `verified · not shipped`, in `warn` — built and checked, not yet released. **This row wins** over "before the current one" |
 | Before the current one | `advanced past`, in `ok` — or `advanced past, roadmap pending` while `/setup` has not caught up |
 | The current one | `current`, in `accent`, weight 600 |
 | Later | The phase's own status from the roadmap |
-| Verified, not yet shipped | `verified · not shipped`, in `warn` — built and checked, but `/ship` has not released it |
 
 Phase status follows the phase the project is **effectively** on, so advancing updates it here as
 well as in the sidebar. Beneath the heading sits the phase goal as a lede.

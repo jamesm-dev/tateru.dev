@@ -44,7 +44,10 @@ ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 ## Phase 2 — Pick the phase
 
 Report where the roadmap stands and name the target phase — the lowest-numbered one that is neither
-`verified` nor `done`. Phases move `planned → in-progress → verified → done`: **`/setup` sets
+`verified` nor `done`. **First read any unconsumed `phase_advance` rows in `board.db`**: an advance
+made on the dashboard moves the effective phase before `ROADMAP.md` knows it, and building the phase
+the user already left (parked work included) is the wrong build. Target the phase they imply, and
+apply them properly in Phase 6. Phases move `planned → in-progress → verified → done`: **`/setup` sets
 `verified`** when every exit criterion it can check is met; **only `/ship` sets `done`**, after the
 release is live. Criteria that only a real release can prove — "deployed and reachable", the
 performance budget "on the real target" — stay open at `verified` and are ticked by `/ship`. That is
@@ -167,10 +170,11 @@ run; refresh it on every later run.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
    each row not yet consumed, record the advance in `ROADMAP.md`, open the next phase, and stamp
    `consumed_at` so it is applied once. Either kind of advance sets the phase `verified` — `/ship`
-   still owns `done`. A **forced** advance (`eligible = 0`) also never reads as a finished phase:
+   still owns `done`. A **forced** advance (`forced = 1`) also never reads as a finished phase:
    write a `> [!warning] Advanced on <date> with N exit criteria unmet` callout in its section and
    leave each unmet criterion as `- [ ] <text> — unmet at advance <date>`, which `/ship`'s Exit
-   criteria gate then reports. Write `state.json` `currentPhase` as the lowest phase that is neither
+   criteria gate then reports. Leave criteria ending ` — at release` exactly as they are: they are
+   `/ship`'s to prove, and are not unmet work. Write `state.json` `currentPhase` as the lowest phase that is neither
    `verified` nor `done`, so the dashboard does not fall back once the row is consumed.
 
    Carry the **parked** items into the record rather than dropping them: a criterion in
