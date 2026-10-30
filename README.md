@@ -22,7 +22,7 @@ A [Claude Code](https://claude.com/claude-code) workflow that walks a project fr
 
 Most AI coding sessions start with a vague prompt and end with a folder of confident-looking code nobody can explain three weeks later. No spec. No decisions written down. No idea which half is tested.
 
-**tateru is nine slash commands and some stubborn rules that get in the way of that.** Spec-driven development for AI agents: it asks questions before writing code, records *why* you chose things, refuses to call a phase done without running the tests, and gives you a project board that reads from your actual repo instead of a spreadsheet nobody updates.
+**tateru is ten slash commands and some stubborn rules that get in the way of that.** Spec-driven development for AI agents: it asks questions before writing code, records *why* you chose things, refuses to call a phase done without running the tests, and gives you a project board that reads from your actual repo instead of a spreadsheet nobody updates.
 
 Works with any language or framework. The workflow is the product; the code stays yours.
 
@@ -81,6 +81,7 @@ Idea → development → production → maintenance. The whole life of a project
 | **`/ship`** | Walks seven readiness gates, then releases. Won't let an unmet gate slide past quietly. |
 | **`/maintain`** | For when it's live and slowly rotting. Dependencies, silent tests, decisions reality has overtaken. |
 | **`/work-on`** | One task, the cheapest safe way. Routes it first, then fixes it directly, hands it to one specialist, or splits it into parallel slices only when they can't collide. |
+| **`/upgrade`** | Pulls a newer tateru into your project. Updates the workflow, never touches your plan or your code, and asks before overwriting anything you edited. |
 | **`/epic`** | New idea halfway through? Adds one epic and its tasks without re-planning everything. |
 | **`/decide`** | Records an architecture decision as a numbered ADR, so future-you knows why. |
 | **`/explain`** | Explains any of the above from scratch, in plain words. |
@@ -208,6 +209,9 @@ Yes. tateru never picks your language — `/shape` interviews you, records the c
 
 **Does it work with Codex, Cursor or Gemini?**
 Partly. tateru is Claude-first: the slash commands, subagents and vault hooks only run in Claude Code. [AGENTS.md](AGENTS.md) points other tools at the same plan, rules and git hooks, and shows how to follow each command's skill by hand. You'll lose the automation, not the method.
+
+**How do I get tateru updates after cloning?**
+Run `/upgrade`. It fetches the latest tateru, tells you what changed (from `.claude/CHANGELOG.md`), and updates only the workflow files. `.idea/`, `app/` and your stack profile are never touched, and any workflow file you edited is merged or asked about, never silently overwritten.
 
 **Do I need Obsidian?**
 No. The notes are plain Markdown and read fine on GitHub or in your editor. Obsidian just makes the graph pretty.

@@ -42,13 +42,9 @@ They cover both ways a note goes wrong: written badly by a tool, or edited by ha
 write. What is enforced is Obsidian-compatible Markdown: valid frontmatter, one H1, real wikilinks,
 no illegal filename characters.
 
-The validator doubles as a CLI:
+The validator doubles as a CLI: `bash .claude/hooks/validate-vault-note.sh --check "<note>.md"`.
 
-```bash
-bash .claude/hooks/validate-vault-note.sh --check ".idea/notes/Some Idea.md"
-```
-
-All four fail open and never block on their own error. Everything outside those two folders passes
+All three fail open and never block on their own error. Everything outside those two folders passes
 through untouched. If you change the vault contract, change the validator in the same edit — a rule
 that only exists in prose is not a rule.
 
@@ -59,8 +55,9 @@ runs them by name. [dashboard-conformance.sh](.claude/scripts/dashboard-conforma
 built `/management` dashboard against the data contract in `.management/contract/` — strings,
 measurements, and order. It needs only `bash`, `find`, `sed`, `tr` and `awk`, so it runs in any
 project before any package manager exists. Exit `2` means it could not run, including "nothing built
-yet". Why: prose read by a model is not reproducible, so the checkable half of a design is data —
-see [Conformance.md](.management/design/Conformance.md).
+yet". [selftest.sh](.claude/scripts/selftest.sh) checks tateru's own machinery — every hook and
+script — and runs in CI on each push. **Run it after changing any hook or script**; a hook that
+silently stops firing looks exactly like a project where nobody commits.
 
 ## Keep `/explain` and `AGENTS.md` current
 
@@ -88,6 +85,7 @@ On removal, also confirm nothing still mentions or links to it.
 | [/work-on](.claude/commands/work-on.md) | [work-on](.claude/skills/work-on/SKILL.md) | One task with the smallest agent team: route, then build directly, solo, or in parallel slices | Development |
 | [/ship](.claude/commands/ship.md) | [ship](.claude/skills/ship/SKILL.md) | Verify the readiness gates, then release | Production |
 | [/maintain](.claude/commands/maintain.md) | [maintain](.claude/skills/maintain/SKILL.md) | Health-check a shipped project and fix the rot | Maintenance |
+| [/upgrade](.claude/commands/upgrade.md) | [upgrade](.claude/skills/upgrade/SKILL.md) | Pull a newer tateru workflow into a cloned project, leaving its plan and code alone | Maintenance |
 | [/decide](.claude/commands/decide.md) | — | Record an ADR | Any |
 | [/explain](.claude/commands/explain.md) | — | List the commands, then explain one in depth (ELI5) | Any |
 

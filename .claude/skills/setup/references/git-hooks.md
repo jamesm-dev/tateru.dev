@@ -65,8 +65,10 @@ Behaviour:
 - **Warn, do not block, when no task is referenced.** Plenty of legitimate commits — a typo fix, a
   dependency bump — belong to no task. Blocking those teaches people to pass `--no-verify`, which
   disables every other hook too.
-- **Block only on a reference that does not exist.** `TSK-` followed by an id absent from
-  `state.json` is a typo, and silently losing the link is worse than one rejected commit.
+- **Block only on a reference that does not exist.** Silently losing the link is worse than one
+  rejected commit. `TSK-` plus six hex characters is a planned task, checked against `state.json`.
+  `ADH-` plus four to six hex characters is an ad-hoc task authored on the dashboard, checked
+  against `board.db`'s `task_authored` table when `sqlite3` is installed, and accepted otherwise.
 - Keep the message itself unmodified. Do not rewrite what someone wrote.
 
 ### `post-commit` — record it

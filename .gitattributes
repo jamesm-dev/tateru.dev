@@ -1,0 +1,5 @@
+# Shell scripts must keep LF line endings on every platform. Git for Windows
+# checks text out as CRLF by default, and a CRLF shell script fails with errors
+# like "set: Illegal option -" — which would silently disable every hook.
+*.sh        text eol=lf
+.githooks/* text eol=lf

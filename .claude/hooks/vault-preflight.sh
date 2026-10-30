@@ -30,6 +30,20 @@ emit() {
   exit 0
 }
 
+# Once /setup has created app/, the git hooks are what keep .management/ honest.
+# Unwired or non-executable hooks fail silently — it looks exactly like a project
+# where nobody commits — so say so here, where someone will read it.
+if [ -d app ] && [ -d .githooks ]; then
+  hp=$(git config core.hooksPath 2>/dev/null)
+  if [ "$hp" != ".githooks" ]; then
+    add "[hooks] Git hooks are not wired: core.hooksPath is '${hp:-unset}'. Commits are not being tracked. Fix: git config core.hooksPath .githooks"
+  else
+    for h in .githooks/*; do
+      [ -x "$h" ] || add "[hooks] $h is not executable, so git skips it. Fix: chmod +x $h, and git update-index --chmod=+x $h"
+    done
+  fi
+fi
+
 [ -f "$VALIDATOR" ] && [ -d .idea ] || emit
 
 # Parallel width: one job per core, clamped to a sane range. nproc is absent on some
