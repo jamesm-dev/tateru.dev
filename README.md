@@ -66,9 +66,12 @@ graph LR
   S -->|spec + roadmap| U["/setup"]
   B -->|one idea| E["/epic"]
   E --> U
+  U -->|one task| W["/work-on"]
+  W --> U
   U -->|gates met| P["/ship"]
   P -->|live| M["/maintain"]
   M -->|new work| E
+  M -.->|workflow update| G["/upgrade"]
 ```
 
 Idea → development → production → maintenance. The whole life of a project, not just the fun part at the start.
