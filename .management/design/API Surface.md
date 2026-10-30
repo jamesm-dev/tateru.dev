@@ -53,7 +53,7 @@ Each writes to `board.db` only. **None of them touches `.idea/`.**
 | `POST /sprint/delete` | `sprintId` | |
 | `POST /task/sprint` | `taskId, sprintId` | `null` removes from sprint |
 | `POST /criterion/park` | `phase, text, parked` | Keyed by text, not index |
-| `POST /phase/advance` | `phase, eligible, force, leftUnfinished?` | Returns `{ forced }` |
+| `POST /phase/advance` | `phase, eligible, force, leftUnfinished?` | Returns `{ forced }`. Upserts on `phase`: a phase `/epic` reopened can be advanced again, and the new row replaces the consumed one |
 | `POST /phase/advance/withdraw` | `phase` | Steps back a pending advance |
 
 **`null` is meaningful in three places** — clearing a status override, clearing a priority override,

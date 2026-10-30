@@ -79,6 +79,7 @@ card.marker.priority.title	Priority set by a person
 card.points.plural	pts
 card.points.singular	pt
 card.unverified	done · unverified
+card.unconfirmed	done · unconfirmed
 
 # --- task drawer -------------------------------------------------------------
 drawer.close	Close

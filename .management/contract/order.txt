@@ -25,4 +25,4 @@ create.fields	Title|Epic|Points|Priority|Description	600	Identity, then placemen
 drawer.sections	Reference|Epic|Note from /setup|Status|Priority|Assignee|Effort|Sprint|Test trail|Remove|Pull request		Identity, then what a person changes, then what was synced in
 status.sections	Needs attention|Deployment readiness|Sprint progress|Phases		Obstacles before the score: readiness answers can we ship, attention answers why not
 status.tiles	Tasks done|Blocked|Estimate accuracy		Work, then what stops it, then the phase, then the figure honest about not existing
-specs.pills	advanced past|current	400	A phase group carries exactly one, chosen by where it sits relative to the current phase
+specs.pills	verified · not shipped|advanced past|current	400	A phase group carries exactly one, chosen by where it sits relative to the current phase

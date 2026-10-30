@@ -165,7 +165,13 @@ run; refresh it on every later run.
    live there, so a deferred dashboard must not mean an untracked project. Use the `sqlite3` CLI, or
    the app's own SQLite driver where the CLI is missing (Git Bash on Windows does not ship it). If
    neither exists, say so plainly; the Markdown tracking still works. Then sync pull request and
-   test data into it. **Never** clear a row a person authored: a task id
+   test data into it.
+
+   **Ask whether the team shares it.** `board.db` is gitignored by default, because it holds names.
+   That is right for one person and wrong for a team: drags, assignees, parks, phase advances and
+   confirmations would all stay on one machine, and another clone's `/setup` would never see them.
+   Ask when `git log` shows more than one author or the dashboard is not dev-only: keep it local, or
+   commit it (remove the `.gitignore` line). Record the answer as an ADR either way. **Never** clear a row a person authored: a task id
    that has left `.idea/` is marked orphaned, not deleted.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
    each row not yet consumed, record the advance in `ROADMAP.md`, open the next phase, and stamp
@@ -178,7 +184,9 @@ run; refresh it on every later run.
    `verified` nor `done`, so the dashboard does not fall back once the row is consumed.
 
    Carry the **parked** items into the record rather than dropping them: a criterion in
-   `criterion_park` is written into `ROADMAP.md` as `- [~] <text> — parked <date>`, not ticked, and
+   `criterion_park` is written into `ROADMAP.md` as `- [~] <text>`, its text unchanged — the park is
+   keyed on that text — with `  Parked <date>.` on the next line; `[~]` goes into `state.json` as
+   `done: false`, the park itself living in `board.db`. It is not ticked, and
    a phase that advanced with parked work says so in its section. A phase reported as complete when
    three of its criteria were skipped is exactly the lie this workflow exists to prevent — the aim
    is that skipping is *allowed and visible*, not that it is hidden.
@@ -190,9 +198,9 @@ run; refresh it on every later run.
    `status = 'done'` and `confirmed_by IS NULL`, with its note and commits, and ask the person
    (`AskUserQuestion`) to confirm or reject each. Confirm sets `confirmed_by` — the person's
    `assignee.id`; ask once which assignee they are, and add them to `assignee` if the table is empty
-   — and `confirmed_at`. Reject **rewrites** the row as `source = 'human'`, `status = 'in-progress'`,
-   with a note saying the agent's completion was rejected and why. Deleting it would let the agent
-   mark the same task done again from the same commits; a person's row is one it never replaces. This is the only writer of `confirmed_by`. Until confirmed, such a task
+   — and `confirmed_at`. Reject sets `rejected_at` and puts the person's reason in `note`: the row stops
+   applying, so the task falls back to its plan status, but it is kept. Deleting it would let the
+   agent mark the same task done again from the same commits. This is the only writer of `confirmed_by`. Until confirmed, such a task
    reads as `done · unconfirmed` and counts as not done everywhere.
 10. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
    the runner's own output — and write each run into `board.db`'s `test_run` table, linked to a task
@@ -353,8 +361,11 @@ instead: a self-contained `.management/dashboard.html` plus a `board` script tha
   `/ship`'s.
 - **Tick each epic acceptance criterion this run verified**, with its evidence before the points,
   because the block reference must end the line:
-  `- [x] Saves a doc — verified by save.test.ts, a1b2c3d (3 pts) ^tsk-7f3a21`. This includes work `/work-on` finished since the
-  last run, which leaves `.idea/` alone and relies on this step to record it.
+  `- [x] Saves a doc — verified by save.test.ts, a1b2c3d (3 pts) ^tsk-7f3a21`.
+  An agent completion a person confirmed in Phase 6 is ticked the same way, with
+  `confirmed by <name>, <SHAs>` as its evidence, so the plan and the board agree it is done.
+  This includes work `/work-on` finished since the last run, which leaves `.idea/` alone and relies
+  on this step to record it.
 - Set the built epics to `done` or `in-progress`; bump their `updated`.
 - Write an ADR for any decision you had to make that SPECS.md did not cover.
 - Regenerate `INDEX.md`.

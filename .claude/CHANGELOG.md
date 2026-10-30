@@ -33,6 +33,15 @@ after upgrading as **Breaking**, and say what to do.
 - **Changed:** hooks never write `board.db`; `.management/README.md` ships with tateru and `/setup`
   leaves it alone.
 - **Added:** this release process, and CI that blocks on macOS and Windows as well as Linux.
+- **Breaking for projects that already ran `/setup`:** `/upgrade` offers to convert `CLAUDE.md` —
+  the stale "No app exists yet" section goes, and the stack moves under `## Stack and commands`,
+  which the self-test (and so CI) now checks. Say no and CI fails until you do it by hand. Any phase
+  an older `/setup` marked `done` that was never released: set it back to `verified` in
+  `ROADMAP.md`, so `/ship` can release it.
+- **Breaking for clones:** a plain `git clone` brings tateru's own `v*` tags. The first `/setup` now
+  moves them to `tateru/v*`; in a project that already ran `/setup`, do it by hand before the next
+  `/ship`: `for t in $(git tag -l 'v*'); do git tag "tateru/$t" "$t" && git tag -d "$t"; done` —
+  only for tags that are tateru's, never your own releases.
 - **Changed:** phases now go `planned → in-progress → verified → done`. `/setup` sets `verified`;
   only `/ship` sets `done`, after the release is live. Phase 0's "deployed" criterion is met by its
   first `/ship`, which was otherwise impossible to satisfy.
@@ -71,6 +80,13 @@ after upgrading as **Breaking**, and say what to do.
   longer make every advance look forced.
 - **Changed:** `/upgrade` three-way merges `project-manager.md` instead of skipping it, so fixes to
   the agent reach projects that tailored it.
+- **Fixed:** a rejected agent completion is marked `rejected_at` and ignored, instead of a fake
+  status that blocked the phase; a confirmed one is ticked in the epic, so the plan and the board
+  agree.
+- **Changed:** `/setup` asks a team whether to commit `board.db`. It is not regenerable: parks,
+  advances and confirmations live only there.
+- **Fixed:** a consumed advance no longer moves the dashboard; a parked criterion keeps its text;
+  `/ship` and `/maintain` refresh `.management/` the way `/setup` does.
 
 ## 0.1.0 — 2026-10-30
 

@@ -124,7 +124,7 @@ the current phase. Readiness answers "can we ship yet", so it must look at what 
 
 | Gate | Met when |
 |---|---|
-| Exit criteria | Every criterion of the readiness phase is met, with evidence |
+| Exit criteria | Every criterion of the readiness phase is met with evidence, or parked (recorded, never counted as met). Criteria marked ` — at release` are pending until `/ship` proves them |
 | Tasks | No task in the phase is blocked or in progress |
 | Tests | The latest run passed, and every epic in the phase has at least one linked run |
 | Checks | Lint, typecheck, build all pass |

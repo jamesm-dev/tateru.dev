@@ -132,8 +132,10 @@ CREATE TABLE task_status (
   note          TEXT,                     -- REQUIRED when source = agent: why
   evidence_shas TEXT,                     -- comma-separated commit shas
   pr_url        TEXT,
-  confirmed_by  INTEGER,                  -- NULL until a person confirms
+  confirmed_by  INTEGER,                  -- assignee.id; NULL until a person confirms
   confirmed_at  TEXT,
+  rejected_at   TEXT,                     -- set when a person rejects the agent's completion;
+                                          -- the row is then ignored, and kept so it is not re-marked
   set_at        TEXT NOT NULL
 );
 

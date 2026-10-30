@@ -61,6 +61,10 @@ Required on every such update, without exception:
 Write it via `sqlite3` against `.management/board.db`, per the `task_status` table in
 `.management/design/Database Schema.md`.
 
+**Never re-mark a rejected completion.** A row with `rejected_at` set is a person saying no. Leave
+it unless commits newer than its `evidence_shas` change the picture — then write a fresh row and
+say in its note what is new.
+
 **Never replace a status a person set.** If `task_status` already has a row for the task with
 `source = 'human'`, leave it and report what the commits suggest instead. A person's drag on the
 board outranks your reading of the log.
@@ -75,7 +79,7 @@ the acceptance criterion asks — the code touches the right thing and, ideally,
 message that merely mentions the id is not enough. When it is ambiguous, leave it and say so in your
 report; a wrong completion is worse than a missing one, because it silently inflates progress.
 
-Your updates surface as `done (unconfirmed)` until a person confirms them. That is deliberate. It
+Your updates surface as `done · unconfirmed` until a person confirms them. That is deliberate. It
 never satisfies a phase exit criterion — only verified criteria do that, and that is `/setup`.
 
 ### What you may never do

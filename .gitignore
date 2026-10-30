@@ -1,5 +1,6 @@
-# Dashboard-authored data: assignees, points, notes. Regenerable state, not
-# source, and it holds names — so it is not committed by default. Sharing it is
+# Dashboard-authored data: assignees, points, notes, parks, advances and
+# confirmations. It holds names, so it is not committed by default - but it is
+# NOT regenerable, and a team should share it. /setup asks. Sharing it is
 # a deliberate decision to record in an ADR.
 .management/board.db
 .management/board.db-journal

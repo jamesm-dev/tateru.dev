@@ -158,6 +158,8 @@ check "phase status vocabulary includes verified in /shape, /setup and /ship" "g
 check "verified is a phase status in the vault contract and state.json schema" "grep -q 'verified' .claude/skills/shared/vault-contract.md && grep -q 'in-progress | verified | done' .claude/skills/setup/references/management.md"
 check "/upgrade reads tateru's tags from their own namespace" "grep -q 'refs/tags/tateru/v' .claude/skills/upgrade/SKILL.md && ! grep -qE 'checkout v<|HEAD v<' .claude/skills/upgrade/SKILL.md"
 check "/upgrade installs release tags, never main" "grep -q 'never \`<up>/main\`' .claude/skills/upgrade/SKILL.md && ! grep -q 'checkout <up>/main' .claude/skills/upgrade/SKILL.md"
+check "/setup moves inherited tateru tags out of the project's way" "grep -q 'git tag \"tateru/\$t\"' .claude/skills/setup/references/execution.md"
+check "every Copy Deck status label is in the machine contract" "grep -q 'done · unconfirmed' .management/contract/strings.txt && grep -q 'verified · not shipped' .management/contract/strings.txt"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
   # /setup has run: it replaces the block, so the markers must be gone.

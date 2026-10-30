@@ -93,6 +93,10 @@ Then:
 - **`CLAUDE.md`**: show the upstream diff since the base, and apply only the workflow sections it
   changed. Keep the project's stack, commands and conventions as written. Once `app/` exists, never
   bring back the `<!-- tateru:before-setup -->` block — `/setup` replaced it on purpose.
+  **A project set up before 0.1.1** still has that section without markers ("No app exists yet"),
+  and its stack under some other heading. Offer to convert it: remove the stale section, and gather
+  the stack and commands under `## Stack and commands`, which the self-test checks for. Show the
+  diff and ask; never rewrite the project's own wording silently.
 - **Executable bits**: after checking out scripts, confirm `git ls-files -s .githooks .claude/hooks
   .claude/scripts` shows `100755`, and fix with `git update-index --chmod=+x` if not.
 - Write the new version into `.claude/TATERU_VERSION`.

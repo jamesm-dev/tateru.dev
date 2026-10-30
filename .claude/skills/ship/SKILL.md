@@ -48,7 +48,7 @@ something**, not by reading a status file — a file can be stale, a command can
 
 | Gate | How to actually check |
 |---|---|
-| Exit criteria | Each one, against evidence. Unverifiable means unmet — except criteria marked ` — at release`, which this release itself must prove: count them as pending, check them in Phase 4 after the deploy, and fail the release if they do not hold |
+| Exit criteria | Each one, against evidence. Unverifiable means unmet. A parked criterion is reported as parked, never as met. Criteria marked ` — at release` are this release's to prove: count them as pending, check them in Phase 4 after the deploy, and fail the release if they do not hold |
 | Tasks | Nothing blocked or in flight in this phase |
 | Tests | Run the suite now. Show the output. |
 | Checks | Run lint, typecheck, build now |
@@ -91,7 +91,9 @@ Things that are cheap now and expensive at 2am:
 - **Migrations** — pending ones identified, reversible or explicitly not, and a note on ordering if
   the deploy is not atomic.
 - **Rollback** — say concretely how to undo this. If the answer is "redeploy the previous tag",
-  confirm the previous tag exists.
+  confirm the previous tag exists — the project's own `v*`, never a `tateru/v*` tag, which is the
+  workflow's version, not a release of this app. If a bare `v*` tag still points at a tateru commit
+  (a clone from before `/setup` moved them), move it first, as `/setup`'s Git step does.
 - **Data** — anything destructive, called out by name.
 - **Config drift** — the target's runtime version matches local and CI.
 
@@ -126,7 +128,8 @@ Ask before each outward-facing step. Do not chain them.
 - Set its epics to `done`.
 - Write an ADR for anything decided under pressure during the release — those are the decisions
   most likely to be forgotten and most expensive to rediscover.
-- Regenerate `.management/`.
+- Refresh `.management/` the way `/setup` Phase 6 does — steps 1 to 4, 7 and 11, and `currentPhase`
+  in `state.json` — so the dashboard stops showing the shipped phase as `verified · not shipped`.
 
 Close with: what shipped, where it is live, what was waived, how to roll back, and the next phase.
 

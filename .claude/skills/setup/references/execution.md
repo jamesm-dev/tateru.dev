@@ -117,6 +117,17 @@ Then check the phase's exit criteria one at a time, with evidence per criterion.
 Ensure the repo exists and `.gitignore` is right. Commit only if the user asks; if on the default
 branch, branch first.
 
+**On the first run, move tateru's own tags out of the project's way.** A plain `git clone` of tateru
+brings its release tags (`v0.1.0`, …) along, and the project's first `/ship` would collide with
+them, or mistake one for its own previous release. The project has shipped nothing yet, so every
+`v*` tag here is tateru's:
+
+```bash
+for t in $(git tag -l 'v*'); do git tag "tateru/$t" "$t" && git tag -d "$t"; done
+```
+
+Say what was moved. These are local tags; `/upgrade` reads the same `tateru/v*` names.
+
 ## Windows notes
 
 This project runs on Windows. Prefer cross-platform scripts over shell-specific ones; avoid `&&`

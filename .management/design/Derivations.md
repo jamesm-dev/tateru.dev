@@ -61,7 +61,8 @@ function buildTaskIndex(plan, board) -> Map<id, TaskState>
     put(a.task_id, a.epic, phase, a.status, null, null, authored = true)
 
   where put(...) records:
-    explicit  = statusById[id]              # may be absent
+    explicit  = statusById[id] unless it has rejected_at   # may be absent; a rejected
+                                            # agent completion is kept, but never applied
     status    = explicit ?? planStatus
     unconfirmed = explicit.source == 'agent' and explicit.confirmed_by is null
                   and status == 'done'      # the agent's reading, not yet a person's
@@ -85,8 +86,15 @@ known.
 ```
 function effectivePhase(plan, board) -> number
   last     = max phase number in plan.phases, else 0
-  advanced = [ a.phase + 1 for a in board.advances ]
+  advanced = [ a.phase + 1 for a in board.advances where a.consumed_at is null ]
+             # a consumed advance is already in plan.project.currentPhase
   return min(last, max(plan.project.currentPhase, ...advanced, 0))
+
+function readinessPhase(plan, board) -> number
+  # The phase "can we ship yet" is about: the lowest one /setup verified and /ship
+  # has not released, otherwise the effective phase.
+  waiting = [ p.n for p in plan.phases where p.status == 'verified' ]
+  return min(waiting) if waiting else effectivePhase(plan, board)
 
 function advancePending(plan, board) -> bool
   return effectivePhase(plan, board) > plan.project.currentPhase
