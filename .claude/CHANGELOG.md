@@ -46,8 +46,8 @@ after upgrading as **Breaking**, and say what to do.
   git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
     while read -r sha ref; do
       t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
-      [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] &&
-        git tag "tateru/$t" "$t" && git tag -d "$t"
+      [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] || continue
+      git tag "tateru/$t" "$t" && git tag -d "$t"
     done
   ```
 
@@ -57,6 +57,7 @@ after upgrading as **Breaking**, and say what to do.
   ```bash
   up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')   # origin, or tateru after the new /setup
   [ -n "$up" ] || { git remote add tateru https://github.com/jamesm-dev/tateru.dev.git; up=tateru; }
+  git config "remote.$up.tagOpt" --no-tags
   git fetch "$up" --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
   git checkout tateru/v<new version> -- .claude/skills/upgrade .claude/commands/upgrade.md
   git commit -m "chore: fetch the new /upgrade"
@@ -116,6 +117,8 @@ after upgrading as **Breaking**, and say what to do.
   mergeable, and not regenerable.
 - **Added:** `contract/fixtures/lifecycle/`, goldens for the confirm, unverified, rejected,
   consumed-advance, at-release and readiness-phase rules, so a rebuilt dashboard cannot skip them.
+- **Fixed:** `/upgrade` merges `.gitignore` (tateru's new lines plus the project's own) and sets
+  `tagOpt --no-tags` on the tateru remote, so moved tags stay moved.
 - **Fixed:** commit history excludes tateru's own commits. The first `/setup` records where the
   project began in `.claude/TATERU_BASE` (a committed file, so every clone has it) and renames a
   plain clone's `origin` remote to `tateru`. An older project gets the file on its next `/setup`.

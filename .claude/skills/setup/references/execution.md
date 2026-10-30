@@ -126,8 +126,8 @@ same name pointing at the same object as on tateru — so a project's own releas
 git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
   while read -r sha ref; do
     t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
-    [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] &&
-      git tag "tateru/$t" "$t" && git tag -d "$t"
+    [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] || continue
+    git tag "tateru/$t" "$t" && git tag -d "$t"
   done
 ```
 

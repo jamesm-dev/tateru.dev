@@ -19,7 +19,8 @@ date and leaves everything the project owns exactly where it was.
 | `AGENTS.md`, `.claude/TATERU_VERSION`, `.claude/CHANGELOG.md` | Every other file in `.management/`, and the root `README.md` |
 
 `CLAUDE.md` is shared: `/setup` writes the project's stack and commands into it. It is merged, never
-replaced. So is `.claude/agents/project-manager.md`, which `/setup` tailors per project: the
+replaced. So is `.gitignore`: take tateru's new lines (the self-test checks some of them) and keep
+the project's own. So is `.claude/agents/project-manager.md`, which `/setup` tailors per project: the
 three-way merge below keeps that tailoring and still brings in tateru's fixes to the agent.
 
 A workflow file the user has edited is still theirs to decide on. **Never overwrite a local edit
@@ -36,7 +37,9 @@ silently** — that is the one way this skill can destroy work.
    git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }'
    ```
 
-   Use that name everywhere below, written `<up>` here. If no remote matches, **ask before adding
+   Use that name everywhere below, written `<up>` here, and set
+   `git config remote.<up>.tagOpt --no-tags` so a plain fetch never brings tateru's bare `v*` tags
+   back into the project. If no remote matches, **ask before adding
    one**, then use `tateru`:
 
    ```bash

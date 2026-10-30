@@ -147,7 +147,8 @@ run; refresh it on every later run.
    Read it whole on every run; it is cheap, and a resume point would break on the first rebase.
    `.claude/TATERU_BASE` is the commit the project started from, written by the first run's Git
    step. **If it is missing** (the script exits 2 — a project set up at 0.1.0 or earlier), write it
-   now: fetch the tateru remote and use `git merge-base HEAD <up>/main`; with no tateru remote,
+   now: `git fetch <up> --no-tags` (and `git config remote.<up>.tagOpt --no-tags`), then
+   `git merge-base HEAD <up>/main`; with no tateru remote,
    ask. Parse task ids from each message the way
    the `post-commit` hook does (`TSK-` and `ADH-` ids, case-insensitive). `.management/commits.jsonl`
    is a local cache of this machine's commits, useful for timing, never the whole record. Map commits to tasks by reference id; a commit is
