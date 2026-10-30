@@ -22,6 +22,7 @@ Gather before judging. Run things; do not trust status files.
 | CI | Green? When did it last run? A pipeline nobody triggers is not a pipeline. |
 | Deploy | When was the last release? Does the deploy path still work? |
 | Activity | Commits since the last release, and what they touched. |
+| Stack profile | `.claude/team/stack.md` against reality: versions against the lockfile, commands that no longer run, lanes whose paths are gone, `checks.env` disagreeing with the `## Commands` table. A stale profile makes every `/work-on` specialist confidently wrong. |
 | Dashboard | If one was built: `bash .claude/scripts/dashboard-conformance.sh`, plus the derivation goldens. Drift here is silent by nature — nobody notices a reworded button or a reordered column until two builds disagree. |
 
 ## Phase 2 — Read the record against reality

@@ -54,7 +54,7 @@ the skeleton is what makes later phases safe. Say why if you have to override an
 Produce a concrete ordered list of exactly what you will create and run: scaffolder invocation,
 dependencies, directory tree, config files, env files, database setup, scripts, CI, git hooks, docs,
 and the `.management/` tracker. Every path in that list is under `app/`, except `.management/`,
-`.claude/`, and the root `README.md`.
+`.claude/` (including the `.claude/team/` stack profile), and the root `README.md`.
 
 Structure is a decision, not a default. Per `quality-bar.md`, state your reasoning for the module
 boundaries, the data-access approach, and the rendering or data-fetching strategy — including where
@@ -308,6 +308,10 @@ instead: a self-contained `.management/dashboard.html` plus a `board` script tha
 - Write an ADR for any decision you had to make that SPECS.md did not cover.
 - Regenerate `INDEX.md`.
 - Write or update `CLAUDE.md` with the stack, conventions, and the real commands to run.
+- **Write or refresh the stack profile** — `.claude/team/stack.md` and `.claude/team/checks.env` —
+  per `.claude/skills/work-on/references/stack-profile.md`. It is what turns the `/work-on` agents
+  into specialists of this stack, and what the `pre-push` hook runs. Only from commands Phase 5
+  verified green; never a version the lockfile does not pin. Preserve a hand edit and say so.
 - Refresh `.management/` so `BOARD.md`, `PROGRESS.md` and `state.json` match what Phase 5 verified.
 
 Close with: what was created and why · commands verified with their actual results · exit criteria

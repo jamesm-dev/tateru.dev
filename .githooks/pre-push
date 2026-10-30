@@ -9,39 +9,54 @@
 set -u
 
 APP="app"
+CHECKS=".claude/team/checks.env"
 
-if [ ! -f "$APP/package.json" ]; then
-  echo "pre-push: no $APP/package.json yet, skipping checks."
+# The commands come from the stack /setup chose, never from this script.
+# checks.env is generated alongside .claude/team/stack.md; see
+# .claude/skills/work-on/references/stack-profile.md.
+if [ ! -d "$APP" ]; then
+  echo "pre-push: no $APP/ yet, skipping checks."
+  exit 0
+fi
+if [ ! -f "$CHECKS" ]; then
+  echo "pre-push: no $CHECKS yet (written by /setup), skipping checks."
   exit 0
 fi
 
+LINT="" TYPECHECK="" TEST="" TRAIL=""
+# shellcheck disable=SC1090
+. "./$CHECKS"
+
 echo "pre-push: running checks in $APP/ ..."
 
+LOG="${TMPDIR:-/tmp}/prepush.log"
+
 run() {
+  [ -n "$2" ] || { printf '  %-12s%s\n' "$1" "not wired"; return 0; }
   printf '  %-12s' "$1"
-  if (cd "$APP" && pnpm run --silent "$1" >"${TMPDIR:-/tmp}/prepush.log" 2>&1); then
+  if (cd "$APP" && sh -c "$2" >"$LOG" 2>&1); then
     echo "ok"
     return 0
   fi
   echo "FAILED"
   echo
-  tail -30 "${TMPDIR:-/tmp}/prepush.log"
+  tail -30 "$LOG"
   echo
   echo "pre-push: '$1' failed. Push blocked." >&2
   echo "pre-push: fix it, or use --no-verify if you genuinely mean to push a red tree." >&2
   return 1
 }
 
-run lint      || exit 1
-run typecheck || exit 1
-run test      || exit 1
+run lint      "$LINT"      || exit 1
+run typecheck "$TYPECHECK" || exit 1
+run test      "$TEST"      || exit 1
 
 # Record the trail at the moment the tests actually ran, rather than
 # reconstructing it later. Data only: the hook never writes Markdown.
-if (cd "$APP" && pnpm run --silent trail >/dev/null 2>&1); then
-  echo "  trail        recorded"
+if [ -n "$TRAIL" ] && (cd "$APP" && sh -c "$TRAIL" >/dev/null 2>&1); then
+  echo "  trail       recorded"
 else
-  echo "  trail        not recorded (no report, or no database yet)"
+  echo "  trail       not recorded (no report, or no database yet)"
 fi
 
 # Take stock. Readiness is computed by /setup into .management/PROGRESS.md; the

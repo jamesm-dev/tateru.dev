@@ -99,6 +99,7 @@ it and that nothing else links to it.
 | [/shape](.claude/commands/shape.md) | [shape](.claude/skills/shape/SKILL.md) | Turn ideas into `SPECS.md`, a phased `ROADMAP.md`, and epics | Idea |
 | [/epic](.claude/commands/epic.md) | [epic](.claude/skills/epic/SKILL.md) | One epic and its tasks, mid-project. Also triages suggested epics | Development |
 | [/setup](.claude/commands/setup.md) | [setup](.claude/skills/setup/SKILL.md) | Build the dev environment and the current roadmap phase | Development |
+| [/work-on](.claude/commands/work-on.md) | [work-on](.claude/skills/work-on/SKILL.md) | One task with the smallest agent team: route, then build directly, solo, or in parallel slices | Development |
 | [/ship](.claude/commands/ship.md) | [ship](.claude/skills/ship/SKILL.md) | Verify the readiness gates, then release | Production |
 | [/maintain](.claude/commands/maintain.md) | [maintain](.claude/skills/maintain/SKILL.md) | Health-check a shipped project and fix the rot | Maintenance |
 | [/decide](.claude/commands/decide.md) | — | Record an ADR | Any |
@@ -108,6 +109,12 @@ The [project-manager](.claude/agents/project-manager.md) agent oversees all four
 auditor with exactly two write powers: it proposes epics at `status: suggested`, and it marks tasks
 done in `board.db` from commit evidence — always with a note saying why, and never confirmed until
 a person confirms it. It may not touch the plan, tick a criterion, or deploy.
+
+`/work-on` drives a second team — `task-router`, `repo-scout`, `work-planner`, `implementer`,
+`reviewer` — written stack-agnostic. They become specialists by reading `.claude/team/stack.md`,
+which `/setup` generates from the verified stack
+([format](.claude/skills/work-on/references/stack-profile.md)); its twin `checks.env` is what
+`pre-push` runs. Never hand-write either from memory — no stack, no profile, generalist agents.
 
 Commands stay thin — they name the skill, pass `$ARGUMENTS`, and handle invocation-specific cases.
 Method and detail live in the skill and its `references/`, which load only when that phase is
