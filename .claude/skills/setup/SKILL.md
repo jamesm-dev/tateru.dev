@@ -134,7 +134,9 @@ run; refresh it on every later run.
    missing value makes every capacity figure a lie of unknown size. An epic whose criteria lack
    points is a gap in `.idea/` — report it and offer `/shape` to fix it, rather than defaulting the
    number here and hiding the omission.
-4. Write `README.md`, `BOARD.md`, `PROGRESS.md`, `BLOCKERS.md`, `CHANGELOG.md`, and `state.json`.
+4. Write `BOARD.md`, `PROGRESS.md`, `BLOCKERS.md`, `CHANGELOG.md`, and `state.json`. **Leave
+   `.management/README.md` alone**: it ships with tateru, explains the folder, and `/upgrade` keeps
+   it current.
    Carry each task's reference id (`^tsk-`) through into `state.json`; a task without one cannot
    hold assignees or effort.
 5. Mark done only what Phase 5 actually verified. Progress you cannot evidence is fiction.

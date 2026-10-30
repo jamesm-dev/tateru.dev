@@ -72,7 +72,7 @@ PROGRESS=".management/PROGRESS.md"
 if [ -f "$PROGRESS" ]; then
   echo
   grep -m1 -E '^\*\*Phase' "$PROGRESS" 2>/dev/null || true
-  grep -m1 -E 'gates met' "$PROGRESS" 2>/dev/null || true
+  grep -m1 -E '^\*\*Readiness' "$PROGRESS" 2>/dev/null || true
 fi
 
 echo

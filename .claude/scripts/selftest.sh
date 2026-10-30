@@ -154,6 +154,10 @@ up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')
 check "/upgrade finds the tateru remote when it is called origin" "[ '$up' = origin ]"
 git remote remove origin 2>/dev/null
 
+ver=$(tr -d '[:space:]' < .claude/TATERU_VERSION 2>/dev/null)
+top=$(sed -n 's/^## \([0-9][0-9.]*\) .*/\1/p' .claude/CHANGELOG.md 2>/dev/null | head -1)
+check "TATERU_VERSION matches the newest changelog release ($ver)" "[ -n '$ver' ] && [ '$ver' = '$top' ]"
+
 echo "Scripts that need a built app"
 bash .claude/scripts/dashboard-conformance.sh >/dev/null 2>&1
 check "dashboard-conformance exits 2 with nothing built" "[ $? -eq 2 ]"

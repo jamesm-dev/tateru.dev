@@ -105,8 +105,8 @@ and giving it a database driver to write rows nothing yet reads buys complexity 
 2. Print a two-line summary so the developer sees where the phase stands as they push:
 
 ```
-Phase 1 - Core loop:  12/19 tasks, 3 of 4 exit criteria met
-Not deployable yet:   1 criterion unmet, 2 tasks blocked
+**Phase 1 - Core loop:** 12/19 tasks, 3 of 4 exit criteria met
+**Readiness:** 5 of 7 gates met. Open: Tests, Deploy path
 ```
 
 Never push, tag, or deploy from a hook.

@@ -6,6 +6,34 @@ Changes to the tateru workflow itself — not to a project built with it. A proj
 `/upgrade` reads this file to tell a cloned project what changed. Mark anything that needs action
 after upgrading as **Breaking**, and say what to do.
 
+## Releasing tateru
+
+1. Every change since the last release is listed under **Unreleased** below, in plain words.
+2. Pick the version: patch for fixes only, minor for anything new, and before 1.0 a minor marked
+   **Breaking** for anything a project must act on.
+3. In one commit on `main`: rename **Unreleased** to `## <version> — <date>`, start a fresh empty
+   **Unreleased** above it, and write the version into `.claude/TATERU_VERSION`. `selftest.sh`
+   fails if the two disagree.
+4. Tag that commit `v<version>` and publish a GitHub release from the entry. `/upgrade` diffs
+   against the tag, so a version with no tag cannot be upgraded from.
+
+## Unreleased
+
+- **Fixed:** `/epic` and `/shape` show acceptance criteria with points, as the vault validator
+  requires. Following the old example blocked every `/epic` run.
+- **Fixed:** the vault validator no longer counts `# comments` inside code blocks as headings, and
+  now checks that a note's heading matches its title.
+- **Fixed:** a commit naming a task `/epic` added since the last `/setup` is accepted, instead of
+  rejected as unknown.
+- **Fixed:** `/setup` replaces `CLAUDE.md`'s "No app exists yet" section once the app exists.
+- **Fixed:** `/upgrade` works when the tateru remote is called `origin`, as a plain clone names it.
+- **Fixed:** `/setup` creates `board.db` even when the dashboard is deferred, writes `checks.env`
+  before it tests the hooks, and skips epics that were only suggested.
+- **Fixed:** `checks.env` with Windows line endings no longer breaks every push.
+- **Changed:** hooks never write `board.db`; `.management/README.md` ships with tateru and `/setup`
+  leaves it alone.
+- **Added:** this release process, and CI that blocks on macOS and Windows as well as Linux.
+
 ## 0.1.0 — 2026-10-30
 
 The first versioned release. Projects cloned earlier have no `.claude/TATERU_VERSION` and no

@@ -22,7 +22,8 @@ The caller names one.
 Find out whether the work already exists. Check in this order and stop once the answer is clear:
 
 1. **`.idea/epics/`** — an epic or task (`TSK-xxxxxx`) covering it, and its status.
-2. **`.management/board.db`** if it exists — `sqlite3 -readonly` on the task's status.
+2. **`.management/board.db`** if it exists and `sqlite3` is installed — `sqlite3 -readonly` on the
+   task's status. Without `sqlite3`, say `board.db: not checked (no sqlite3)`.
 3. **Git** — `git branch -a --list`, `git log --oneline -n 50 --all --grep=<term or TSK id>`.
 4. **GitHub** — open and closed PRs and issues, if the GitHub tools are available to you. If not,
    say `github: not checked (no access)`. Never claim it was checked.

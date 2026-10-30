@@ -17,16 +17,18 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
-    # Linux is the gate. macOS (bash 3.2) and Windows (Git Bash, CRLF) report
-    # platform drift without blocking, until they have been green for a while.
-    continue-on-error: ${{ matrix.os != 'ubuntu-latest' }}
     defaults:
       run:
         shell: bash
     steps:
       - uses: actions/checkout@v4
-      - name: Install shellcheck and sqlite3
+      - name: Install shellcheck and sqlite3 (Linux)
         if: runner.os == 'Linux'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck sqlite3
+      # macOS ships sqlite3. Windows runs without either, which is how most
+      # Git Bash users run it too; selftest says which checks it skipped.
+      - name: Install shellcheck (macOS)
+        if: runner.os == 'macOS'
+        run: brew install shellcheck
       - name: Self-test
         run: bash .claude/scripts/selftest.sh
