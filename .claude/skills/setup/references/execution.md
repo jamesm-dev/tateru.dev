@@ -133,15 +133,17 @@ git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
 
 Then, still on the first run:
 
-- **Mark where the project began**: `git tag tateru/base HEAD`, before any project commit. Commit
-  ingestion and the author check exclude everything up to it, so tateru's own history never reads
-  as the project's work.
+- **Record where the project began**: `git rev-parse HEAD > .claude/TATERU_BASE`, before any
+  project commit, and commit it with the first project commit. It is a file, not a tag, so every
+  clone and teammate has it. Commit ingestion and the author check exclude everything up to it, so
+  tateru's own history never reads as the project's work.
 - **Rename the tateru remote** if a plain clone left it as `origin`: `git remote rename origin
   tateru`, then `git config remote.tateru.tagOpt --no-tags`, so a fetch never brings bare `v*` tags
   back. The project adds its own `origin` when it has a repository; `/upgrade` finds `tateru` by
   URL either way.
 
-Say what was moved and renamed. These are local tags; `/upgrade` reads the same `tateru/*` names.
+Say what was moved, renamed and recorded. The moved tags are local; `/upgrade` reads the same
+`tateru/v*` names.
 
 ## Windows notes
 

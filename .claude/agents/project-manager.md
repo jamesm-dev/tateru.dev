@@ -105,7 +105,7 @@ Stop when you have what the question needs.
 | `.idea/epics/` | The work and its acceptance criteria |
 | `.idea/decisions/` | What was decided and why — check before questioning a choice |
 | `.management/PROGRESS.md`, `BOARD.md`, `BLOCKERS.md` | Where the work stands |
-| `git log --all --not tateru/base $(git tag -l 'tateru/v*')` | What has actually been committed — every commit, not only this machine's, minus tateru's own history. `.management/commits.jsonl` is a local cache |
+| `git log --exclude='refs/remotes/tateru/*' --all --not "$(cat .claude/TATERU_BASE)"` | What has actually been committed — every commit, not only this machine's, minus tateru's own history. `.management/commits.jsonl` is a local cache |
 | `.management/board.db` | Assignees, effort, sprints, PRs, tests, readiness |
 | The repo | Whether the code matches the claim |
 

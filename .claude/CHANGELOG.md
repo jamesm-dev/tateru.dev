@@ -55,7 +55,7 @@ after upgrading as **Breaking**, and say what to do.
   and would collide with your own. Fetch the new skill first, then run `/upgrade`:
 
   ```bash
-  up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')   # often "origin"
+  up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')   # origin, or tateru after the new /setup
   [ -n "$up" ] || { git remote add tateru https://github.com/jamesm-dev/tateru.dev.git; up=tateru; }
   git fetch "$up" --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
   git checkout tateru/v<new version> -- .claude/skills/upgrade .claude/commands/upgrade.md
@@ -116,8 +116,9 @@ after upgrading as **Breaking**, and say what to do.
   mergeable, and not regenerable.
 - **Added:** `contract/fixtures/lifecycle/`, goldens for the confirm, unverified, rejected,
   consumed-advance, at-release and readiness-phase rules, so a rebuilt dashboard cannot skip them.
-- **Fixed:** commit history excludes tateru's own commits: the first `/setup` tags where the
-  project began (`tateru/base`) and renames a plain clone's `origin` remote to `tateru`.
+- **Fixed:** commit history excludes tateru's own commits. The first `/setup` records where the
+  project began in `.claude/TATERU_BASE` (a committed file, so every clone has it) and renames a
+  plain clone's `origin` remote to `tateru`. An older project gets the file on its next `/setup`.
 - **Fixed:** a consumed advance no longer moves the dashboard; a parked criterion keeps its text;
   `/ship` and `/maintain` refresh `.management/` the way `/setup` does.
 

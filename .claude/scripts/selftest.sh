@@ -111,6 +111,12 @@ check "pre-push survives a checks.env with Windows line endings" "sh .githooks/p
 check ".gitattributes pins checks.env to LF" "git check-attr eol .claude/team/checks.env | grep -q 'eol: lf'"
 rm -rf app .claude/team
 
+git rev-parse HEAD > .claude/TATERU_BASE
+git commit -q --allow-empty -m "project work after the base" >/dev/null 2>&1
+n=$(git log --oneline --exclude='refs/remotes/tateru/*' --all --not "$(cat .claude/TATERU_BASE)" | wc -l | tr -d ' ')
+check "the commit range from TATERU_BASE sees only the project's commits" "[ '$n' = 1 ]"
+rm -f .claude/TATERU_BASE
+
 echo "Claude hooks"
 validator=.claude/hooks/validate-vault-note.sh
 good=$(find .management/design -name '*.md' | head -1)
