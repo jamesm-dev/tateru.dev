@@ -50,6 +50,7 @@ it as a procedure:
 | `/work-on` | `.claude/skills/work-on/SKILL.md` — do every agent's step yourself, in order, without parallel slices |
 | `/ship` | `.claude/skills/ship/SKILL.md` |
 | `/maintain` | `.claude/skills/maintain/SKILL.md` |
+| `/upgrade` | `.claude/skills/upgrade/SKILL.md` |
 | `/decide` | `.claude/commands/decide.md` — it has no skill |
 
 Expect to be slower and less checked than in Claude Code. That is the cost of not being in the tool

@@ -37,6 +37,16 @@ else
   skip "shellcheck not installed"
 fi
 
+echo "Docs"
+# The sync rule in CLAUDE.md, made checkable: every command is listed where a
+# reader would look for it.
+for c in .claude/commands/*.md; do
+  name=$(basename "$c" .md)
+  check "/$name is in CLAUDE.md" "grep -q '\[/$name\]' CLAUDE.md"
+  check "/$name is in README.md" "grep -q '/$name' README.md"
+  [ -f ".claude/skills/$name/SKILL.md" ] && check "/$name is in AGENTS.md" "grep -q '\`/$name\`' AGENTS.md"
+done
+
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 git clone -q "$root" "$tmp/repo"

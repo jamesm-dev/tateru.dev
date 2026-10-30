@@ -42,11 +42,7 @@ They cover both ways a note goes wrong: written badly by a tool, or edited by ha
 write. What is enforced is Obsidian-compatible Markdown: valid frontmatter, one H1, real wikilinks,
 no illegal filename characters.
 
-The validator doubles as a CLI:
-
-```bash
-bash .claude/hooks/validate-vault-note.sh --check ".idea/notes/Some Idea.md"
-```
+The validator doubles as a CLI: `bash .claude/hooks/validate-vault-note.sh --check "<note>.md"`.
 
 All three fail open and never block on their own error. Everything outside those two folders passes
 through untouched. If you change the vault contract, change the validator in the same edit — a rule
@@ -89,6 +85,7 @@ On removal, also confirm nothing still mentions or links to it.
 | [/work-on](.claude/commands/work-on.md) | [work-on](.claude/skills/work-on/SKILL.md) | One task with the smallest agent team: route, then build directly, solo, or in parallel slices | Development |
 | [/ship](.claude/commands/ship.md) | [ship](.claude/skills/ship/SKILL.md) | Verify the readiness gates, then release | Production |
 | [/maintain](.claude/commands/maintain.md) | [maintain](.claude/skills/maintain/SKILL.md) | Health-check a shipped project and fix the rot | Maintenance |
+| [/upgrade](.claude/commands/upgrade.md) | [upgrade](.claude/skills/upgrade/SKILL.md) | Pull a newer tateru workflow into a cloned project, leaving its plan and code alone | Maintenance |
 | [/decide](.claude/commands/decide.md) | — | Record an ADR | Any |
 | [/explain](.claude/commands/explain.md) | — | List the commands, then explain one in depth (ELI5) | Any |
 
