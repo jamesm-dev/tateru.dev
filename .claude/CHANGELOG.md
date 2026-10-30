@@ -6,19 +6,17 @@ Changes to the tateru workflow itself — not to a project built with it. A proj
 `/upgrade` reads this file to tell a cloned project what changed. Mark anything that needs action
 after upgrading as **Breaking**, and say what to do.
 
-## Unreleased
-
-- **Fixed:** `/upgrade` on a project cloned before versioning now finds the starting point from the
-  git history it shares with tateru, so it only asks about files you actually edited. Before, it
-  would have asked about every file tateru had changed.
-- **Fixed:** `selftest.sh` tests the working tree, not the last commit, so it verifies an upgrade
-  `/upgrade` has applied but not committed. It no longer checks the root `README.md`, which is the
-  project's own file in a clone, or fails because of the project's own notes.
-
 ## 0.1.0 — 2026-10-30
 
-The first versioned release. Projects cloned earlier have no `.claude/TATERU_VERSION`; `/upgrade` handles
-them by asking about every workflow file that differs.
+The first versioned release. Projects cloned earlier have no `.claude/TATERU_VERSION` and no
+`/upgrade` yet. Fetch it once from the project root, then run `/upgrade`, which works out what was
+edited locally from the git history the project shares with tateru:
+
+```bash
+git remote add tateru https://github.com/jamesm-dev/tateru.dev.git
+git fetch tateru --tags
+git checkout tateru/main -- .claude/commands/upgrade.md .claude/skills/upgrade
+```
 
 - **Fixed:** the git hooks were committed without the executable bit, so git skipped them on macOS
   and Linux — no commit tracking, no task links, no pre-push checks. **Breaking for earlier clones:**
@@ -35,3 +33,9 @@ them by asking about every workflow file that differs.
 - **Added:** `selftest.sh` and a CI workflow that run it, and a session-start warning when the hooks
   are unwired or not executable.
 - **Added:** `AGENTS.md`, for tools other than Claude Code.
+- **Fixed:** `/upgrade` on a project cloned before versioning now finds the starting point from the
+  git history it shares with tateru, so it only asks about files you actually edited. Before, it
+  would have asked about every file tateru had changed.
+- **Fixed:** `selftest.sh` tests the working tree, not the last commit, so it verifies an upgrade
+  `/upgrade` has applied but not committed. It no longer checks the root `README.md`, which is the
+  project's own file in a clone, or fails because of the project's own notes.
