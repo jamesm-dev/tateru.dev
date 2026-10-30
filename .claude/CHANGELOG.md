@@ -50,6 +50,18 @@ after upgrading as **Breaking**, and say what to do.
   `sources.txt` and `tokens.map`.
 - **Added:** `/ship` handles a re-run after a failed release without bumping the version twice.
 - **Added:** `pre-push` runs an optional `BUILD` check, like CI.
+- **Fixed:** the `verified` phase status is defined everywhere it is read: the vault contract, the
+  `state.json` schema and the dashboard (`verified · not shipped`). A forced advance also sets
+  `verified`, and `/setup` keeps `currentPhase` in step, so the dashboard never falls back.
+- **Fixed:** a card dragged into Done counts as not done until `/setup` verifies it, as the board
+  design always said; only the agent's completions were excluded before.
+- **Fixed:** `/ship` measures the performance budget on the live release, and its exit-criteria gate
+  treats criteria marked ` — at release` as this release's to prove, not as unmet.
+- **Fixed:** adding an epic to a `verified` phase sets it back to `in-progress`, and `/setup` asks
+  before building past a phase that was never shipped.
+- **Fixed:** rejecting the agent's completion keeps a record, so it is not re-marked; confirming
+  names an assignee; an accepted suggestion gets linked into the vault.
+- **Fixed:** `/upgrade` installs the newest release tag, never unreleased work on `main`.
 
 ## 0.1.0 — 2026-10-30
 

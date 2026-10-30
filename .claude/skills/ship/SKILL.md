@@ -48,7 +48,7 @@ something**, not by reading a status file — a file can be stale, a command can
 
 | Gate | How to actually check |
 |---|---|
-| Exit criteria | Each one, against evidence. Unverifiable means unmet. |
+| Exit criteria | Each one, against evidence. Unverifiable means unmet — except criteria marked ` — at release`, which this release itself must prove: count them as pending, check them in Phase 4 after the deploy, and fail the release if they do not hold |
 | Tasks | Nothing blocked or in flight in this phase |
 | Tests | Run the suite now. Show the output. |
 | Checks | Run lint, typecheck, build now |
@@ -111,6 +111,10 @@ Ask before each outward-facing step. Do not chain them.
    output, not the repository root.
 5. **Verify live** — hit the deployed thing and confirm it responds. A deploy that reported success
    is not a deploy that works.
+6. **Measure the budget live** — each `SPECS.md` performance budget entry, against the deployed URL
+   on the device and network it names. Record the real numbers beside the criterion. A missed
+   budget is reported as missed: fix it, or record it as an accepted regression with a reason.
+   Never round it, and never tick a budget criterion on a number nobody measured.
 
 ## Phase 5 — Record
 
@@ -118,8 +122,7 @@ Ask before each outward-facing step. Do not chain them.
   waived, and **what was published** — the output directory, so a later reader can tell at a glance
   that the vault was never part of the release.
 - Mark the phase `done` in `ROADMAP.md` — only `/ship` does this — and tick the criteria only a live
-  release could prove ("deployed and reachable", the budget measured on the real target), with the
-  step 5 evidence.
+  release could prove — the ` — at release` ones — with the step 5 and 6 evidence.
 - Set its epics to `done`.
 - Write an ADR for anything decided under pressure during the release — those are the decisions
   most likely to be forgotten and most expensive to rediscover.

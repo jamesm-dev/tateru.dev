@@ -102,7 +102,9 @@ Acceptance criteria are the tasks. For each:
 
 ## Phase 5 — Wire it in and hand off
 
-- Add the epic to `ROADMAP.md` under its phase, with its tasks counted.
+- Add the epic to `ROADMAP.md` under its phase, with its tasks counted. If that phase is already
+  `verified`, set it back to `in-progress` and say so: it has new work, so `/setup` must build and
+  verify it again before `/ship` releases it.
 - Update the theme MoC and regenerate `INDEX.md`.
 - Write an ADR into `decisions/` for anything consequential that the epic settled.
 - Verify traceability both ways: every task has an id, the epic has at least one source note, and
@@ -121,7 +123,7 @@ no phase, count toward nothing, and are never built until a person accepts one.
 | Subcommand | Does |
 |---|---|
 | `/epic list` | Every suggested epic, with why the agent proposed it and the evidence it cited |
-| `/epic accept <name>` | Review it with the user, edit as needed, set `status: planned`, assign a phase, generate task ids — Phases 2 to 5 above |
+| `/epic accept <name>` | Review it with the user, edit as needed, set `status: planned`, assign a phase, generate task ids, and link it from its theme and `INDEX.md` — Phases 2 to 5 above |
 | `/epic reject <name>` | Set `status: cut` and add a `## Why rejected` section, after confirming |
 
 Accepting is not rubber-stamping. Run Phase 2 on a suggestion exactly as on a user's idea — the

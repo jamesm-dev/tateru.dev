@@ -68,7 +68,8 @@ Behaviour:
   dependency bump — belong to no task. Blocking those teaches people to pass `--no-verify`, which
   disables every other hook too.
 - **Block only on a reference that does not exist.** Silently losing the link is worse than one
-  rejected commit. `TSK-` plus six hex characters is a planned task, checked against `state.json`.
+  rejected commit. `TSK-` plus six hex characters is a planned task, checked against `state.json`
+  and, for a task `/epic` added since the last `/setup`, against the `^tsk-` ids in `.idea/epics/`.
   `ADH-` plus four to six hex characters is an ad-hoc task authored on the dashboard, checked
   against `board.db`'s `task_authored` table when `sqlite3` is installed, and accepted otherwise.
 - Keep the message itself unmodified. Do not rewrite what someone wrote.
@@ -135,7 +136,8 @@ never as `71% ready` — a percentage of a checklist invites rounding up.
 
 On each run, before regenerating `.management/`:
 
-1. Read `commits.jsonl` since the last run. That is the whole commit record — there is no table.
+1. Read `git log --all` since the last run — that is the commit record. `commits.jsonl` is only this
+   machine's cache of it.
 2. Map commits to tasks by reference id. **A commit never marks a task done** — it is evidence, not
    completion. Completion comes from a verified exit criterion in Phase 5.
 3. Surface commits that referenced no task as untracked work, so unplanned effort is recorded

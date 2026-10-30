@@ -42,8 +42,9 @@ silently** — that is the one way this skill can destroy work.
    git remote add tateru https://github.com/jamesm-dev/tateru.dev.git
    ```
 
-3. `git fetch <up> --tags`. Read the upstream `.claude/TATERU_VERSION` and the `.claude/CHANGELOG.md`
-   entries between the two versions, with `git show <up>/main:.claude/CHANGELOG.md`.
+3. `git fetch <up> --tags`. Read the upstream version from the newest release tag (`git tag -l 'v*' --sort=-v:refname | head -1`)
+   and the `.claude/CHANGELOG.md` entries between the two versions, with
+   `git show <newest tag>:.claude/CHANGELOG.md`. Unreleased work on `<up>/main` is never installed.
 4. Already current → say so and stop.
 5. Refuse to start on a dirty working tree (`git status --porcelain`). Ask the user to commit or
    stash first, so the upgrade is one reviewable diff they can throw away.
@@ -56,24 +57,25 @@ words, not pasted), and any entry marked **Breaking**. Ask whether to proceed.
 ## Phase 3 — Apply, file by file
 
 The base is the upstream tag for the local version, `v<local version>`. For every workflow path that
-differs between that tag and `<up>/main`:
+differs between that tag and the **target tag** `v<upstream version>` — never `<up>/main`, which can
+carry unreleased work:
 
 | Local file vs. base | Do |
 |---|---|
-| Identical — never edited | Take the upstream version: `git checkout <up>/main -- <path>` |
+| Identical — never edited | Take the upstream version: `git checkout v<upstream version> -- <path>` |
 | Edited locally, unchanged upstream | Keep the local file. Nothing to do |
 | Edited locally **and** changed upstream | Three-way merge with `git merge-file`. Clean merge → keep it and say so. Conflict → show both changes and ask: take upstream, keep local, or leave the conflict markers for the user |
 | Deleted upstream | Ask before deleting a file the user may still use |
 | New upstream | Add it |
 
 No base tag (a project cloned before versioning, or the tag was never fetched): use the last
-commit the project shares with upstream, `git merge-base HEAD <up>/main`. A normal clone keeps
+commit the project shares with upstream, `git merge-base HEAD v<upstream version>`. A normal clone keeps
 tateru's history, so this finds the exact version it started from, and only the files the user
-really edited need a decision. Comparing against `<up>/main` directly instead would flag every
+really edited need a decision. Comparing against the target tag directly instead would flag every
 file upstream changed as a possible local edit — in testing, 19 questions for one real edit.
 
 No shared history at all (a "Use this template" copy): then, and only then, compare local against
-`<up>/main` directly, take files that are identical or missing, and ask about each one that
+the target tag directly, take files that are identical or missing, and ask about each one that
 differs.
 
 Then:

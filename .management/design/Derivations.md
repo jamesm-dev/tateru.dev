@@ -65,7 +65,9 @@ function buildTaskIndex(plan, board) -> Map<id, TaskState>
     status    = explicit ?? planStatus
     unconfirmed = explicit.source == 'agent' and explicit.confirmed_by is null
                   and status == 'done'      # the agent's reading, not yet a person's
-    done      = status == 'done' and not unconfirmed
+    unverified  = not authored and explicit.source == 'human' and status == 'done'
+                  and planStatus != 'done'  # dragged into Done; no exit criterion yet (Board.md)
+    done      = status == 'done' and not unconfirmed and not unverified
     parked    = status == 'parked'
     overridden= explicit is present
     points    = metaById[id].points ?? planPoints

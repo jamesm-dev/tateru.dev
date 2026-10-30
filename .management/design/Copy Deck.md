@@ -254,6 +254,7 @@ until a sprint exists.
 | An advance was made here, not yet written to the roadmap by `/setup` | `roadmap pending` |
 | A phase the project has moved beyond | `advanced past` |
 | A phase moved beyond with an advance still pending | `advanced past, roadmap pending` |
+| A phase `/setup` verified that `/ship` has not released | `verified · not shipped` |
 
 ## Sync and honesty
 

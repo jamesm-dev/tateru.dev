@@ -149,6 +149,7 @@ specs.phase.empty	No epics in this phase.
 specs.pill.advanced	advanced past
 specs.pill.pending	roadmap pending
 specs.pill.current	current
+specs.pill.verified	verified · not shipped
 specs.pill.parked	parked
 
 # --- team --------------------------------------------------------------------

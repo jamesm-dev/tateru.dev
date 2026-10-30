@@ -115,7 +115,7 @@ script, or dependency as if it exists; check first, and if it is missing, say so
 `/setup` is what creates `app/`. Until it has run:
 
 - Write plans into `.idea/`, not code into `app/`.
-- `.management/` holds only `README.md`, `DESIGN.md`, and `design/`. `BOARD.md`, `PROGRESS.md`,
+- `.management/` holds only `README.md`, `DESIGN.md`, `design/` and `contract/`. `BOARD.md`, `PROGRESS.md`,
   `BLOCKERS.md`, `CHANGELOG.md`, `state.json`, and `board.db` are generated later.
 - There is no chosen language, framework, or package manager. The stack is decided during `/shape`
   and `/setup` against [quality-bar.md](.claude/skills/shared/quality-bar.md) and recorded as an

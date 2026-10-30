@@ -52,13 +52,14 @@ The single machine-readable snapshot. Regenerate wholesale; never hand-edit.
 {
   "generatedAt": "2026-08-30T12:00:00Z",
   "project": { "name": "", "description": "", "currentPhase": 0 },
+  "_currentPhase": "the lowest phase that is neither verified nor done - the phase /setup builds next",
   "phases": [
     {
       "n": 0,
       "name": "Walking skeleton",
       "goal": "",
       "demo": "",
-      "status": "planned | in-progress | done | cut",
+      "status": "planned | in-progress | verified | done | cut",
       "exitCriteria": [{ "text": "", "done": false }],
       "nonGoals": [""]
     }

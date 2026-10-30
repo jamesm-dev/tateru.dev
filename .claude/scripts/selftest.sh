@@ -132,6 +132,10 @@ mkdir -p .idea/epics
 note ".idea/epics/Pointed.md" planned '- [ ] The document reopens after a restart (3 pts) ^tsk-4b91c2'
 check "the /epic example criterion passes" "bash $validator --check '.idea/epics/Pointed.md'"
 note ".idea/epics/Unpointed.md" planned '- [ ] The document reopens after a restart ^tsk-4b91c2'
+note ".idea/epics/Ticked.md" planned '- [x] Saves a doc — verified by save.test.ts, a1b2c3d (3 pts) ^tsk-7f3a21'
+check "a ticked criterion with evidence before the points passes" "bash $validator --check '.idea/epics/Ticked.md'"
+note ".idea/epics/Trailing.md" planned '- [x] Saves a doc (3 pts) ^tsk-7f3a21 — verified by save.test.ts'
+check "evidence after the block ref is rejected with a clear message" "bash $validator --check '.idea/epics/Trailing.md' | grep -q 'must end the line'"
 check "a criterion with no points is rejected" "bash $validator --check '.idea/epics/Unpointed.md' | grep -q 'no points'"
 rm -rf .idea/epics .idea/notes/*.md .idea/notes/*.bak
 # A clean vault built here, so the project's own notes - which the session
@@ -151,6 +155,8 @@ check "the prompt hook reports the vault" "bash .claude/hooks/idea-context.sh </
 
 echo "Workflow contracts"
 check "phase status vocabulary includes verified in /shape, /setup and /ship" "grep -q 'verified' .claude/skills/shape/references/templates.md && grep -q 'only \`/ship\` sets \`done\`' .claude/skills/setup/SKILL.md && grep -q 'only \`/ship\` does this' .claude/skills/ship/SKILL.md"
+check "verified is a phase status in the vault contract and state.json schema" "grep -q 'verified' .claude/skills/shared/vault-contract.md && grep -q 'in-progress | verified | done' .claude/skills/setup/references/management.md"
+check "/upgrade installs release tags, never main" "grep -q 'never \`<up>/main\`' .claude/skills/upgrade/SKILL.md && ! grep -q 'checkout <up>/main' .claude/skills/upgrade/SKILL.md"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 check "CLAUDE.md marks the before-setup block for /setup to replace" "grep -q '<!-- tateru:before-setup -->' CLAUDE.md && grep -q '<!-- /tateru:before-setup -->' CLAUDE.md"
 git remote add origin https://github.com/jamesm-dev/tateru.dev.git 2>/dev/null

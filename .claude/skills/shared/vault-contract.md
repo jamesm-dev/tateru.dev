@@ -92,6 +92,7 @@ sources: [Idea A, Idea B]   # the notes this epic came from
 | brainstorm session | `active` / `done` |
 | epic | `suggested` → `planned` → `in-progress` → `done` / `cut` |
 | SPECS / ROADMAP | `draft` → `active` → `superseded` |
+| a phase, inside `ROADMAP.md` | `planned` → `in-progress` → `verified` (`/setup`) → `done` (`/ship`) / `cut` |
 | ADR | `proposed` → `accepted` / `rejected` / `superseded` |
 
 ## Two vaults, and how to write to them
@@ -146,7 +147,9 @@ It is the **only** thing that agent may write, and the only status it may write.
 1. **Never delete a note.** Kill an idea by setting `status: superseded` and linking what replaced it.
 2. **Never overwrite.** Read, edit in place, bump `updated`.
 3. **One idea per file.** If a note needs a second H1-worthy subject, split it.
-4. **No orphans.** A new note is linked from its theme MoC and from `INDEX.md` in the same turn.
+4. **No orphans.** A new note is linked from its theme MoC and from `INDEX.md` in the same turn. The
+   one exception is an epic at `status: suggested`: the `project-manager` agent may not edit
+   existing notes, so `/epic accept` does its linking.
 5. **Traceability runs both ways.** idea ↔ epic ↔ phase. Any deliverable must trace back to an idea;
    any committed idea must trace forward to an epic. `shape` enforces this.
 6. **INDEX.md is regenerated, not appended to.** It must never drift from what is on disk.

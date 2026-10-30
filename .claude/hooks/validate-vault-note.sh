@@ -173,7 +173,11 @@ case "$fp" in
         *'^tsk-'*)
           # Points must sit before the block ref, which has to end the line.
           if ! printf '%s' "$line" | grep -qE '\([0-9]+ pts?\) \^tsk-[0-9a-f]{6}[[:space:]]*$'; then
-            add "Acceptance criterion has no points. Write '(N pts) ^tsk-xxxxxx' - see shape/SKILL.md: $line"
+            if printf '%s' "$line" | grep -qE '\^tsk-[0-9a-f]{6}[[:space:]]*[^[:space:]]'; then
+              add "The ^tsk- block reference must end the line. Put evidence before the points: $line"
+            else
+              add "Acceptance criterion has no points. Write '(N pts) ^tsk-xxxxxx' - see shape/SKILL.md: $line"
+            fi
           fi
           ;;
       esac
