@@ -309,7 +309,11 @@ instead: a self-contained `.management/dashboard.html` plus a `board` script tha
 - Set the built epics to `done` or `in-progress`; bump their `updated`.
 - Write an ADR for any decision you had to make that SPECS.md did not cover.
 - Regenerate `INDEX.md`.
-- Write or update `CLAUDE.md` with the stack, conventions, and the real commands to run.
+- Write or update `CLAUDE.md` with the stack, conventions, and the real commands to run. **Replace
+  the block between `<!-- tateru:before-setup -->` and `<!-- /tateru:before-setup -->`** — the "No
+  app exists yet" section, which stops being true now — with a `## Stack and commands` section: the
+  stack, where the app lives, and the verified install, dev, lint, typecheck, test, focused-test and
+  build commands. Leave the rest of the file as it is.
 - **Write or refresh the stack profile** — `.claude/team/stack.md` and `.claude/team/checks.env` —
   per `.claude/skills/work-on/references/stack-profile.md`. It is what turns the `/work-on` agents
   into specialists of this stack, and what the `pre-push` hook runs. Only from commands Phase 5

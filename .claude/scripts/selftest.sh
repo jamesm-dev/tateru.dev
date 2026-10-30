@@ -85,6 +85,10 @@ fi
 printf '{"tasks":[{"ref":"tsk-111111"}]}\n' > .management/state.json
 check "a known TSK id is accepted" "git commit -q --allow-empty -m 'TSK-111111 known'"
 check "an unknown TSK id is rejected" "! git commit -q --allow-empty -m 'TSK-999999 unknown'"
+mkdir -p .idea/epics
+printf -- '- [ ] Added by /epic after the last /setup (2 pts) ^tsk-222222\n' > ".idea/epics/New Epic.md"
+check "a TSK id that only exists in an epic is accepted" "git commit -q --allow-empty -m 'TSK-222222 from epic'"
+rm -rf .idea/epics
 if command -v sqlite3 >/dev/null 2>&1; then
   sqlite3 .management/board.db "CREATE TABLE task_authored(task_id TEXT); INSERT INTO task_authored VALUES('ADH-3C81');"
   check "a known ADH id is accepted" "git commit -q --allow-empty -m 'ADH-3c81 known'"
@@ -108,6 +112,23 @@ printf '# One\n\n# Two\n' > ".idea/notes/Broken Note.md"
 check "the validator rejects a note with no frontmatter" "! bash $validator --check '.idea/notes/Broken Note.md'"
 check "the session audit names the broken note" "bash .claude/hooks/vault-preflight.sh | grep -q 'Broken Note'"
 rm ".idea/notes/Broken Note.md"
+note() { # note <path> <body...>: a note with valid frontmatter, so only the body is under test
+  t=$(basename "$1" .md)
+  { printf -- '---\ntitle: %s\ncreated: 2026-01-01\nupdated: 2026-01-01\ntags: [test]\nstatus: %s\n---\n\n# %s\n\n' "$t" "$2" "$t"; shift 2; printf '%s\n' "$@"; } > "$1"
+}
+note ".idea/notes/Code Sample.md" seed '```bash' '# install' '#include <x>' '```'
+check "a comment inside a code block is not a heading" "bash $validator --check '.idea/notes/Code Sample.md'"
+note ".idea/notes/Two Headings.md" seed '# Another'
+check "a real second H1 is still rejected" "! bash $validator --check '.idea/notes/Two Headings.md'"
+note ".idea/notes/Wrong Heading.md" seed
+sed -i.bak 's/^# Wrong Heading$/# Something Else/' ".idea/notes/Wrong Heading.md"
+check "an H1 that differs from the title is rejected" "bash $validator --check '.idea/notes/Wrong Heading.md' | grep -q 'does not match the frontmatter title'"
+mkdir -p .idea/epics
+note ".idea/epics/Pointed.md" planned '- [ ] The document reopens after a restart (3 pts) ^tsk-4b91c2'
+check "the /epic example criterion passes" "bash $validator --check '.idea/epics/Pointed.md'"
+note ".idea/epics/Unpointed.md" planned '- [ ] The document reopens after a restart ^tsk-4b91c2'
+check "a criterion with no points is rejected" "bash $validator --check '.idea/epics/Unpointed.md' | grep -q 'no points'"
+rm -rf .idea/epics .idea/notes/*.md .idea/notes/*.bak
 # A clean vault built here, so the project's own notes - which the session
 # audit reports on separately - never decide this check.
 clean="$tmp/clean"
@@ -122,6 +143,13 @@ check "the session audit warns about unwired hooks" "bash .claude/hooks/vault-pr
 git config core.hooksPath .githooks
 rmdir app
 check "the prompt hook reports the vault" "bash .claude/hooks/idea-context.sh </dev/null | grep -q 'SPECS.md'"
+
+echo "Workflow contracts"
+check "CLAUDE.md marks the before-setup block for /setup to replace" "grep -q '<!-- tateru:before-setup -->' CLAUDE.md && grep -q '<!-- /tateru:before-setup -->' CLAUDE.md"
+git remote add origin https://github.com/jamesm-dev/tateru.dev.git 2>/dev/null
+up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')
+check "/upgrade finds the tateru remote when it is called origin" "[ '$up' = origin ]"
+git remote remove origin 2>/dev/null
 
 echo "Scripts that need a built app"
 bash .claude/scripts/dashboard-conformance.sh >/dev/null 2>&1

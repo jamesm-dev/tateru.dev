@@ -39,7 +39,9 @@ Create with `mkdir -p`. Never nest deeper than this — Obsidian's graph is the 
 - Every note links *up* (to its theme) and *sideways* (to related notes). No orphans.
 
 **Body**
-- Exactly one `#` H1, matching `title`. `##`/`###` below it.
+- Exactly one `#` H1, matching `title`. `##`/`###` below it. The exception is a fixed-name system
+  file — an all-caps filename such as `README`, `INDEX` or `DESIGN` — whose H1 may describe it
+  (`# Idea Vault`), because its filename is a role, not a subject.
 - Inline tags `#kebab-case` — never at the start of a line (Obsidian parses that as a heading).
   Indent them or put them inline after text.
 - Tasks as `- [ ] text` so Obsidian's task queries pick them up.
@@ -87,6 +89,7 @@ sources: [Idea A, Idea B]   # the notes this epic came from
 |---|---|
 | idea note | `seed` → `exploring` → `promising` → `committed` / `parked` / `superseded` |
 | theme MoC | `active` / `dormant` |
+| brainstorm session | `active` / `done` |
 | epic | `suggested` → `planned` → `in-progress` → `done` / `cut` |
 | SPECS / ROADMAP | `draft` → `active` → `superseded` |
 | ADR | `proposed` → `accepted` / `rejected` / `superseded` |
