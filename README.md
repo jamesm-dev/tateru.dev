@@ -206,6 +206,9 @@ The agents ship stack-agnostic. Once `/setup` has chosen and verified your stack
 **Does it work with my stack?**
 Yes. tateru never picks your language — `/shape` interviews you, records the choice with its reasoning, and `/setup` uses the ecosystem's own scaffolder. Node, Python, Go, Rust, whatever you like.
 
+**Does it work with Codex, Cursor or Gemini?**
+Partly. tateru is Claude-first: the slash commands, subagents and vault hooks only run in Claude Code. [AGENTS.md](AGENTS.md) points other tools at the same plan, rules and git hooks, and shows how to follow each command's skill by hand. You'll lose the automation, not the method.
+
 **Do I need Obsidian?**
 No. The notes are plain Markdown and read fine on GitHub or in your editor. Obsidian just makes the graph pretty.
 

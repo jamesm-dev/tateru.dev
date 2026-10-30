@@ -91,6 +91,9 @@ check is not optional. Confirm all of the following:
 The same applies to removal: delete the command or skill, then confirm `/explain` no longer mentions
 it and that nothing else links to it.
 
+The same change also updates the command-to-skill table in [AGENTS.md](AGENTS.md), the pointer
+for non-Claude tools. tateru is Claude-first: `AGENTS.md` maps to this file and never duplicates it.
+
 ## Commands
 
 | Command | Delegates to | Purpose | Stage |
@@ -151,7 +154,7 @@ in `app/`, cannot find `.git` at the root, and would be a dependency that does n
 
 - Windows host. Prefer cross-platform scripts; watch path separators and CRLF.
 - Application code will live in `app/`, once `/setup` creates it. The root belongs to the workflow
-  — `.idea/`, `.management/`, `.claude/`, and this project's own `README.md`. Any command in a doc
+  — `.idea/`, `.management/`, `.claude/`, this project's own `README.md`, and `AGENTS.md`. Any command in a doc
   names the directory it runs in.
 - `.idea/` is intent; `.management/` is execution state, derived from it. Never let `.management/`
   become a second source of truth, and never edit `.idea/` from it silently.
