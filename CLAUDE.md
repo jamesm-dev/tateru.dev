@@ -59,8 +59,9 @@ runs them by name. [dashboard-conformance.sh](.claude/scripts/dashboard-conforma
 built `/management` dashboard against the data contract in `.management/contract/` — strings,
 measurements, and order. It needs only `bash`, `find`, `sed`, `tr` and `awk`, so it runs in any
 project before any package manager exists. Exit `2` means it could not run, including "nothing built
-yet". Why: prose read by a model is not reproducible, so the checkable half of a design is data —
-see [Conformance.md](.management/design/Conformance.md).
+yet". [selftest.sh](.claude/scripts/selftest.sh) checks tateru's own machinery — every hook and
+script — and runs in CI on each push. **Run it after changing any hook or script**; a hook that
+silently stops firing looks exactly like a project where nobody commits.
 
 ## Keep `/explain` and `AGENTS.md` current
 
