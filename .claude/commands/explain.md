@@ -23,6 +23,7 @@ If `$ARGUMENTS` names a command, skip to stage 2 for that one, then offer the re
 .claude/skills/*/SKILL.md        project skills
 ~/.claude/commands/*.md          personal commands, if any
 ~/.claude/skills/*/SKILL.md      personal skills, if any
+.claude/agents/*.md              subagents — never menu items, read in stage 2 when a command uses them
 ```
 
 Read each **command** file fully — they are short. For each **skill**, read its frontmatter (the
@@ -52,7 +53,8 @@ the rest. Ask nothing else — one question, then stop and wait.
 
 Only the command they picked. Now read everything: the command file, its skill, and every
 `references/` file that skill loads, plus any `.claude/skills/shared/` contract it reads — such as
-`quality-bar.md`, which decides how `/shape` and `/setup` pick a stack. Those shared files are not
+`quality-bar.md`, which decides how `/shape` and `/setup` pick a stack — and every agent in
+`.claude/agents/` the command spawns, such as the team `/work-on` routes between. Those shared files are not
 commands and never appear in the stage 1 menu, but they are half of what a skill actually does, so a
 walkthrough that skips them describes the wrong thing. Explain what really happens when you run it —
 the command's
@@ -103,5 +105,6 @@ default, not a script.
 
 ## Scope
 
-This project's commands and skills. Mention Claude Code's built-ins (`/help`, `/clear`, `/config`)
+This project's commands and skills. Subagents are explained only as part of the command that uses
+them — `/work-on`'s team, `/setup`'s `project-manager`. Mention Claude Code's built-ins (`/help`, `/clear`, `/config`)
 only in one closing line pointing at `/help`.

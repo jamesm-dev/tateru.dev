@@ -22,7 +22,7 @@ A [Claude Code](https://claude.com/claude-code) workflow that walks a project fr
 
 Most AI coding sessions start with a vague prompt and end with a folder of confident-looking code nobody can explain three weeks later. No spec. No decisions written down. No idea which half is tested.
 
-**tateru is eight slash commands and some stubborn rules that get in the way of that.** Spec-driven development for AI agents: it asks questions before writing code, records *why* you chose things, refuses to call a phase done without running the tests, and gives you a project board that reads from your actual repo instead of a spreadsheet nobody updates.
+**tateru is nine slash commands and some stubborn rules that get in the way of that.** Spec-driven development for AI agents: it asks questions before writing code, records *why* you chose things, refuses to call a phase done without running the tests, and gives you a project board that reads from your actual repo instead of a spreadsheet nobody updates.
 
 Works with any language or framework. The workflow is the product; the code stays yours.
 
@@ -80,6 +80,7 @@ Idea → development → production → maintenance. The whole life of a project
 | **`/setup`** | Builds it. One phase at a time, verified against that phase's exit criteria, showing you real command output. |
 | **`/ship`** | Walks seven readiness gates, then releases. Won't let an unmet gate slide past quietly. |
 | **`/maintain`** | For when it's live and slowly rotting. Dependencies, silent tests, decisions reality has overtaken. |
+| **`/work-on`** | One task, the cheapest safe way. Routes it first, then fixes it directly, hands it to one specialist, or splits it into parallel slices only when they can't collide. |
 | **`/epic`** | New idea halfway through? Adds one epic and its tasks without re-planning everything. |
 | **`/decide`** | Records an architecture decision as a numbered ADR, so future-you knows why. |
 | **`/explain`** | Explains any of the above from scratch, in plain words. |
@@ -107,7 +108,7 @@ tateru starts earlier and stops later.
 | **Ends at** | "implemented" | shipped through readiness gates — then `/maintain` for the rot that arrives afterwards |
 | **Its board tracks** | Claude Code sessions and agent runs | acceptance criteria from your roadmap. The plan, not the tooling |
 | **Sequencing** | tasks in dependency order | phases in **risk** order, each a vertical slice, Phase 0 a deployed walking skeleton |
-| **Its agent** | writes code for you | audits you. It can suggest, and it cannot edit the plan or tick a criterion |
+| **Its agents** | write code for you | one audits you and cannot edit the plan; the build team works one task at a time, against its acceptance criteria, as specialists in *your* stack |
 
 And one thing that is honestly *not* a differentiator: plenty of projects point an AI agent at an
 Obsidian vault. What is different here is what the vault holds — not general notes, but the spec,
@@ -142,7 +143,8 @@ These will occasionally annoy you. That's the point.
 .management/    State — how it's actually going.
                 Board, progress, blockers, changelog.
 
-.claude/        The machinery. Commands, skills, hooks, scripts, the PM agent.
+.claude/        The machinery. Commands, skills, hooks, scripts, agents.
+                team/ holds the stack profile /setup writes for them.
 
 app/            Your actual project. Everything /setup scaffolds lands here.
 ```
@@ -189,12 +191,23 @@ It has exactly **two** powers, both of which leave a trail:
 
 It cannot edit the plan, tick an exit criterion, or deploy. An overseer that can quietly rewrite what it audits isn't an overseer.
 
+### The build team
+
+`/work-on` has a small team for doing one task at a time: a **router** that decides how much machinery the task deserves, a cheap **scout** that checks whether the work already exists, a **planner** that splits work into slices that can't collide, **implementers**, and a **reviewer** that re-runs the checks itself instead of trusting a reported pass.
+
+Most tasks never spawn most of them. A typo is fixed directly; only genuinely independent slices run in parallel, capped at four.
+
+The agents ship stack-agnostic. Once `/setup` has chosen and verified your stack, it writes `.claude/team/stack.md`. That file is a persona for each role and each part of your codebase, such as a senior Django engineer for `app/api/`, or a reviewer who checks for N+1 queries first. It is built from your lockfile and your ADRs, not from memory. Change the stack, and the specialists change with it.
+
 ---
 
 ## FAQ
 
 **Does it work with my stack?**
 Yes. tateru never picks your language — `/shape` interviews you, records the choice with its reasoning, and `/setup` uses the ecosystem's own scaffolder. Node, Python, Go, Rust, whatever you like.
+
+**Does it work with Codex, Cursor or Gemini?**
+Partly. tateru is Claude-first: the slash commands, subagents and vault hooks only run in Claude Code. [AGENTS.md](AGENTS.md) points other tools at the same plan, rules and git hooks, and shows how to follow each command's skill by hand. You'll lose the automation, not the method.
 
 **Do I need Obsidian?**
 No. The notes are plain Markdown and read fine on GitHub or in your editor. Obsidian just makes the graph pretty.

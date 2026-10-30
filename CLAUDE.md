@@ -29,8 +29,7 @@ measure. Read it before choosing any technology.
 
 ## Hooks
 
-Three hooks in [.claude/settings.json](.claude/settings.json) enforce the above rather than trusting
-it to be remembered:
+Three hooks in [.claude/settings.json](.claude/settings.json) enforce the above, not memory:
 
 | Event | Script | Does |
 |---|---|---|
@@ -38,12 +37,10 @@ it to be remembered:
 | `UserPromptSubmit` | [idea-context.sh](.claude/hooks/idea-context.sh) | Injects a snapshot of `.idea/` and whether `CLAUDE.md` exists |
 | `PostToolUse` | [validate-vault-note.sh](.claude/hooks/validate-vault-note.sh) | Checks any vault note — from Write, Edit, or an optional Obsidian MCP — against the vault contract, blocking with the specific violations |
 
-Together they cover the two ways a note can go wrong: written badly by a tool (`PostToolUse`
-validation) or edited by hand outside Claude (`SessionStart` audit).
-
-`.idea/` and `.management/` are **always writable** with plain `Write` and `Edit`. No hook gates the
-write itself. What is enforced is that the Markdown stays Obsidian-compatible — valid frontmatter,
-one H1, real wikilinks, no illegal filename characters.
+They cover both ways a note goes wrong: written badly by a tool, or edited by hand outside Claude.
+`.idea/` and `.management/` are **always writable** with plain `Write` and `Edit` — no hook gates the
+write. What is enforced is Obsidian-compatible Markdown: valid frontmatter, one H1, real wikilinks,
+no illegal filename characters.
 
 The validator doubles as a CLI:
 
@@ -57,39 +54,28 @@ that only exists in prose is not a rule.
 
 ## Scripts
 
-[.claude/scripts/](.claude/scripts/) holds runnable checks that are not hooks — nothing triggers
-them automatically; a skill or a person runs them by name.
+[.claude/scripts/](.claude/scripts/) holds checks nothing triggers automatically; a skill or a person
+runs them by name. [dashboard-conformance.sh](.claude/scripts/dashboard-conformance.sh) checks a
+built `/management` dashboard against the data contract in `.management/contract/` — strings,
+measurements, and order. It needs only `bash`, `find`, `sed`, `tr` and `awk`, so it runs in any
+project before any package manager exists. Exit `2` means it could not run, including "nothing built
+yet". Why: prose read by a model is not reproducible, so the checkable half of a design is data —
+see [Conformance.md](.management/design/Conformance.md).
 
-| Script | Checks |
-|---|---|
-| [dashboard-conformance.sh](.claude/scripts/dashboard-conformance.sh) | A built `/management` dashboard against the machine-readable contract in `.management/contract/` — strings, measurements, and order |
+## Keep `/explain` and `AGENTS.md` current
 
-It needs only `bash`, `find`, `sed`, `tr` and `awk`, deliberately: it has to run in any project in
-any language, including one whose package manager is not installed yet. Exit `2` means it could not
-run — including "nothing has been built yet", which is the right answer in a fresh clone.
+**When a command or skill is added, removed, or changed, update both in the same change.**
+[/explain](.claude/commands/explain.md) discovers commands at run time, so it usually needs no edit —
+which is exactly why the check gets forgotten. Confirm:
 
-Why it exists: prose read by a model is not reproducible, so the checkable half of a design has to
-be data. See [.management/design/Conformance.md](.management/design/Conformance.md).
-
-## Keep `/explain` current
-
-**Whenever a command or skill is added, removed, or changed, update `/explain` in the same change.**
-
-[.claude/commands/explain.md](.claude/commands/explain.md) discovers commands by reading
-`.claude/commands/`, `.claude/skills/`, and the user-level equivalents at run time, so a new command
-is usually picked up with no edit. That is exactly why this rule is easy to forget — and why the
-check is not optional. Confirm all of the following:
-
-- [ ] The new or changed file lives somewhere `/explain`'s **Stage 1** discovery list actually covers.
-      A new location (a plugin, a nested directory, a different config root) means adding that path.
-- [ ] `/explain`'s **Scope** section still describes the real set of commands.
-- [ ] A command that delegates to a skill is explained as what it *does*, not as its two-line body —
-      if a new command breaks that pattern, the guidance needs adjusting.
-- [ ] The one-line chain note in **Stage 1** still reflects how the commands actually chain.
+- [ ] The file sits where `/explain`'s **Stage 1** discovery list looks; a new location means a new path.
+- [ ] `/explain`'s **Scope** and its one-line chain note still match the real commands.
+- [ ] A command is explained as what its skill *does*, not as its two-line body.
+- [ ] The command-to-skill table in [AGENTS.md](AGENTS.md) matches. tateru is Claude-first:
+      `AGENTS.md` points non-Claude tools at this file and never duplicates it.
 - [ ] Run `/explain` once and read the output. A rule that is never exercised silently rots.
 
-The same applies to removal: delete the command or skill, then confirm `/explain` no longer mentions
-it and that nothing else links to it.
+On removal, also confirm nothing still mentions or links to it.
 
 ## Commands
 
@@ -99,6 +85,7 @@ it and that nothing else links to it.
 | [/shape](.claude/commands/shape.md) | [shape](.claude/skills/shape/SKILL.md) | Turn ideas into `SPECS.md`, a phased `ROADMAP.md`, and epics | Idea |
 | [/epic](.claude/commands/epic.md) | [epic](.claude/skills/epic/SKILL.md) | One epic and its tasks, mid-project. Also triages suggested epics | Development |
 | [/setup](.claude/commands/setup.md) | [setup](.claude/skills/setup/SKILL.md) | Build the dev environment and the current roadmap phase | Development |
+| [/work-on](.claude/commands/work-on.md) | [work-on](.claude/skills/work-on/SKILL.md) | One task with the smallest agent team: route, then build directly, solo, or in parallel slices | Development |
 | [/ship](.claude/commands/ship.md) | [ship](.claude/skills/ship/SKILL.md) | Verify the readiness gates, then release | Production |
 | [/maintain](.claude/commands/maintain.md) | [maintain](.claude/skills/maintain/SKILL.md) | Health-check a shipped project and fix the rot | Maintenance |
 | [/decide](.claude/commands/decide.md) | — | Record an ADR | Any |
@@ -108,6 +95,12 @@ The [project-manager](.claude/agents/project-manager.md) agent oversees all four
 auditor with exactly two write powers: it proposes epics at `status: suggested`, and it marks tasks
 done in `board.db` from commit evidence — always with a note saying why, and never confirmed until
 a person confirms it. It may not touch the plan, tick a criterion, or deploy.
+
+`/work-on` drives a second team — `task-router`, `repo-scout`, `work-planner`, `implementer`,
+`reviewer` — written stack-agnostic. They become specialists by reading `.claude/team/stack.md`,
+which `/setup` generates from the verified stack
+([format](.claude/skills/work-on/references/stack-profile.md)); its twin `checks.env` is what
+`pre-push` runs. Never hand-write either from memory — no stack, no profile, generalist agents.
 
 Commands stay thin — they name the skill, pass `$ARGUMENTS`, and handle invocation-specific cases.
 Method and detail live in the skill and its `references/`, which load only when that phase is
@@ -144,7 +137,7 @@ in `app/`, cannot find `.git` at the root, and would be a dependency that does n
 
 - Windows host. Prefer cross-platform scripts; watch path separators and CRLF.
 - Application code will live in `app/`, once `/setup` creates it. The root belongs to the workflow
-  — `.idea/`, `.management/`, `.claude/`, and this project's own `README.md`. Any command in a doc
+  — `.idea/`, `.management/`, `.claude/`, this project's own `README.md`, and `AGENTS.md`. Any command in a doc
   names the directory it runs in.
 - `.idea/` is intent; `.management/` is execution state, derived from it. Never let `.management/`
   become a second source of truth, and never edit `.idea/` from it silently.

@@ -90,6 +90,10 @@ and giving it a database driver to write rows nothing yet reads buys complexity 
 1. Run the project's real checks: lint, typecheck, test. **Block the push if they fail.** This is the
    one hook that should stop you, because a red push is what turns into a broken deploy.
 
+   The commands come from **`.claude/team/checks.env`**, which Phase 7 writes from the verified
+   commands — the hook itself names no package manager, so it works for any stack. Until that file
+   exists the hook skips the checks and says so.
+
    Leave the machine-readable report where the runner wrote it. `/setup` reads it and writes the
    runs into `board.db`'s `test_run` table, because that is where a database driver already exists;
    the hook stays a shell script with no dependencies.
