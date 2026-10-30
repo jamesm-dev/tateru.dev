@@ -131,7 +131,9 @@ git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
   done
 ```
 
-Say what was moved. These are local tags; `/upgrade` reads the same `tateru/v*` names.
+Then stop a plain `git fetch` from bringing them back, when the tateru remote is still `origin`:
+`git config remote.origin.tagOpt --no-tags`. Say what was moved. These are local tags; `/upgrade`
+reads the same `tateru/v*` names.
 
 ## Windows notes
 

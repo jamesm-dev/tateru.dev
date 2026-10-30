@@ -168,6 +168,8 @@ if command -v python3 >/dev/null 2>&1; then
     check "$f is valid JSON" "python3 -c 'import json,sys; json.load(open(sys.argv[1]))' '$f'"
   done
 fi
+check "/setup never asks again about a rejected agent completion" "grep -q 'rejected_at IS NULL' .claude/skills/setup/SKILL.md"
+check "board.db stays local: ignored with its WAL files" "git check-ignore -q .management/board.db && git check-ignore -q .management/board.db-wal"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
   # /setup has run: it replaces the block, so the markers must be gone.
@@ -185,8 +187,12 @@ top=$(sed -n 's/^## \([0-9][0-9.]*\) .*/\1/p' .claude/CHANGELOG.md 2>/dev/null |
 check "TATERU_VERSION matches the newest changelog release ($ver)" "[ -n '$ver' ] && [ '$ver' = '$top' ]"
 
 echo "Scripts that need a built app"
-bash .claude/scripts/dashboard-conformance.sh >/dev/null 2>&1
-check "dashboard-conformance exits 2 with nothing built" "[ $? -eq 2 ]"
+if grep -qv '^[[:space:]]*\(#\|$\)' .management/contract/sources.txt 2>/dev/null; then
+  skip "a dashboard is built here; /setup runs dashboard-conformance against it"
+else
+  bash .claude/scripts/dashboard-conformance.sh >/dev/null 2>&1
+  check "dashboard-conformance exits 2 with nothing built" "[ $? -eq 2 ]"
+fi
 
 echo
 echo "selftest: $pass passed, $fail failed"

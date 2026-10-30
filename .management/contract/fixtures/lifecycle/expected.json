@@ -15,8 +15,8 @@
                     "_": "dragged into Done; the plan has not ticked it" },
     "TSK-b00003": { "status": "next-up", "done": false, "unconfirmed": false, "unverified": false, "overridden": false,
                     "_": "a rejected agent row is kept but never applied" },
-    "TSK-b00004": { "status": "done", "done": true, "unconfirmed": false, "unverified": false, "overridden": true,
-                    "_": "confirmed by a person" },
+    "TSK-b00004": { "status": "done", "done": false, "unconfirmed": false, "unverified": true, "overridden": true,
+                    "_": "confirmed by a person: vouched for, but not done until a verified criterion ticks it" },
     "TSK-b00005": { "status": "in-progress", "done": false, "unconfirmed": false, "unverified": false, "overridden": true,
                     "_": "rejected, then a person dragged it: the person's drop applies" }
   },

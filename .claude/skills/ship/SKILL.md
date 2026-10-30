@@ -48,7 +48,7 @@ something**, not by reading a status file — a file can be stale, a command can
 
 | Gate | How to actually check |
 |---|---|
-| Exit criteria | Each one, against evidence. Unverifiable means unmet. A parked criterion is reported as parked, never as met. Criteria marked ` — at release` are this release's to prove: count them as pending, check them in Phase 4 after the deploy, and fail the release if they do not hold |
+| Exit criteria | Each one, against evidence. Unverifiable means unmet. A parked criterion is reported as parked, never as met. Criteria marked ` — at release` count as satisfied for the gate, as everywhere else: this release proves them in Phase 4 after the deploy, and fails if they do not hold |
 | Tasks | Nothing blocked or in flight in this phase |
 | Tests | Run the suite now. Show the output. |
 | Checks | Run lint, typecheck, build now |

@@ -52,6 +52,8 @@ The single machine-readable snapshot. Regenerate wholesale; never hand-edit.
 {
   "generatedAt": "2026-08-30T12:00:00Z",
   "project": { "name": "", "description": "", "currentPhase": 0 },
+  "lastIngested": "",
+  "_lastIngested": "the newest commit SHA /setup has read; the next run starts after it",
   "_currentPhase": "the lowest phase that is neither verified nor done - the phase /setup builds next - or the last phase once every phase is",
   "phases": [
     {

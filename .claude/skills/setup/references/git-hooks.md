@@ -124,7 +124,7 @@ the current phase. Readiness answers "can we ship yet", so it must look at what 
 
 | Gate | Met when |
 |---|---|
-| Exit criteria | Every criterion of the readiness phase is met with evidence, or parked (recorded, never counted as met). Criteria marked ` — at release` are pending until `/ship` proves them |
+| Exit criteria | Every criterion of the readiness phase is met with evidence, or parked (recorded, never counted as met). Criteria marked ` — at release` count as satisfied here, as on the dashboard; `/ship` proves them after the deploy and fails the release if they do not hold |
 | Tasks | No task in the phase is blocked or in progress |
 | Tests | The latest run passed, and every epic in the phase has at least one linked run |
 | Checks | Lint, typecheck, build all pass |
@@ -139,8 +139,9 @@ never as `71% ready` — a percentage of a checklist invites rounding up.
 
 On each run, before regenerating `.management/`:
 
-1. Read `git log --all` since the last run — that is the commit record. `commits.jsonl` is only this
-   machine's cache of it.
+1. Read `git log --all --not $(git tag -l 'tateru/v*')` after `state.json` `lastIngested` — the
+   project's commit record, without tateru's own history. `commits.jsonl` is only this machine's
+   cache of it.
 2. Map commits to tasks by reference id. **A commit never marks a task done** — it is evidence, not
    completion. Completion comes from a verified exit criterion in Phase 5.
 3. Surface commits that referenced no task as untracked work, so unplanned effort is recorded

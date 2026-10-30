@@ -91,5 +91,6 @@ it returns a 404 outside development, because it exposes the roadmap, blockers, 
 to anyone who can reach it.
 
 Structure comes from `.idea/` and is read-only there; assignees, points, and ad-hoc tasks are
-authored into `board.db`, which is gitignored by default because it holds names. It is not regenerable — parks, advances and
-confirmations live only there — so `/setup` asks a team whether to commit it.
+authored into `board.db`, which is gitignored because it holds names and is a binary file git cannot merge. It is one
+person's board, and it is not regenerable — parks, advances and confirmations live only there — so
+back it up rather than deleting it.

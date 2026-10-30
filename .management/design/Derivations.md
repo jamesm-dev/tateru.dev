@@ -68,8 +68,10 @@ function buildTaskIndex(plan, board) -> Map<id, TaskState>
     status    = explicit ?? planStatus
     unconfirmed = explicit.source == 'agent' and explicit.confirmed_by is null
                   and status == 'done'      # the agent's reading, not yet a person's
-    unverified  = not authored and explicit.source == 'human' and status == 'done'
-                  and planStatus != 'done'  # dragged into Done; no exit criterion yet (Board.md)
+    unverified  = not authored and status == 'done' and planStatus != 'done'
+                  and (explicit.source == 'human' or explicit.confirmed_by is not null)
+                  # a person's drag into Done, or a confirmed agent reading: claimed, but no
+                  # verified exit criterion ticks it yet (Board.md)
     done      = status == 'done' and not unconfirmed and not unverified
     parked    = status == 'parked'
     overridden= explicit is present

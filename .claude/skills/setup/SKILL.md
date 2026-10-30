@@ -136,7 +136,9 @@ why); `.management/` holds state (progress, blockers, dates, what shipped). Crea
 run; refresh it on every later run.
 
 1. **Ingest commits first.** The record is `git log --all` itself — every commit, including pulled
-   ones, squash-merges from GitHub and a teammate's work. Parse task ids from each message the way
+   ones, squash-merges from GitHub and a teammate's work — minus tateru's own history, which every
+   clone carries: `git log --all --not $(git tag -l 'tateru/v*')`. Start after the SHA in
+   `state.json` `lastIngested` when there is one, and write the newest ingested SHA back. Parse task ids from each message the way
    the `post-commit` hook does (`TSK-` and `ADH-` ids, case-insensitive). `.management/commits.jsonl`
    is a local cache of this machine's commits, useful for timing, never the whole record. Map commits to tasks by reference id; a commit is
    evidence, never completion. Commits referencing no task are recorded as untracked work, so
@@ -168,11 +170,10 @@ run; refresh it on every later run.
    neither exists, say so plainly; the Markdown tracking still works. Then sync pull request and
    test data into it.
 
-   **Ask whether the team shares it.** `board.db` is gitignored by default, because it holds names.
-   That is right for one person and wrong for a team: drags, assignees, parks, phase advances and
-   confirmations would all stay on one machine, and another clone's `/setup` would never see them.
-   Ask when `git log` shows more than one author or the dashboard is not dev-only: keep it local, or
-   commit it (remove the `.gitignore` line). Record the answer as an ADR either way. **Never** clear a row a person authored: a task id
+   **`board.db` is one person's board.** It is gitignored because it holds names, and it is a binary
+   file git cannot merge, so it is not shared between clones. Say so once, on the first run, if
+   `git log` shows authors beyond the project's own: in a team, one person runs `/setup` and holds
+   the board. **Never** clear a row a person authored: a task id
    that has left `.idea/` is marked orphaned, not deleted.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
    each row not yet consumed, record the advance in `ROADMAP.md`, open the next phase, and stamp
@@ -196,13 +197,15 @@ run; refresh it on every later run.
    ask. Never silently overwrite a phase status a person set.
 
 9. **Confirm the agent's completions.** List every `task_status` row with `source = 'agent'`,
-   `status = 'done'` and `confirmed_by IS NULL`, with its note and commits, and ask the person
+   `status = 'done'`, `confirmed_by IS NULL` and `rejected_at IS NULL` — a rejected one is never
+   asked about again — with its note and commits, and ask the person
    (`AskUserQuestion`) to confirm or reject each. Confirm sets `confirmed_by` — the person's
    `assignee.id`; ask once which assignee they are, and add them to `assignee` if the table is empty
    — and `confirmed_at`. Reject sets `rejected_at` and puts the person's reason in `note`: the row stops
    applying, so the task falls back to its plan status, but it is kept. Deleting it would let the
    agent mark the same task done again from the same commits. This is the only writer of `confirmed_by`. Until confirmed, such a task
-   reads as `done · unconfirmed` and counts as not done everywhere.
+   reads as `done · unconfirmed`; once confirmed, `done · unverified`, like a person's own drag into
+   Done. Either way it counts as not done until a verified criterion ticks it.
 10. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
    the runner's own output — and write each run into `board.db`'s `test_run` table, linked to a task
    by its reference id where the test names one, and to the epic otherwise.
@@ -369,9 +372,8 @@ stays as it was; this is where the difference shows.
 - **Tick each epic acceptance criterion this run verified**, with its evidence before the points,
   because the block reference must end the line:
   `- [x] Saves a doc — verified by save.test.ts, a1b2c3d (3 pts) ^tsk-7f3a21`.
-  An agent completion a person confirmed in Phase 6 is ticked the same way, with
-  `confirmed by <name>, <SHAs>` as its evidence, so the plan and the board agree it is done.
-  This includes work `/work-on` finished since the last run, which leaves `.idea/` alone and relies
+  A confirmed agent completion is ticked only when this run verified it too — confirming is a
+  person vouching for the agent's reading, not evidence. This includes work `/work-on` finished since the last run, which leaves `.idea/` alone and relies
   on this step to record it.
 - Set the built epics to `done` or `in-progress`; bump their `updated`.
 - Write an ADR for any decision you had to make that SPECS.md did not cover.

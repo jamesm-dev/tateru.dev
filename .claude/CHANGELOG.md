@@ -55,14 +55,19 @@ after upgrading as **Breaking**, and say what to do.
   and would collide with your own. Fetch the new skill first, then run `/upgrade`:
 
   ```bash
-  git fetch tateru --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
+  up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')   # often "origin"
+  git fetch "$up" --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
   git checkout tateru/v<new version> -- .claude/skills/upgrade .claude/commands/upgrade.md
+  git commit -m "chore: fetch the new /upgrade"
   ```
+
+  Commit it before running `/upgrade`, which refuses to start on uncommitted changes.
 
 - **Breaking for a dashboard built at 0.1.0:** its derivations predate the confirm, unverified,
   rejected and advance fixes, so it counts unconfirmed work as done. `/upgrade` never touches
-  `app/`: after upgrading, update the dashboard's derivation code to match
-  `.management/design/Derivations.md`, then run the goldens (including the new
+  `app/`: after upgrading, update the dashboard to match `.management/design/Derivations.md` and
+  `API Surface.md` — add the `task_status.rejected_at` column, keep it on `POST /status`, and make
+  `POST /phase/advance` upsert — then run the goldens (including the new
   `fixtures/lifecycle/`) and `dashboard-conformance.sh`. `/setup` now runs them on every run.
 - **Changed:** phases now go `planned → in-progress → verified → done`. Once every phase is
   `verified` or `done`, `currentPhase` is the last phase and `/setup` reports the roadmap complete. `/setup` sets `verified`;
@@ -103,11 +108,11 @@ after upgrading as **Breaking**, and say what to do.
   longer make every advance look forced.
 - **Changed:** `/upgrade` three-way merges `project-manager.md` instead of skipping it, so fixes to
   the agent reach projects that tailored it.
-- **Fixed:** a rejected agent completion is marked `rejected_at` and ignored, instead of a fake
-  status that blocked the phase; a confirmed one is ticked in the epic, so the plan and the board
-  agree.
-- **Changed:** `/setup` asks a team whether to commit `board.db`. It is not regenerable: parks,
-  advances and confirmations live only there.
+- **Fixed:** a rejected agent completion is marked `rejected_at` and ignored, and never asked about
+  again. A confirmed one reads `done · unverified`, like a person's drag: done only once a verified
+  criterion ticks it.
+- **Changed:** the docs say plainly that `board.db` is one person's board: gitignored, binary, not
+  mergeable, and not regenerable.
 - **Added:** `contract/fixtures/lifecycle/`, goldens for the confirm, unverified, rejected,
   consumed-advance, at-release and readiness-phase rules, so a rebuilt dashboard cannot skip them.
 - **Fixed:** a consumed advance no longer moves the dashboard; a parked criterion keeps its text;

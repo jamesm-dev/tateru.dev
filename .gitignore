@@ -1,9 +1,11 @@
 # Dashboard-authored data: assignees, points, notes, parks, advances and
-# confirmations. It holds names, so it is not committed by default - but it is
-# NOT regenerable, and a team should share it. /setup asks. Sharing it is
-# a deliberate decision to record in an ADR.
+# confirmations. It holds names, and it is a binary SQLite file git cannot
+# merge, so it stays on one machine: one person's board. It is NOT
+# regenerable - back it up rather than deleting it.
 .management/board.db
 .management/board.db-journal
+.management/board.db-wal
+.management/board.db-shm
 
 # Commit log written by the post-commit hook. Append-only local evidence.
 .management/commits.jsonl
