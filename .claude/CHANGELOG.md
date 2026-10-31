@@ -11,15 +11,23 @@ after upgrading as **Breaking**, and say what to do.
 1. Every change since the last release is listed under **Unreleased** below, in plain words.
 2. Pick the version: patch for fixes only, minor for anything new, and before 1.0 a minor marked
    **Breaking** for anything a project must act on.
-3. In one commit on `main`: rename **Unreleased** to `## <version> — <date>`, start a fresh empty
-   **Unreleased** above it, and write the version into `.claude/TATERU_VERSION`. `selftest.sh`
-   fails if the two disagree.
-4. Tag that commit `v<version>` and publish a GitHub release from the entry. `/upgrade` diffs
-   against the tag, so a version with no tag cannot be upgraded from.
+3. In **its own pull request** — never on top of a feature PR, which may be merged before the
+   release commit lands: rename **Unreleased** to `## <version> — <date>`, optionally followed by
+   ` — <short title>`, start a fresh empty **Unreleased** above it, and write the version into
+   `.claude/TATERU_VERSION`. `selftest.sh` fails if the two disagree. The entry is the release
+   description, so write it for the people upgrading.
+4. Merge it. `.github/workflows/release.yml` sees the version change, runs the self-test, then
+   tags the merge commit `v<version>` and publishes the GitHub release, titled from the heading and
+   described by the entry (`.claude/scripts/release-notes.sh` builds both). It skips a version that
+   is already tagged. `/upgrade` diffs against the tag, so a version with no tag cannot be upgraded
+   from: if the workflow fails, fix it and run it again from the Actions tab.
 
 ## Unreleased
 
-Nothing yet.
+- **Added:** releases publish themselves. Merging a version bump to `main` runs the self-test,
+  tags the release and publishes it on GitHub, with the changelog entry as its description.
+- **Added:** the README tells anyone working on tateru itself to run
+  `git config tateru.maintainer true` once.
 
 ## 0.3.1 — 2026-10-31
 

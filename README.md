@@ -249,6 +249,14 @@ claude mcp add github -s user -- npx -y @modelcontextprotocol/server-github
 
 Issues and PRs welcome. The workflow is opinionated on purpose — if a rule annoys you, open an issue and say why. The rules that survive an argument are the good ones.
 
+**Working on tateru itself**, not building an app with it? Run this once in your copy:
+
+```bash
+git config tateru.maintainer true
+```
+
+Without it, Claude treats the folder like anyone's project and will happily build an app in it — which would then ship to everyone who clones tateru. Releases are automatic: see "Releasing tateru" in `.claude/CHANGELOG.md`.
+
 ## Author
 
 Built by **James Malatabon** — because I kept starting projects and losing the thread of why.

@@ -139,7 +139,7 @@ Applies only when `git config tateru.maintainer` is `true`. Everyone else is bui
 project, and none of this concerns them.
 
 Commands stay thin: method lives in the skill and its `references/`. Release steps are in
-[.claude/CHANGELOG.md](.claude/CHANGELOG.md). **When a command or skill changes, update `/explain`
+[.claude/CHANGELOG.md](.claude/CHANGELOG.md); merging a version bump publishes the release. **When a command or skill changes, update `/explain`
 and `AGENTS.md` in the same change** — `/explain` finds commands at run time, which is exactly why
 this gets forgotten:
 
