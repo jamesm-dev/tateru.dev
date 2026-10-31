@@ -19,6 +19,12 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.3.0 — 2026-10-31
+
+Plain words when tateru talks to you. Nothing breaks for existing projects.
+
 - **Changed:** tateru now talks to you in plain words. A new shared contract,
   `.claude/skills/shared/plain-language.md`, assumes you are not a developer: every question, plan,
   summary and report uses simple words, explains a technical word the first time it appears, and
