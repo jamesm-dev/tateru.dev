@@ -19,7 +19,10 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
-Nothing yet.
+- **Fixed:** a fresh clone is treated as your own project. Claude could mistake it for tateru's own
+  repository — the git remote still points at tateru, and `CLAUDE.md` described the workflow — and
+  warn you not to run `/setup`. `CLAUDE.md` and `/setup` now say plainly to build here. Working on
+  tateru itself is opt-in for its maintainer: `git config tateru.maintainer true`.
 
 ## 0.3.0 — 2026-10-31
 

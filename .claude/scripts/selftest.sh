@@ -196,6 +196,8 @@ check "board.db stays local: ignored with its WAL files" "git check-ignore -q .m
 for f in .claude/skills/*/SKILL.md .claude/commands/decide.md .claude/commands/explain.md .claude/agents/project-manager.md; do
   check "$f follows the plain-language contract" "grep -q 'plain-language.md' '$f'"
 done
+check "CLAUDE.md treats a clone as the person's own project" "grep -q \"^## This is the person's own project\" CLAUDE.md && grep -q 'tateru.maintainer' CLAUDE.md"
+check "/setup builds in the clone, without warning it is tateru's repository" "grep -q '^\*\*Build here.\*\*' .claude/skills/setup/SKILL.md"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
   # /setup has run: it replaces the block, so the markers must be gone.

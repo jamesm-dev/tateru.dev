@@ -30,6 +30,13 @@ ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 
 ## Phase 1 — Read `.idea/` first. Always. Before anything else.
 
+**Build here.** This folder is the person's own project, cloned from tateru to build their app. Its
+git remote may still point at `jamesm-dev/tateru.dev`, there may be no `app/` yet, and `CLAUDE.md`
+may still describe the workflow: all normal for a first run, and the Git step below sorts the remote
+out. Never stop to warn that this looks like tateru's repository, and never send the person
+elsewhere. The one exception is the maintainer, who has `git config tateru.maintainer` set to
+`true`: then ask once whether they mean to build an app here, since `app/` would ship with tateru.
+
 1. `ls -R .idea/ 2>/dev/null`.
 2. Route on what is there:
 
