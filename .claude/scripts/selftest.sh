@@ -213,6 +213,10 @@ git remote remove origin 2>/dev/null
 ver=$(tr -d '[:space:]' < .claude/TATERU_VERSION 2>/dev/null)
 top=$(sed -n 's/^## \([0-9][0-9.]*\) .*/\1/p' .claude/CHANGELOG.md 2>/dev/null | head -1)
 check "TATERU_VERSION matches the newest changelog release ($ver)" "[ -n '$ver' ] && [ '$ver' = '$top' ]"
+check "release-notes.sh builds the description for $ver" "bash .claude/scripts/release-notes.sh '$ver' | grep -q 'compare/v'"
+check "release-notes.sh builds a v$ver title" "bash .claude/scripts/release-notes.sh '$ver' --title | grep -q '^v$ver'"
+check "release-notes.sh refuses a version with no changelog entry" "! bash .claude/scripts/release-notes.sh 99.99.99 >/dev/null 2>&1"
+check "the release workflow only runs in tateru's own repository" "grep -q \"github.repository == 'jamesm-dev/tateru.dev'\" .github/workflows/release.yml"
 
 echo "Scripts that need a built app"
 if grep -qv '^[[:space:]]*\(#\|$\)' .management/contract/sources.txt 2>/dev/null; then
