@@ -19,6 +19,12 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.3.1 — 2026-10-31
+
+One fix: tateru works out of the box in a fresh clone again. Nothing breaks.
+
 - **Fixed:** a fresh clone is treated as your own project. Claude could mistake it for tateru's own
   repository — the git remote still points at tateru, and `CLAUDE.md` described the workflow — and
   warn you not to run `/setup`. `CLAUDE.md` and `/setup` now say plainly to build here. Working on
