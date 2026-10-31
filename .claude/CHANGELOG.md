@@ -19,6 +19,13 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
+Nothing yet.
+
+## 0.2.0 — 2026-10-31
+
+Phases, completions and upgrades that hold together end to end. Projects on 0.1.0: read the
+**Breaking** entries first; each says what to do.
+
 - **Fixed:** `/epic` and `/shape` show acceptance criteria with points, as the vault validator
   requires. Following the old example blocked every `/epic` run.
 - **Fixed:** the vault validator no longer counts `# comments` inside code blocks as headings, and
@@ -59,7 +66,7 @@ after upgrading as **Breaking**, and say what to do.
   [ -n "$up" ] || { git remote add tateru https://github.com/jamesm-dev/tateru.dev.git; up=tateru; }
   git config "remote.$up.tagOpt" --no-tags
   git fetch "$up" --no-tags '+refs/tags/v*:refs/tags/tateru/v*'
-  git checkout tateru/v<new version> -- .claude/skills/upgrade .claude/commands/upgrade.md
+  git checkout tateru/v0.2.0 -- .claude/skills/upgrade .claude/commands/upgrade.md
   git commit -m "chore: fetch the new /upgrade"
   ```
 
