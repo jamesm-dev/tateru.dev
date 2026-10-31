@@ -10,6 +10,8 @@
 
 A [Claude Code](https://claude.com/claude-code) workflow that walks a project from *“I had a thought in the shower”* to something live — and then keeps an eye on it.
 
+<sub>10 slash commands · brainstorm → spec → risk-ordered roadmap → build → ship → maintain · ADRs · an agent team that learns your stack · readiness gates · safe upgrades · a kanban board built from your own plan</sub>
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-black.svg)](LICENSE)
 [![Built for Claude Code](https://img.shields.io/badge/built%20for-Claude%20Code-d97757)](https://claude.com/claude-code)
 [![Stack agnostic](https://img.shields.io/badge/stack-agnostic-4a5568)](#faq)
@@ -262,5 +264,5 @@ to say so. A star works too, and is free.
 
 ---
 
-<sub>**Keywords:** claude code · ai project management · brainstorm to production · roadmap kanban board · deployment readiness · post-launch maintenance · architecture decision records (ADR) · product roadmap · sprint planning · release management · software development lifecycle · spec-driven development · ai agents · slash commands · developer productivity · developer tools · obsidian vault · project boilerplate<br />
+<sub>**Keywords:** claude code · ai project management · brainstorm to production · ai agent team · workflow upgrades · roadmap kanban board · deployment readiness · post-launch maintenance · architecture decision records (ADR) · product roadmap · sprint planning · release management · software development lifecycle · spec-driven development · ai agents · slash commands · developer productivity · developer tools · obsidian vault · project boilerplate<br />
 Built and maintained by <a href="https://jamesm-dev.com">James Malatabon</a>.</sub>
