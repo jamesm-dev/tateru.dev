@@ -24,6 +24,8 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
+- **Changed:** the CI and release workflows use `actions/checkout@v7`, which runs on Node.js 24,
+  and pin Linux to `ubuntu-24.04`, so GitHub's Node 20 and Ubuntu 26 notices are gone.
 - **Added:** releases publish themselves. Merging a version bump to `main` runs the self-test,
   tags the release and publishes it on GitHub, with the changelog entry as its description.
 - **Added:** the README tells anyone working on tateru itself to run
