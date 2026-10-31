@@ -193,6 +193,9 @@ if command -v python3 >/dev/null 2>&1; then
 fi
 check "/setup never asks again about a rejected agent completion" "grep -q 'rejected_at IS NULL' .claude/skills/setup/SKILL.md"
 check "board.db stays local: ignored with its WAL files" "git check-ignore -q .management/board.db && git check-ignore -q .management/board.db-wal"
+for f in .claude/skills/*/SKILL.md .claude/commands/decide.md .claude/commands/explain.md .claude/agents/project-manager.md; do
+  check "$f follows the plain-language contract" "grep -q 'plain-language.md' '$f'"
+done
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
   # /setup has run: it replaces the block, so the markers must be gone.

@@ -8,6 +8,11 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash, AskUserQuestion, WebSearch, 
 
 Turn `.idea/SPECS.md` into a working repository, one roadmap phase at a time.
 
+**Plain language.** Everything you say to the person — questions, plans, summaries, reports —
+follows `.claude/skills/shared/plain-language.md`: assume they are not a developer, use simple
+words, recommend an option when you ask, and explain any technical word the first time it appears.
+Notes in `.idea/` may stay technical; explain them, don't paste them.
+
 > [!important] Application code lives in `app/`
 > The repository root belongs to the workflow — `.idea/`, `.management/`, `.claude/`, and the
 > project's own `README.md`. Everything you scaffold goes in **`app/`**: the manifest, the source
@@ -63,6 +68,11 @@ First run always includes the Phase 0 walking skeleton, even if the user asks to
 the skeleton is what makes later phases safe. Say why if you have to override an ask.
 
 ## Phase 3 — Plan, then confirm
+
+**Show the person a plain summary first**: what you are about to set up, in a few short lines, what
+it will cost them (money, accounts to create, time), and anything you need from them. The full
+technical list below follows it, for the record, clearly marked as detail they do not need to read
+to say yes.
 
 Produce a concrete ordered list of exactly what you will create and run: scaffolder invocation,
 dependencies, directory tree, config files, env files, database setup, scripts, CI, git hooks, docs,

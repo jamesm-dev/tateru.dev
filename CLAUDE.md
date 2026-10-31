@@ -18,14 +18,14 @@ only answer available.
 The repo is the source of truth for what exists; `.idea/` is the source of truth for what was
 intended. On conflict, ask — do not silently pick one.
 
-The format contract for everything in `.idea/` is
-[.claude/skills/shared/vault-contract.md](.claude/skills/shared/vault-contract.md). It is
-authoritative; obey it when writing any note.
-
-The decision contract for what gets built is
-[.claude/skills/shared/quality-bar.md](.claude/skills/shared/quality-bar.md). It governs stack and
-structure choices in `/shape` and `/setup`, and defines the performance budget that Phase 0 must
-measure. Read it before choosing any technology.
+Three shared contracts, all authoritative:
+- [vault-contract.md](.claude/skills/shared/vault-contract.md) — the **format** of every note in
+  `.idea/` and `.management/`. Obey it when writing any note.
+- [quality-bar.md](.claude/skills/shared/quality-bar.md) — **what gets built**: stack and structure
+  choices in `/shape` and `/setup`, and the performance budget Phase 0 measures.
+- [plain-language.md](.claude/skills/shared/plain-language.md) — **how tateru talks**. The person
+  using it is assumed not to be a developer: questions, plans and reports use simple words and come
+  with a recommendation. `.idea/` notes are the blueprint and may stay technical.
 
 ## Hooks
 
