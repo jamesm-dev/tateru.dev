@@ -160,7 +160,7 @@ not once per phase.
 | Attention meta | `Since {date} · holds up {epic}` |
 | Attention command | `/epic {ref}` and `creates the epic and tasks that address this`; the reference button is titled `Copy the reference` and reads ` copied` |
 | Readiness | `{n} of {m} gates met.` |
-| Gate freshness | `Exit criteria, tasks and risks are computed live, so parking something updates them at once. {stale gates} come from the last /setup run ({date}) — a browser cannot see a test run, a pull request, or whether a deploy happened, and guessing would be worse than deferring. A gate with no evidence stays unmet, never assumed green.` |
+| Gate freshness | `Exit criteria and tasks are computed live, so parking something updates them at once. {stale gates} come from the last /setup run ({date}) — a browser cannot see a test run, a pull request, or whether a deploy happened, and guessing would be worse than deferring. A gate with no evidence stays unmet, never assumed green.` |
 | No sprints | `No sprints yet. A project without them is perfectly normal — create one below when a dated window is useful.` |
 | Sprint table | `Sprint` · `Dates` · `Status` · `Tasks` · `Points` · `Remove` |
 | Sprint footnote | `Completed over committed points. A task with no points still counts as a task — points alone would hide the unestimated work.` |
@@ -249,11 +249,12 @@ until a sprint exists.
 
 | Meaning | Exactly |
 |---|---|
-| A person dropped a derived task into Done, unverified by an exit criterion | `done · unverified` |
+| A person dropped a derived task into Done, or confirmed the agent's completion, unverified by an exit criterion | `done · unverified` |
 | The agent marked a task done from commit evidence | `done · unconfirmed` |
 | An advance was made here, not yet written to the roadmap by `/setup` | `roadmap pending` |
 | A phase the project has moved beyond | `advanced past` |
 | A phase moved beyond with an advance still pending | `advanced past, roadmap pending` |
+| A phase `/setup` verified that `/ship` has not released | `verified · not shipped` |
 
 ## Sync and honesty
 

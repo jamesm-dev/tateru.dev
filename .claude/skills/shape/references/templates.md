@@ -131,6 +131,9 @@ status: draft
 | 0 | Walking skeleton | Deployed, CI green | planned |
 | 1 | | | planned |
 
+Phase status: `planned` → `in-progress` → `verified` (`/setup`: every criterion it can check is
+met) → `done` (`/ship`: the release is live).
+
 ```mermaid
 graph LR
   P0[Phase 0 - Skeleton] --> P1[Phase 1 - Core loop]

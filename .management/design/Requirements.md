@@ -50,9 +50,9 @@ Order of preference:
 > data: it must not appear in the app's schema, its migration history, or its backups. A separate
 > file is the whole point of "standalone".
 
-`board.db` is gitignored by default. Ask before committing it — it holds names, and it is
-regenerable state rather than source. If the team wants shared assignees, that is a deliberate
-decision to record in an ADR.
+`board.db` is gitignored: it holds names, and it is a binary file git cannot merge. It is one
+person's board — in a team, one person runs `/setup` and holds it. It is **not** regenerable: parks,
+advances and confirmations live only there, so back it up rather than deleting it.
 
 ## GitHub MCP
 

@@ -76,6 +76,6 @@ If a fix needs real work, it is an epic, not a maintenance edit — say so and o
 - Append a dated maintenance entry to `.management/CHANGELOG.md`: checked, changed, deferred.
 - Write an ADR for any decision that changed, and mark the superseded one.
 - Note anything deliberately deferred, so the next pass does not rediscover it from scratch.
-- Regenerate `.management/`.
+- Refresh `.management/` the way `/setup` Phase 6 does (steps 1 to 4, 7 and 11).
 
 Close with health in one sentence, what changed, what was deferred and why, and when to look again.

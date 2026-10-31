@@ -23,7 +23,7 @@ if [ ! -f "$CHECKS" ]; then
   exit 0
 fi
 
-LINT="" TYPECHECK="" TEST="" TRAIL=""
+LINT="" TYPECHECK="" TEST="" BUILD="" TRAIL=""
 # Strip carriage returns before sourcing: a CRLF checkout turns LINT="npm run lint"
 # into a command ending in \r, which fails as a missing script on every push.
 # .gitattributes pins the file to LF; this covers a copy made outside git.
@@ -56,6 +56,7 @@ run() {
 run lint      "$LINT"      || exit 1
 run typecheck "$TYPECHECK" || exit 1
 run test      "$TEST"      || exit 1
+run build     "$BUILD"     || exit 1
 
 # Save the test report at the moment the tests actually ran, rather than
 # reconstructing it later. /setup records it in board.db; the hook never

@@ -103,8 +103,8 @@ and no time entries, the one case where nothing is lost.
 ## Privacy
 
 This section holds real people's names. It is why the dashboard defaults to development-only, and
-why `board.db` is gitignored — see [[Requirements]]. If the team wants shared assignment, committing
-the database is a deliberate decision, and one worth recording as an ADR.
+why `board.db` is gitignored — see [[Requirements]]. It is one person's board: in a team, one person
+runs `/setup` and holds it, and assigns on everyone's behalf.
 
 ## Related
 

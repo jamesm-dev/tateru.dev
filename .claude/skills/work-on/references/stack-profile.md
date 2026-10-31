@@ -112,6 +112,7 @@ Shell-sourceable, so the `pre-push` hook can run the real checks without knowing
 LINT=""
 TYPECHECK=""
 TEST=""
+BUILD=""
 # Optional. Makes the test runner leave its machine-readable report (JUnit or
 # JSON) where /setup reads it. Never writes board.db - hooks do not.
 TRAIL=""

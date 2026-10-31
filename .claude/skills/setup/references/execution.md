@@ -83,8 +83,10 @@ Write `.claude/team/checks.env` now, from the scripts step 6 created, in the for
 `.claude/skills/work-on/references/stack-profile.md` — `pre-push` runs nothing until it exists.
 Phase 7 refreshes it from the commands Phase 5 verified.
 
-Verify by making a throwaway commit and confirming a line appears in `.management/commits.jsonl`,
-then confirm `pre-push` blocks on a deliberately failing check. A hook nobody proved fires is a hook
+Verify the hooks fire. Ask before the throwaway commit — "commit only if the user asks" holds here
+too. With a yes, make one (`git commit --allow-empty -m "chore: verify hooks"`) and confirm a line
+appears in `.management/commits.jsonl`; without one, run `sh .githooks/commit-msg` on a sample
+message instead. Then confirm `sh .githooks/pre-push` blocks on a deliberately failing check. A hook nobody proved fires is a hook
 that does not fire.
 
 Hooks write data only — `commits.jsonl` — never Markdown in `.idea/` or `.management/`, and never
@@ -114,6 +116,34 @@ Then check the phase's exit criteria one at a time, with evidence per criterion.
 
 Ensure the repo exists and `.gitignore` is right. Commit only if the user asks; if on the default
 branch, branch first.
+
+**On the first run, move tateru's own tags out of the project's way.** A plain `git clone` of tateru
+brings its release tags (`v0.1.0`, …) along, and the project's first `/ship` would collide with
+them, or mistake one for its own previous release. Move only the tags that **are** tateru's — the
+same name pointing at the same object as on tateru — so a project's own release is never touched:
+
+```bash
+git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
+  while read -r sha ref; do
+    t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
+    [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] || continue
+    git tag "tateru/$t" "$t" && git tag -d "$t"
+  done
+```
+
+Then, still on the first run:
+
+- **Record where the project began**: `git rev-parse HEAD > .claude/TATERU_BASE`, before any
+  project commit, and commit it with the first project commit. It is a file, not a tag, so every
+  clone and teammate has it. Commit ingestion and the author check exclude everything up to it, so
+  tateru's own history never reads as the project's work.
+- **Rename the tateru remote** if a plain clone left it as `origin`: `git remote rename origin
+  tateru`, then `git config remote.tateru.tagOpt --no-tags`, so a fetch never brings bare `v*` tags
+  back. The project adds its own `origin` when it has a repository; `/upgrade` finds `tateru` by
+  URL either way.
+
+Say what was moved, renamed and recorded. The moved tags are local; `/upgrade` reads the same
+`tateru/v*` names.
 
 ## Windows notes
 

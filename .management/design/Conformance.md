@@ -103,7 +103,9 @@ nothing.
 `board.json`, shaped to hit every branch the derivations have — a done task, an open one,
 a parked one, an ad-hoc one, a task in a later phase, a points override, a priority
 override, a met criterion and a parked one — and `expected.json`, which is what every
-derivation in [[Derivations]] must return for them.
+derivation in [[Derivations]] must return for them. A second set in `fixtures/lifecycle/` pins the
+rules the first cannot reach: unconfirmed and unverified completions, rejected rows, a consumed
+advance, an at-release criterion and the readiness phase.
 
 **A rebuild writes these as tests in the host project's own runner.** There is nothing to
 port: the derivations are pure functions, the fixtures are JSON, and the expectations are
@@ -151,7 +153,9 @@ Say this out loud rather than letting a green check imply more than it earned:
 1. Build the dashboard from the notes in [design/](.).
 2. Write `contract/sources.txt` with the real paths, **including the server side**.
 3. Write `contract/tokens.map` for every measurement it expressed differently.
-4. Write the derivation tests from `contract/fixtures/` into the project's test runner.
+4. Write the derivation tests from `contract/fixtures/` into the project's test runner — both sets:
+   the main `plan.json`/`board.json`/`expected.json`, and `fixtures/lifecycle/`, which pins the
+   confirm, unverified, rejected, consumed-advance, at-release and readiness-phase rules.
 5. Run the checker and the tests, and **report both**.
 6. Not report the dashboard built while either fails.
 

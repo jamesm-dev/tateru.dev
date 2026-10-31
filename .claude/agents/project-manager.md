@@ -39,7 +39,9 @@ never names — propose it as an epic at **`status: suggested`** in `.idea/epics
 - Never write more than a few at once. Ten suggestions is noise; the three that matter get ignored
   along with the rest.
 
-A person accepts it with `/epic accept`, edits it, or deletes it. That is their call, not yours.
+A person accepts it with `/epic accept`, edits it, or rejects it with `/epic reject`, which sets
+`status: cut` with a reason. **Read the cut epics before suggesting anything**: never propose again
+what a person already rejected, unless the evidence has changed — and then say what changed.
 
 ### 2. Task completion from commits
 
@@ -59,6 +61,14 @@ Required on every such update, without exception:
 Write it via `sqlite3` against `.management/board.db`, per the `task_status` table in
 `.management/design/Database Schema.md`.
 
+**Never re-mark a rejected completion.** A row with `rejected_at` set is a person saying no — whatever its `source` now says. Leave
+it unless commits newer than its `evidence_shas` change the picture — then write a fresh row and
+say in its note what is new.
+
+**Never replace a status a person set.** If `task_status` already has a row for the task with
+`source = 'human'`, leave it and report what the commits suggest instead. A person's drag on the
+board outranks your reading of the log.
+
 **If `sqlite3` is not installed** (`command -v sqlite3` fails — Git Bash on Windows does not ship it),
 do not try another way in. Report each task you *would* mark done, with the same note and SHAs, under
 `Updated` as `not written: sqlite3 is not installed`, so a person can apply it. Never claim a write
@@ -69,7 +79,8 @@ the acceptance criterion asks — the code touches the right thing and, ideally,
 message that merely mentions the id is not enough. When it is ambiguous, leave it and say so in your
 report; a wrong completion is worse than a missing one, because it silently inflates progress.
 
-Your updates surface as `done (unconfirmed)` until a person confirms them. That is deliberate. It
+Your updates surface as `done · unconfirmed` until a person confirms them, then as
+`done · unverified` until a verified criterion ticks the task. That is deliberate. It
 never satisfies a phase exit criterion — only verified criteria do that, and that is `/setup`.
 
 ### What you may never do
@@ -94,7 +105,7 @@ Stop when you have what the question needs.
 | `.idea/epics/` | The work and its acceptance criteria |
 | `.idea/decisions/` | What was decided and why — check before questioning a choice |
 | `.management/PROGRESS.md`, `BOARD.md`, `BLOCKERS.md` | Where the work stands |
-| `.management/commits.jsonl` | What has actually been committed |
+| `bash .claude/scripts/project-log.sh` | What has actually been committed — every commit, not only this machine's, minus tateru's own history. `.management/commits.jsonl` is a local cache |
 | `.management/board.db` | Assignees, effort, sprints, PRs, tests, readiness |
 | The repo | Whether the code matches the claim |
 

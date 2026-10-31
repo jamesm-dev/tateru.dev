@@ -174,7 +174,7 @@ Structure comes from `.idea/`. Assignees and effort live in a database the dashb
 
 **It's built last, after your app works.** The page borrows your tokens, your components, your dark mode — so `/setup` waits until the app is built and verified, checks what's actually there, and offers to *defer* if there's nothing yet to inherit. Tracking starts on day one either way; only the page waits. A dashboard built against an empty skeleton has to invent a card, a badge and a drawer, and every one of them is wrong the moment you add the real ones.
 
-**And it's rebuildable.** The design isn't only prose — every string, measurement and ordering lives as data in `.management/contract/`, with fixtures pinning every derived number. One command checks a build against all of it:
+**And it's rebuildable.** The design isn't only prose — every string, measurement and ordering lives as data in `.management/contract/`, with fixtures pinning the derived numbers. One command checks a build's strings, measurements and ordering against it, and the fixtures become tests in your app's own runner:
 
 ```bash
 bash .claude/scripts/dashboard-conformance.sh
@@ -191,9 +191,9 @@ So the tenth rebuild is the same page as the first: same sections, same order, s
 It has exactly **two** powers, both of which leave a trail:
 
 - **Suggests epics** for gaps it finds. They land at `status: suggested`, belong to no phase, and count toward nothing until you accept one.
-- **Marks tasks done from commits** — with a note explaining why and the SHAs it relied on. Shows as `done · unconfirmed` until a human agrees.
+- **Marks tasks done from commits** — with a note explaining why and the SHAs it relied on. Shows as `done · unconfirmed` until you confirm or reject it during the next `/setup`, and counts as done only once a verified criterion ticks it — your confirmation vouches for it, it doesn't replace the evidence.
 
-It cannot edit the plan, tick an exit criterion, or deploy. An overseer that can quietly rewrite what it audits isn't an overseer.
+It's built not to edit the plan, tick an exit criterion, or deploy: it has no `Edit` tool, its one `Write` is for new suggestions, and its instructions forbid the rest. That's a rule it follows, not a lock — so every change it makes is labelled, and nothing it does counts until a person agrees and a check backs it up. An overseer that can quietly rewrite what it audits isn't an overseer.
 
 ### The build team
 

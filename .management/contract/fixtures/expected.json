@@ -3,6 +3,8 @@
 
   "effectivePhase": 0,
   "advancePending": false,
+  "readinessPhase": 0,
+  "_readinessPhase": "0: no phase is verified, so readiness follows the effective phase",
   "lastPhase": 1,
 
   "taskIndex": {

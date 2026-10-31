@@ -79,6 +79,7 @@ card.marker.priority.title	Priority set by a person
 card.points.plural	pts
 card.points.singular	pt
 card.unverified	done · unverified
+card.unconfirmed	done · unconfirmed
 
 # --- task drawer -------------------------------------------------------------
 drawer.close	Close
@@ -149,6 +150,7 @@ specs.phase.empty	No epics in this phase.
 specs.pill.advanced	advanced past
 specs.pill.pending	roadmap pending
 specs.pill.current	current
+specs.pill.verified	verified · not shipped
 specs.pill.parked	parked
 
 # --- team --------------------------------------------------------------------
@@ -198,7 +200,7 @@ status.readiness.met	of {total} met
 status.readiness.parked	parked
 status.readiness.inflight	blocked or in progress
 status.readiness.clear	none blocked or in progress
-status.readiness.note	Exit criteria, tasks and risks are computed live, so parking something updates them at once.
+status.readiness.note	Exit criteria and tasks are computed live, so parking something updates them at once.
 status.readiness.note2	a browser cannot see a test run, a pull request, or whether a deploy happened, and guessing would be worse than deferring. A gate with no evidence stays unmet, never assumed green.
 
 # --- status: sprints ---------------------------------------------------------

@@ -61,9 +61,18 @@ function buildTaskIndex(plan, board) -> Map<id, TaskState>
     put(a.task_id, a.epic, phase, a.status, null, null, authored = true)
 
   where put(...) records:
-    explicit  = statusById[id]              # may be absent
+    explicit  = statusById[id] unless (its source == 'agent' and it has rejected_at)
+                                            # may be absent; a rejected agent completion is
+                                            # kept, but never applied. A person's later drop
+                                            # on that task applies as usual.
     status    = explicit ?? planStatus
-    done      = status == 'done'
+    unconfirmed = explicit.source == 'agent' and explicit.confirmed_by is null
+                  and status == 'done'      # the agent's reading, not yet a person's
+    unverified  = not authored and status == 'done' and planStatus != 'done'
+                  and (explicit.source == 'human' or explicit.confirmed_by is not null)
+                  # a person's drag into Done, or a confirmed agent reading: claimed, but no
+                  # verified exit criterion ticks it yet (Board.md)
+    done      = status == 'done' and not unconfirmed and not unverified
     parked    = status == 'parked'
     overridden= explicit is present
     points    = metaById[id].points ?? planPoints
@@ -81,8 +90,15 @@ known.
 ```
 function effectivePhase(plan, board) -> number
   last     = max phase number in plan.phases, else 0
-  advanced = [ a.phase + 1 for a in board.advances ]
+  advanced = [ a.phase + 1 for a in board.advances where a.consumed_at is null ]
+             # a consumed advance is already in plan.project.currentPhase
   return min(last, max(plan.project.currentPhase, ...advanced, 0))
+
+function readinessPhase(plan, board) -> number
+  # The phase "can we ship yet" is about: the lowest one /setup verified and /ship
+  # has not released, otherwise the effective phase.
+  waiting = [ p.n for p in plan.phases where p.status == 'verified' ]
+  return min(waiting) if waiting else effectivePhase(plan, board)
 
 function advancePending(plan, board) -> bool
   return effectivePhase(plan, board) > plan.project.currentPhase
@@ -101,10 +117,16 @@ Clamping to `last` is what stops the project advancing past its final phase.
 function criteriaOf(plan, board, phase) -> CriterionState[]
   parked = { c.text for c in board.parkedCriteria where c.phase == phase }
   for each c in plan.phases[phase].exitCriteria:
+    atRelease = c.text ends with ' — at release'   # /ship proves it after the deploy
     yield { text: c.text, done: c.done,
             parked:    c.text in parked,
-            satisfied: c.done or (c.text in parked) }
+            atRelease: atRelease,
+            satisfied: c.done or (c.text in parked) or atRelease }
 ```
+
+A criterion marked ` — at release` (see `/shape`'s phases reference) counts as satisfied here: no
+amount of work before the release can meet it, so it must not make every advance look forced.
+`/ship` checks it against the live release.
 
 Parking a criterion is how a phase moves on without it. It is **never** a claim the criterion was
 met: it is recorded, counted and displayed as set aside, so `done` keeps meaning done. Criteria are

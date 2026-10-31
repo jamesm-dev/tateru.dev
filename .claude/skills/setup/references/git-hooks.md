@@ -68,7 +68,8 @@ Behaviour:
   dependency bump — belong to no task. Blocking those teaches people to pass `--no-verify`, which
   disables every other hook too.
 - **Block only on a reference that does not exist.** Silently losing the link is worse than one
-  rejected commit. `TSK-` plus six hex characters is a planned task, checked against `state.json`.
+  rejected commit. `TSK-` plus six hex characters is a planned task, checked against `state.json`
+  and, for a task `/epic` added since the last `/setup`, against the `^tsk-` ids in `.idea/epics/`.
   `ADH-` plus four to six hex characters is an ad-hoc task authored on the dashboard, checked
   against `board.db`'s `task_authored` table when `sqlite3` is installed, and accepted otherwise.
 - Keep the message itself unmodified. Do not rewrite what someone wrote.
@@ -84,14 +85,16 @@ Append one line to `.management/commits.jsonl`:
 Append-only, one JSON object per line, never rewritten. It survives rebases badly on purpose: it is
 a log of what happened locally, not a mirror of history.
 
-**The JSONL is the only store.** There are no `commit_log` or `task_commit` tables, deliberately —
-see the *not tables* section of `.management/design/Database Schema.md`. A hook is a shell script,
-and giving it a database driver to write rows nothing yet reads buys complexity and no information.
-`/setup` reads the JSONL.
+**The JSONL is a local cache, not the record.** It only sees commits made on this machine after the
+hooks were wired. The record is `git log --all`, which `/setup` and the `project-manager` agent
+parse for task ids — so pulled commits, GitHub squash-merges and a teammate's work all count. There
+are still no `commit_log` or `task_commit` tables, deliberately — see the *not tables* section of
+`.management/design/Database Schema.md`.
 
 ### `pre-push` — verify, then take stock
 
-1. Run the project's real checks: lint, typecheck, test. **Block the push if they fail.** This is the
+1. Run the project's real checks: lint, typecheck, test, build — the same as CI. **Block the push if
+   they fail.** This is the
    one hook that should stop you, because a red push is what turns into a broken deploy.
 
    The commands come from **`.claude/team/checks.env`**, which `/setup` writes when it wires the
@@ -116,9 +119,12 @@ Never push, tag, or deploy from a hook.
 The answer to "how much more before this can ship". Computed from `.idea/` and `.management/`, never
 guessed, and expressed as a checklist rather than a percentage.
 
+The **readiness phase** is the one waiting to ship — the lowest phase at `verified` — and otherwise
+the current phase. Readiness answers "can we ship yet", so it must look at what `/ship` would ship.
+
 | Gate | Met when |
 |---|---|
-| Phase exit criteria | Every criterion of the current phase is met, with evidence |
+| Exit criteria | Every criterion of the readiness phase is met with evidence, or parked (recorded, never counted as met). Criteria marked ` — at release` count as satisfied here, as on the dashboard; `/ship` proves them after the deploy and fails the release if they do not hold |
 | Tasks | No task in the phase is blocked or in progress |
 | Tests | The latest run passed, and every epic in the phase has at least one linked run |
 | Checks | Lint, typecheck, build all pass |
@@ -133,7 +139,9 @@ never as `71% ready` — a percentage of a checklist invites rounding up.
 
 On each run, before regenerating `.management/`:
 
-1. Read `commits.jsonl` since the last run. That is the whole commit record — there is no table.
+1. Read `bash .claude/scripts/project-log.sh` — the project's commit record, without tateru's own
+   history, read whole every run. `commits.jsonl` is only this machine's
+   cache of it.
 2. Map commits to tasks by reference id. **A commit never marks a task done** — it is evidence, not
    completion. Completion comes from a verified exit criterion in Phase 5.
 3. Surface commits that referenced no task as untracked work, so unplanned effort is recorded

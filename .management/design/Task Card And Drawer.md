@@ -58,7 +58,7 @@ for the same fact is clutter.
 | **Unassigned** | A dashed circle that **is itself the assign control**, so assigning costs one click. See [[Board]] |
 | **Points** | Pushed to the right of the row. `3 pts`, `1 pt`, `0 pts`. **Omitted entirely when unset** — a badge reading `no pts` is noise on a card that has enough of it. The gap surfaces on [[Team]], where it actually distorts a number |
 | **Estimate / actual** | `2h / 3.5h`. Actual is emphasised in `warn` when it exceeds the estimate — that contrast is the whole reason to show both. `2h / —` when no time is logged. **The pair is omitted when neither is set** |
-| **Unverified** | `done · unverified` in `warn`, on a derived card a person dropped into Done with no verified criterion behind it |
+| **Unverified** | `done · unverified` in `warn`, on a derived card a person dropped into Done, or whose agent completion a person confirmed, with no verified criterion behind it |
 
 Durations are always human units — `30m`, `2h`, `3.5h`, `2d`. Never raw minutes in the UI.
 
@@ -141,7 +141,7 @@ scroll.
 | Absent | Why |
 |---|---|
 | PR badge and test glyph on the card | The card already carries seven fields. Both live in the drawer, where there is room to say what they mean |
-| `done · unconfirmed` and the agent-provenance block | The `project-manager` agent's confirm flow has no writer yet. The schema keeps room for it; the UI does not pretend it exists |
+| The agent-provenance block | Who confirmed what, and when, is `/setup`'s conversation, not the card's. The card shows the `done · unconfirmed` status label (Copy Deck) for an agent completion no person has confirmed yet; `/setup` Phase 6 is where a person confirms or rejects it |
 | An assignee **list** on a task | One assignee is set from the drawer's select. The card renders several because the schema allows them, and a rebuild must keep that read path |
 | A rendered-Markdown description | Descriptions are one line of plain text |
 | Created and updated timestamps | Nothing on the page acts on them |

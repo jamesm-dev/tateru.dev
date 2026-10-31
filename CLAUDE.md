@@ -55,7 +55,8 @@ runs them by name. [dashboard-conformance.sh](.claude/scripts/dashboard-conforma
 built `/management` dashboard against the data contract in `.management/contract/` — strings,
 measurements, and order. It needs only `bash`, `find`, `sed`, `tr` and `awk`, so it runs in any
 project before any package manager exists. Exit `2` means it could not run, including "nothing built
-yet". [selftest.sh](.claude/scripts/selftest.sh) checks tateru's own machinery — every hook and
+yet". [project-log.sh](.claude/scripts/project-log.sh) is the project's commit history without
+tateru's own; read commits through it. [selftest.sh](.claude/scripts/selftest.sh) checks tateru's own machinery — every hook and
 script — and runs in CI on each push. **Run it after changing any hook or script**; a hook that
 silently stops firing looks exactly like a project where nobody commits.
 
@@ -115,7 +116,7 @@ script, or dependency as if it exists; check first, and if it is missing, say so
 `/setup` is what creates `app/`. Until it has run:
 
 - Write plans into `.idea/`, not code into `app/`.
-- `.management/` holds only `README.md`, `DESIGN.md`, and `design/`. `BOARD.md`, `PROGRESS.md`,
+- `.management/` holds only `README.md`, `DESIGN.md`, `design/` and `contract/`. `BOARD.md`, `PROGRESS.md`,
   `BLOCKERS.md`, `CHANGELOG.md`, `state.json`, and `board.db` are generated later.
 - There is no chosen language, framework, or package manager. The stack is decided during `/shape`
   and `/setup` against [quality-bar.md](.claude/skills/shared/quality-bar.md) and recorded as an

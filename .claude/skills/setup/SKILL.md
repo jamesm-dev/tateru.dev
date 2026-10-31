@@ -43,7 +43,20 @@ ones `SPECS.md` left open and the ones a scaffolder makes on your behalf.
 
 ## Phase 2 — Pick the phase
 
-Report where the roadmap stands and name the target phase — the lowest-numbered one not `done`.
+Report where the roadmap stands and name the target phase — the lowest-numbered one that is neither
+`verified` nor `done`. If there is none, the roadmap is complete: say so and offer `/ship` for any
+phase still at `verified`, `/epic` for new work, or `/maintain`. **First read any unconsumed `phase_advance` rows in `board.db`**: an advance
+made on the dashboard moves the effective phase before `ROADMAP.md` knows it, and building the phase
+the user already left (parked work included) is the wrong build. Target the phase they imply, and
+apply them properly in Phase 6. Phases move `planned → in-progress → verified → done`: **`/setup` sets
+`verified`** when every exit criterion it can check is met; **only `/ship` sets `done`**, after the
+release is live. Criteria that only a real release can prove — "deployed and reachable", the
+performance budget "on the real target" — stay open at `verified` and are ticked by `/ship`. That is
+how Phase 0's walking skeleton gets deployed: its first `/ship`.
+
+If a lower phase is `verified` but not yet `done`, say so before building the next one, and ask.
+Phase 0 especially: building features on a skeleton that never reached the real target postpones
+exactly the risk Phase 0 exists to retire.
 State its Goal, Exit criteria and Non-goals back to the user, and confirm that is the target.
 
 First run always includes the Phase 0 walking skeleton, even if the user asks to jump ahead:
@@ -111,21 +124,41 @@ reported as complete with a failing check is worse than an honest partial.
 
 ## Phase 6 — Project management
 
-Once the phase is built and verified, stand up `.management/` — the execution tracker.
+Run this phase on **every** run, green or not — "tracking starts on day one" includes the day the
+checks failed. A red run still ingests commits, records the failing test runs and recomputes
+readiness; it simply marks nothing done. Only the dashboard build, at the end, waits for green.
+
+Stand up or refresh `.management/` — the execution tracker.
 Load `references/management.md` for the layout, templates, and the `state.json` schema.
 
 It is **derived from `.idea/`**, never a second source of truth. `.idea/` holds intent (what and
 why); `.management/` holds state (progress, blockers, dates, what shipped). Create it on the first
 run; refresh it on every later run.
 
-1. **Ingest commits first.** Read `.management/commits.jsonl` — written by the `post-commit` hook,
-   and the whole commit record; there is no table. Map commits to tasks by reference id; a commit is
+1. **Ingest commits first.** The record is `git log --all` itself — every commit, including pulled
+   ones, squash-merges from GitHub and a teammate's work — minus tateru's own history, which every
+   clone carries. Read it through one script, which excludes tateru's tags and branches whatever
+   the remote is called, and works from any directory:
+
+   ```bash
+   bash .claude/scripts/project-log.sh --format='%H %an %s'
+   ```
+
+   Read it whole on every run; it is cheap, and a resume point would break on the first rebase.
+   `.claude/TATERU_BASE` is the commit the project started from, written by the first run's Git
+   step. **If it is missing** (the script exits 2 — a project set up at 0.1.0 or earlier), write it
+   now: `git fetch <up> --no-tags` (and `git config remote.<up>.tagOpt --no-tags`), then
+   `git merge-base HEAD <up>/main`; with no tateru remote,
+   ask. Parse task ids from each message the way
+   the `post-commit` hook does (`TSK-` and `ADH-` ids, case-insensitive). `.management/commits.jsonl`
+   is a local cache of this machine's commits, useful for timing, never the whole record. Map commits to tasks by reference id; a commit is
    evidence, never completion. Commits referencing no task are recorded as untracked work, so
    unplanned effort is not lost.
-2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`. **Skip epics at `status: suggested`** —
+2. Read `.idea/ROADMAP.md` and every `.idea/epics/*.md`. **Skip epics at `status: suggested` or
+   `cut`** —
    the `project-manager` agent's proposals count toward nothing until a person accepts one with
-   `/epic accept` (vault contract). List them in the run report as awaiting a decision instead, and
-   never report their missing points as gaps.
+   `/epic accept` (vault contract), and a cut one was rejected. List suggestions in the run report as
+   awaiting a decision instead, and never report either kind's missing points as gaps.
 3. Derive tasks from the remaining epics' acceptance criteria. Never invent a task with no epic behind it, and never
    quietly drop one — an epic with no criteria is a gap, so report it.
 
@@ -146,14 +179,29 @@ run; refresh it on every later run.
    live there, so a deferred dashboard must not mean an untracked project. Use the `sqlite3` CLI, or
    the app's own SQLite driver where the CLI is missing (Git Bash on Windows does not ship it). If
    neither exists, say so plainly; the Markdown tracking still works. Then sync pull request and
-   test data into it. **Never** clear a row a person authored: a task id
-   that has left `.idea/` is marked orphaned, not deleted.
+   test data into it.
+
+   **`board.db` is one person's board.** It is gitignored because it holds names, and it is a binary
+   file git cannot merge, so it is not shared between clones. Say so once, on the first run, if the
+   same commit range shows more than one author: in a team, one person runs
+   `/setup` and holds the board.
+
+   **Never** clear a row a person authored: a task id that has left `.idea/` is marked orphaned, not
+   deleted.
 8. **Apply any phase advance recorded on the dashboard.** Read `phase_advance` in `board.db`. For
-   each row not yet consumed, set that phase `done` in `ROADMAP.md`, open the next one, and stamp
-   `consumed_at` so it is applied once.
+   each row not yet consumed, record the advance in `ROADMAP.md`, open the next phase, and stamp
+   `consumed_at` so it is applied once. Either kind of advance sets the phase `verified` — `/ship`
+   still owns `done`. A **forced** advance (`forced = 1`) also never reads as a finished phase:
+   write a `> [!warning] Advanced on <date> with N exit criteria unmet` callout in its section and
+   leave each unmet criterion as `- [ ] <text> — unmet at advance <date>`, which `/ship`'s Exit
+   criteria gate then reports. Leave criteria ending ` — at release` exactly as they are: they are
+   `/ship`'s to prove, and are not unmet work. Write `state.json` `currentPhase` as the lowest phase that is neither
+   `verified` nor `done` — or the last phase, once every phase is — so the dashboard does not fall back once the row is consumed.
 
    Carry the **parked** items into the record rather than dropping them: a criterion in
-   `criterion_park` is written into `ROADMAP.md` as `- [~] <text> — parked <date>`, not ticked, and
+   `criterion_park` is written into `ROADMAP.md` as `- [~] <text>`, its text unchanged — the park is
+   keyed on that text — with `  Parked <date>.` on the next line; `[~]` goes into `state.json` as
+   `done: false`, the park itself living in `board.db`. It is not ticked, and
    a phase that advanced with parked work says so in its section. A phase reported as complete when
    three of its criteria were skipped is exactly the lie this workflow exists to prevent — the aim
    is that skipping is *allowed and visible*, not that it is hidden.
@@ -161,7 +209,17 @@ run; refresh it on every later run.
    If the roadmap and the dashboard disagree because someone edited `ROADMAP.md` by hand, say so and
    ask. Never silently overwrite a phase status a person set.
 
-9. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
+9. **Confirm the agent's completions.** List every `task_status` row with `source = 'agent'`,
+   `status = 'done'`, `confirmed_by IS NULL` and `rejected_at IS NULL` — a rejected one is never
+   asked about again — with its note and commits, and ask the person
+   (`AskUserQuestion`) to confirm or reject each. Confirm sets `confirmed_by` — the person's
+   `assignee.id`; ask once which assignee they are, and add them to `assignee` if the table is empty
+   — and `confirmed_at`. Reject sets `rejected_at` and puts the person's reason in `note`: the row stops
+   applying, so the task falls back to its plan status, but it is kept. Deleting it would let the
+   agent mark the same task done again from the same commits. This is the only writer of `confirmed_by`. Until confirmed, such a task
+   reads as `done · unconfirmed`; once confirmed, `done · unverified`, like a person's own drag into
+   Done. Either way it counts as not done until a verified criterion ticks it.
+10. **Record the test trail.** Read whatever the test run produced — a JUnit or JSON reporter file,
    the runner's own output — and write each run into `board.db`'s `test_run` table, linked to a task
    by its reference id where the test names one, and to the epic otherwise.
 
@@ -173,7 +231,7 @@ run; refresh it on every later run.
    Never write a passing run that did not happen. If the reporter produced nothing, record nothing
    and say so.
 
-10. **Recompute deployment readiness** — the seven gates in `references/git-hooks.md` — and write it
+11. **Recompute deployment readiness** — the seven gates in `references/git-hooks.md` — and write it
    into `PROGRESS.md` as a checklist. Report gates met over gates total, never a percentage.
 
 ### Install the project management agent
@@ -294,7 +352,8 @@ Add no new dependencies beyond the one database driver, and apply the gate the u
 Two checks, in this order, and **report both**:
 
 1. **Conformance.** Write `.management/contract/sources.txt` (including the server side) and
-   `tokens.map`, write the derivation goldens from `.management/contract/fixtures/` as tests in the
+   `tokens.map`, write the derivation goldens from `.management/contract/fixtures/` (both the main set and
+   `lifecycle/`) as tests in the
    project's own runner, then run them and:
 
    ```bash
@@ -311,10 +370,24 @@ Two checks, in this order, and **report both**:
 If the project has no web surface — a CLI, a library — say so and offer the reference's fallback
 instead: a self-contained `.management/dashboard.html` plus a `board` script that prints progress.
 
+**On every later run, re-check a built dashboard.** If `.management/contract/sources.txt` lists
+files, the dashboard exists: run its derivation goldens and `dashboard-conformance.sh` again, and
+report both. A `/upgrade` can change `Derivations.md` or the contract while the code in `app/`
+stays as it was; this is where the difference shows.
+
 ## Phase 7 — Record and hand off
 
-- Append a dated entry to `## Setup log` in `SPECS.md`; set `status: active` and bump `updated`.
-- In `ROADMAP.md`, tick met exit criteria and set the phase `status`.
+- Append a dated entry to `## Setup log` in `SPECS.md`; set `status: active` and bump `updated`. Set
+  `ROADMAP.md` to `status: active` too, on the first run: the plan is now being built.
+- In `ROADMAP.md`, tick met exit criteria with their evidence. Set the phase `in-progress`, or
+  `verified` once every criterion that does not need a live release is met — never `done`, which is
+  `/ship`'s.
+- **Tick each epic acceptance criterion this run verified**, with its evidence before the points,
+  because the block reference must end the line:
+  `- [x] Saves a doc — verified by save.test.ts, a1b2c3d (3 pts) ^tsk-7f3a21`.
+  A confirmed agent completion is ticked only when this run verified it too — confirming is a
+  person vouching for the agent's reading, not evidence. This includes work `/work-on` finished since the last run, which leaves `.idea/` alone and relies
+  on this step to record it.
 - Set the built epics to `done` or `in-progress`; bump their `updated`.
 - Write an ADR for any decision you had to make that SPECS.md did not cover.
 - Regenerate `INDEX.md`.
