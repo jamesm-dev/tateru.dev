@@ -237,6 +237,8 @@ claude mcp add github -s user -- npx -y @modelcontextprotocol/server-github
 
 ## Is this for you?
 
+**You don't need to be a developer.** tateru talks to you in plain words, recommends an answer whenever it asks you something, and explains any technical word the first time it uses one. The notes it keeps for building stay precise; it explains them rather than handing them to you.
+
 **Probably yes** if you start more projects than you finish, or you've reopened your own repo and had no idea why past-you chose Postgres.
 
 **Probably not** if you want to type one prompt and get an app. This one asks questions first.

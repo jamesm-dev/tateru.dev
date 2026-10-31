@@ -19,7 +19,13 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
-Nothing yet.
+- **Changed:** tateru now talks to you in plain words. A new shared contract,
+  `.claude/skills/shared/plain-language.md`, assumes you are not a developer: every question, plan,
+  summary and report uses simple words, explains a technical word the first time it appears, and
+  comes with a recommendation when you are asked to decide. The notes in `.idea/` stay as precise
+  and technical as the build needs; tateru explains them to you in plain words instead. `/shape`
+  now proposes the technology itself and explains it by cost and effort, instead of asking you to
+  pick between tools, and `/setup` shows a plain summary before its technical plan.
 
 ## 0.2.0 — 2026-10-31
 
