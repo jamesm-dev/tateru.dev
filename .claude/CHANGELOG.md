@@ -24,23 +24,33 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
-- **Fixed:** in a project `/setup` had set up, three `project-log.sh` checks in `selftest.sh` failed,
-  so CI went red. The test dropped its stand-in commits with `git reset --hard`, which put the
-  project's committed `TATERU_BASE` back over the value the test had just written. It uses
-  `--soft` now, and tateru's own self-test runs with a tracked `TATERU_BASE` the way a set-up
-  project does, so this is caught here. Reported, with the fix, by the payday-dev project.
-- **Fixed:** the self-test no longer assumes there is no `app/`. In a set-up project it printed
-  "rmdir: … Directory not empty" and deleted its scratch copy of the real app and `.claude/team/`;
-  it now borrows them and puts them back.
-- **Fixed:** `/setup`'s first run checks that hooks and scripts are executable in git, and fixes
-  them. A repository re-created on Windows commits them as non-executable, and Linux CI then skips
-  the hooks without a word. `/upgrade` already checked this.
-- **Changed:** the CI and release workflows use `actions/checkout@v7`, which runs on Node.js 24,
-  and pin Linux to `ubuntu-24.04`, so GitHub's Node 20 and Ubuntu 26 notices are gone.
-- **Added:** releases publish themselves. Merging a version bump to `main` runs the self-test,
-  tags the release and publishes it on GitHub, with the changelog entry as its description.
-- **Added:** the README tells anyone working on tateru itself to run
-  `git config tateru.maintainer true` once.
+Nothing yet.
+
+## 0.4.0 — 2026-11-02 — Your project's own checks pass again
+
+If you set up a project with `/setup`, its automatic checks on GitHub may have been failing on three
+tests that had nothing to do with your app. This release fixes that, makes sure your project's hooks
+actually run, and is the first tateru release published automatically. Nothing breaks: run
+`/upgrade`.
+
+- **Fixed:** in a project `/setup` had set up, three tests in tateru's self-check failed, so your
+  project's checks on GitHub went red. The test put back an old copy of a file tateru keeps
+  (`.claude/TATERU_BASE`) over the one it had just written. It doesn't any more, and tateru now
+  tests itself the way a set-up project runs, so this can't slip through again. Reported, with
+  the fix, by the payday-dev project.
+- **Fixed:** the self-check no longer assumes your project has no `app/` folder. In a set-up
+  project it printed a "Directory not empty" message and deleted its temporary copy of your app;
+  now it borrows the folder and puts it back.
+- **Fixed:** `/setup`'s first run makes sure the hooks (the small scripts that track your commits
+  and check your work before you push) are marked as runnable. A project re-created on Windows
+  could save them as not runnable, and GitHub's checks then skipped them without a word.
+  `/upgrade` already checked this.
+- **Changed:** tateru's automatic checks use newer GitHub building blocks (`actions/checkout@v7`,
+  Linux `ubuntu-24.04`), so GitHub's warnings about outdated versions are gone.
+- **Added:** tateru's releases now publish themselves when a new version is merged, with this
+  changelog entry as the release description.
+- **Added:** the README tells anyone working on tateru itself, rather than building with it, to
+  run `git config tateru.maintainer true` once.
 
 ## 0.3.1 — 2026-10-31
 
