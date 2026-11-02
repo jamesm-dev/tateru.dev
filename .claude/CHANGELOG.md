@@ -24,6 +24,17 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
+- **Fixed:** in a project `/setup` had set up, three `project-log.sh` checks in `selftest.sh` failed,
+  so CI went red. The test dropped its stand-in commits with `git reset --hard`, which put the
+  project's committed `TATERU_BASE` back over the value the test had just written. It uses
+  `--soft` now, and tateru's own self-test runs with a tracked `TATERU_BASE` the way a set-up
+  project does, so this is caught here. Reported, with the fix, by the payday-dev project.
+- **Fixed:** the self-test no longer assumes there is no `app/`. In a set-up project it printed
+  "rmdir: … Directory not empty" and deleted its scratch copy of the real app and `.claude/team/`;
+  it now borrows them and puts them back.
+- **Fixed:** `/setup`'s first run checks that hooks and scripts are executable in git, and fixes
+  them. A repository re-created on Windows commits them as non-executable, and Linux CI then skips
+  the hooks without a word. `/upgrade` already checked this.
 - **Changed:** the CI and release workflows use `actions/checkout@v7`, which runs on Node.js 24,
   and pin Linux to `ubuntu-24.04`, so GitHub's Node 20 and Ubuntu 26 notices are gone.
 - **Added:** releases publish themselves. Merging a version bump to `main` runs the self-test,
