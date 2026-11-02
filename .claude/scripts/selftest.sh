@@ -73,6 +73,14 @@ git config user.name selftest
 git config user.email selftest@example.com
 git config advice.ignoredHook true
 
+# The scratch copy may be a project /setup has already set up, with a real
+# app/ and .claude/team/. Tests that need them borrow them: create what is
+# missing, set aside what exists, and put everything back afterwards.
+borrow_app()  { made_app=0; [ -d app ] || { mkdir app; made_app=1; }; }
+return_app()  { [ "$made_app" = 1 ] && rmdir app; return 0; }
+borrow_team() { [ -d .claude/team ] && mv .claude/team .claude/team.selftest-real; mkdir -p .claude/team; }
+return_team() { rm -rf .claude/team; [ -d .claude/team.selftest-real ] && mv .claude/team.selftest-real .claude/team; return 0; }
+
 echo "Git hooks"
 check "a commit with no task id succeeds" "git commit -q --allow-empty -m 'plain change'"
 check "post-commit appends to commits.jsonl" "[ \"\$(wc -l < .management/commits.jsonl)\" -eq 1 ]"
@@ -99,7 +107,7 @@ if command -v sqlite3 >/dev/null 2>&1; then
 else
   skip "sqlite3 not installed, ADH lookups not checked"
 fi
-mkdir -p app .claude/team
+borrow_app; borrow_team
 printf 'LINT="true"\nTEST="true"\n' > .claude/team/checks.env
 check "pre-push passes when the checks pass" "sh .githooks/pre-push"
 printf 'LINT="false"\n' > .claude/team/checks.env
@@ -109,27 +117,36 @@ check "pre-push blocks when the build fails" "! sh .githooks/pre-push"
 printf 'LINT="true"\r\nTEST="true"\r\n' > .claude/team/checks.env
 check "pre-push survives a checks.env with Windows line endings" "sh .githooks/pre-push"
 check ".gitattributes pins checks.env to LF" "git check-attr eol .claude/team/checks.env | grep -q 'eol: lf'"
-rm -rf app .claude/team
+return_team; return_app
 
+# A set-up project tracks TATERU_BASE (its first /setup commits it), holding a
+# SHA from its own history - stale in this scratch copy. Track a stale value
+# here too, so the test runs the way a set-up project's does.
+printf '%s\n' 0000000000000000000000000000000000000000 > .claude/TATERU_BASE
+git add -f .claude/TATERU_BASE >/dev/null 2>&1
+git commit -q -m "chore: record where the project began" >/dev/null 2>&1
 git rev-parse HEAD > .claude/TATERU_BASE
 # Stand-ins for tateru history that arrives later: a fetched release tag, and a
 # branch on a remote whose URL names tateru (as an older project's "origin" does).
 # Each on its own commit, so each exclusion is tested on its own.
 git commit -q --allow-empty -m "tateru release" >/dev/null 2>&1
 git tag tateru/v9.9.9 HEAD
-git reset -q --hard HEAD~1
+# --soft, not --hard: TATERU_BASE is tracked, and a hard reset would put the
+# committed (stale) value back over the one just written. The commits are
+# empty, so --soft drops them without touching the working tree.
+git reset -q --soft HEAD~1
 git commit -q --allow-empty -m "tateru unreleased" >/dev/null 2>&1
 git update-ref refs/remotes/upstream/main HEAD
-git reset -q --hard HEAD~1
+git reset -q --soft HEAD~1
 git remote add upstream https://github.com/jamesm-dev/tateru.dev.git
 git commit -q --allow-empty -m "project work after the base" >/dev/null 2>&1
 log=$(bash .claude/scripts/project-log.sh --format=%s 2>&1)
 check "project-log.sh sees only the project's commits" "[ '$log' = 'project work after the base' ]"
 printf '%s\r\n' "$(tr -d '\r\n' < .claude/TATERU_BASE)" > .claude/TATERU_BASE
 check "project-log.sh survives a TATERU_BASE with Windows line endings" "[ \"\$(bash .claude/scripts/project-log.sh --format=%s)\" = 'project work after the base' ]"
-mkdir -p app
+borrow_app
 check "project-log.sh works from app/" "[ \"\$(cd app && bash ../.claude/scripts/project-log.sh --format=%s)\" = 'project work after the base' ]"
-rmdir app
+return_app
 check ".gitattributes pins TATERU_BASE to LF" "git check-attr eol .claude/TATERU_BASE | grep -q 'eol: lf'"
 git tag -d tateru/v9.9.9 >/dev/null; git update-ref -d refs/remotes/upstream/main; git remote remove upstream
 rm -f .claude/TATERU_BASE
@@ -172,11 +189,11 @@ cp -R .claude "$clean/"
 cp -R .management/design "$clean/.management/"
 for f in .management/README.md .management/DESIGN.md .idea/README.md; do [ -f "$f" ] && cp "$f" "$clean/$f"; done
 check "the session audit passes a clean vault" "CLAUDE_PROJECT_DIR='$clean' bash .claude/hooks/vault-preflight.sh | grep -q 'satisfy the vault contract'"
-mkdir -p app
+borrow_app
 git config --unset core.hooksPath
 check "the session audit warns about unwired hooks" "bash .claude/hooks/vault-preflight.sh | grep -q 'not wired'"
 git config core.hooksPath .githooks
-rmdir app
+return_app
 check "the prompt hook reports the vault" "bash .claude/hooks/idea-context.sh </dev/null | grep -q 'SPECS.md'"
 
 echo "Workflow contracts"
@@ -198,6 +215,7 @@ for f in .claude/skills/*/SKILL.md .claude/commands/decide.md .claude/commands/e
 done
 check "CLAUDE.md treats a clone as the person's own project" "grep -q \"^## This is the person's own project\" CLAUDE.md && grep -q 'tateru.maintainer' CLAUDE.md"
 check "/setup builds in the clone, without warning it is tateru's repository" "grep -q '^\*\*Build here.\*\*' .claude/skills/setup/SKILL.md"
+check "/setup's first run checks scripts are executable in git" "grep -q '100755' .claude/skills/setup/references/execution.md"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
   # /setup has run: it replaces the block, so the markers must be gone.
