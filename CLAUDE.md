@@ -14,7 +14,7 @@ hooks report `[fresh start needed]`, that comes first — before any command, pl
    commits, ask before rerunning with `--keep-own-commits-lost`; if they would rather keep that
    history, keep it and carry on.
 3. Last, rename the folder: `bash .claude/scripts/fresh-start.sh --rename <project-name>`, then tell
-   them to reopen Claude Code in the new folder.
+   them to reopen Claude Code there. Windows locks an open folder: pass on the steps it prints.
 
 Skip it only if they are contributing to tateru itself: then run `git config tateru.maintainer true`
 (local, never committed), which also unlocks the last section. Never send them elsewhere to build.
