@@ -60,13 +60,18 @@ if [ "${1:-}" = "--rename" ]; then
   [ -e "$target" ] && { echo "fresh-start: $target already exists; pick another name" >&2; exit 1; }
   # Step out first: Windows will not rename a folder a program is working in.
   cd "$parent" || exit 2
-  if mv "$root" "$target" 2>/dev/null; then
-    echo "Renamed the project folder to: $target"
-    echo "Reopen Claude Code in that folder to carry on."
-    exit 0
-  fi
+  # Windows can also hold a brief lock on files just written (virus scanning,
+  # indexing), so try a few times before giving up.
+  for try in 1 2 3 4 5; do
+    if err=$(mv "$root" "$target" 2>&1); then
+      echo "Renamed the project folder to: $target"
+      echo "Reopen Claude Code in that folder to carry on."
+      exit 0
+    fi
+    [ "$try" -lt 5 ] && sleep 1
+  done
   # Usually Windows, because Claude Code itself still has the folder open.
-  echo "The folder could not be renamed while it is open (Windows keeps open folders locked)."
+  echo "The folder could not be renamed while it is open (Windows keeps open folders locked): $err"
   echo "Close Claude Code, rename the folder $(basename "$root") to $name in File Explorer or Finder,"
   echo "then open Claude Code again in the renamed folder."
   exit 1
