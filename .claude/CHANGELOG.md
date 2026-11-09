@@ -24,6 +24,14 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
+## 0.5.0 — 2026-11-09 — Your clone becomes your own project
+
+When you clone tateru to build something, the folder is still tateru's copy: tateru's git history,
+linked to tateru on GitHub, and named `tateru.dev`. From this release Claude spots that first thing
+and, before anything else, turns it into your own project: a brand-new git history and a folder
+named after your app. Every file stays where it is. It works on Windows, macOS and Linux. Nothing
+breaks: run `/upgrade`. Projects that already kept tateru's history keep working as before.
+
 - **Changed:** a fresh clone starts as your own project before anything else. Claude notices when
   the folder is still tateru's copy — tateru's git history, its link to tateru on GitHub, or the
   name `tateru.dev` — and, before any command or question, gives it a new git history of its own
