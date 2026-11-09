@@ -53,12 +53,21 @@ if [ "${1:-}" = "--rename" ]; then
   case "$name" in
     ''|*/*|*\\*|.*|*' '*) echo "fresh-start: give a folder name with no spaces or slashes, like my-recipe-app" >&2; exit 2 ;;
   esac
-  target="$(dirname "$root")/$name"
+  parent=$(dirname "$root")
+  target="$parent/$name"
   [ -e "$target" ] && { echo "fresh-start: $target already exists; pick another name" >&2; exit 1; }
-  mv "$root" "$target" || exit 2
-  echo "Renamed the project folder to: $target"
-  echo "Reopen Claude Code in that folder to carry on."
-  exit 0
+  # Step out first: Windows will not rename a folder a program is working in.
+  cd "$parent" || exit 2
+  if mv "$root" "$target" 2>/dev/null; then
+    echo "Renamed the project folder to: $target"
+    echo "Reopen Claude Code in that folder to carry on."
+    exit 0
+  fi
+  # Usually Windows, because Claude Code itself still has the folder open.
+  echo "The folder could not be renamed while it is open (Windows keeps open folders locked)."
+  echo "Close Claude Code, rename the folder $(basename "$root") to $name in File Explorer or Finder,"
+  echo "then open Claude Code again in the renamed folder."
+  exit 1
 fi
 
 is_maintainer && { echo "fresh-start: this is tateru's maintainer copy (git config tateru.maintainer true); refusing to replace its history." >&2; exit 1; }
@@ -72,10 +81,12 @@ fi
 # either way; this history would go, so stop unless they said yes.
 if [ -d .git ] && git cat-file -e "$TATERU_ROOT^{commit}" 2>/dev/null; then
   # Everything tateru's tags and remote branches reach is tateru's; the rest is theirs.
+  # ${theirs[@]+...}: bash 3.2 (macOS) treats an empty array as unset under set -u.
   theirs=()
   while IFS= read -r r; do theirs+=("$r"); done < <(git for-each-ref --format='%(refname)' refs/tags refs/remotes)
-  own=$(git rev-list --count HEAD --not "${theirs[@]}" 2>/dev/null || echo 0)
-  if [ "${own:-0}" -gt 0 ] && [ "${1:-}" != "--keep-own-commits-lost" ]; then
+  # If the count cannot be made, assume there is work to lose: never wipe on a guess.
+  own=$(git rev-list --count HEAD --not ${theirs[@]+"${theirs[@]}"} 2>/dev/null) || own="an unknown number of"
+  if [ "$own" != 0 ] && [ "${1:-}" != "--keep-own-commits-lost" ]; then
     echo "fresh-start: this copy already has $own commit(s) of the project's own. Their files are kept, but that history would be lost." >&2
     echo "fresh-start: ask the person; if they agree, run again with --keep-own-commits-lost." >&2
     exit 1

@@ -215,7 +215,9 @@ check "the maintainer copy is never flagged or wiped" "cd '$copy' && git config 
 check "fresh-start gives the copy a new history of its own" "cd '$copy' && TATERU_ROOT=$root_sha bash $fs --keep-own-commits-lost >/dev/null && [ \"\$(git rev-list --count HEAD)\" = 1 ] && [ -z \"\$(git remote)\" ] && [ -f CLAUDE.md ]"
 check "fresh-start marks every script executable in git" "cd '$copy' && ! git ls-files -s .githooks .claude/hooks .claude/scripts | grep -qv '^100755'"
 check "only the folder name is left to change" "cd '$copy' && [ \"\$(bash $fs --check)\" = 'the folder is still named tateru.dev' ]"
-check "renaming the folder clears the check" "cd '$copy' && bash $fs --rename my-recipe-app >/dev/null && cd '$tmp/fresh/my-recipe-app' && bash $fs --check"
+# Run from outside the folder, as Claude Code is not inside it here: Windows will
+# not rename a folder that a process is working in.
+check "renaming the folder clears the check" "cd '$tmp/fresh' && bash '$copy/$fs' --rename my-recipe-app >/dev/null && cd '$tmp/fresh/my-recipe-app' && bash $fs --check"
 check "the hooks are quiet once the start is fresh" "cd '$tmp/fresh/my-recipe-app' && ! CLAUDE_PROJECT_DIR='$tmp/fresh/my-recipe-app' bash .claude/hooks/idea-context.sh </dev/null | grep -q 'fresh start needed'"
 check "CLAUDE.md makes the fresh start come first" "grep -q '^## Start with your own copy' CLAUDE.md"
 
