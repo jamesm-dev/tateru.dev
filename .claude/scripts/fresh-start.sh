@@ -22,7 +22,11 @@ TATERU_ROOT="${TATERU_ROOT:-276b2bd07d70eb7ffe865bf51feca289bd1f1114}"
 
 # The project is where this script lives (.claude/scripts/), whatever folder it
 # was started from - so --rename run from outside still renames the right one.
-root=$(cd "$(dirname "$0")/../.." && pwd) || exit 2
+# This script's own full path, taken before any cd: --rename copies it.
+self="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
+# FRESH_START_ROOT is set only when --rename hands itself to a copy outside
+# the folder (see there).
+root="${FRESH_START_ROOT:-$(cd "$(dirname "$0")/../.." && pwd)}" || exit 2
 cd "$root" || exit 2
 
 is_maintainer() { [ "$(git config --get tateru.maintainer 2>/dev/null)" = "true" ]; }
@@ -58,6 +62,17 @@ if [ "${1:-}" = "--rename" ]; then
   parent=$(dirname "$root")
   target="$parent/$name"
   [ -e "$target" ] && { echo "fresh-start: $target already exists; pick another name" >&2; exit 1; }
+  # bash keeps the script it runs open, and Windows will not rename a folder
+  # with an open file inside. So run the rename from a copy outside the folder.
+  if [ -z "${FRESH_START_ROOT:-}" ]; then
+    outside="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/fresh-start.$$")"
+    mkdir -p "$outside" && cp "$self" "$outside/fresh-start.sh" || exit 2
+    cd "$parent" || exit 2
+    FRESH_START_ROOT="$root" bash "$outside/fresh-start.sh" --rename "$name"
+    rc=$?
+    rm -rf "$outside"
+    exit "$rc"
+  fi
   # Step out first: Windows will not rename a folder a program is working in.
   cd "$parent" || exit 2
   # Windows can also hold a brief lock on files just written (virus scanning,
