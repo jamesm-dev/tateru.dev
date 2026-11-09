@@ -24,7 +24,17 @@ after upgrading as **Breaking**, and say what to do.
 
 ## Unreleased
 
-Nothing yet.
+- **Changed:** a fresh clone starts as your own project before anything else. Claude notices when
+  the folder is still tateru's copy — tateru's git history, its link to tateru on GitHub, or the
+  name `tateru.dev` — and, before any command or question, gives it a new git history of its own
+  (every file stays where it is) and renames the folder to your project. It asks first, and won't
+  wipe history that already holds your own commits unless you say so.
+  `.claude/scripts/fresh-start.sh` does the work. Contributing to tateru itself instead? Run
+  `git config tateru.maintainer true` and none of this happens.
+- **Changed:** after a fresh start there is no tateru history to exclude, so `project-log.sh` no
+  longer needs `.claude/TATERU_BASE`, and `/setup` no longer moves tateru's tags or renames its
+  remote. Projects that kept tateru's history keep working as before.
+- **Fixed:** `/setup`'s Windows notes assumed every project runs on Windows.
 
 ## 0.4.0 — 2026-11-02 — Your project's own checks pass again
 

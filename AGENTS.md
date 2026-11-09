@@ -58,6 +58,9 @@ the workflow was built for.
 
 ## Non-negotiables
 
+- **Start fresh first.** If `bash .claude/scripts/fresh-start.sh --check` reports anything, the
+  folder is still tateru's copy: before anything else, follow *Start with your own copy* in
+  `CLAUDE.md`. The hooks that would remind you only run in Claude Code, so check it yourself.
 - After writing any note in `.idea/` or `.management/`, validate it, and fix what it reports:
 
   ```bash

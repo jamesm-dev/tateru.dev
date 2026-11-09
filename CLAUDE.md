@@ -2,14 +2,22 @@
 
 Project-wide instructions for Claude Code in this repository.
 
-## This is the person's own project
+## Start with your own copy — before anything else
 
-Whoever opened this folder cloned tateru to **build their own app with it**. Treat it as their
-project from the first prompt: run `/brainstorm`, `/shape` and `/setup` here, and build `app/` here.
-Never warn that this looks like tateru's own repository, and never refuse or redirect a command
-because of it — a git remote still pointing at `jamesm-dev/tateru.dev` is normal in a fresh clone,
-and `/setup`'s first run handles it. Only the maintainer edits tateru itself, and only after
-switching it on locally (`git config tateru.maintainer true`, never committed); see the last section.
+Whoever opened this folder cloned tateru to **build their own app with it**, here. A fresh clone is
+still tateru's copy: tateru's git history, linked to tateru on GitHub, named after tateru. When the
+hooks report `[fresh start needed]`, that comes first — before any command, plan or question:
+
+1. Say in plain words what is about to happen: the folder becomes their project, with a new
+   history of its own; every file stays. Ask what the project is called.
+2. Run `bash .claude/scripts/fresh-start.sh`. If it stops because the copy already holds their own
+   commits, ask before rerunning with `--keep-own-commits-lost`; if they would rather keep that
+   history, keep it and carry on.
+3. Last, rename the folder: `bash .claude/scripts/fresh-start.sh --rename <project-name>`, then tell
+   them to reopen Claude Code there. Windows locks an open folder: pass on the steps it prints.
+
+Skip it only if they are contributing to tateru itself: then run `git config tateru.maintainer true`
+(local, never committed), which also unlocks the last section. Never send them elsewhere to build.
 
 ## Always read `.idea/` first
 
@@ -24,8 +32,7 @@ For "where does the work stand", read `.management/BOARD.md` and `.management/PR
 but only once `/setup` has generated them. Before that they do not exist, and the roadmap is the
 only answer available.
 
-The repo is the source of truth for what exists; `.idea/` is the source of truth for what was
-intended. On conflict, ask — do not silently pick one.
+The repo is the source of truth for what exists, `.idea/` for what was intended. On conflict, ask.
 
 Three shared contracts, all authoritative:
 - [vault-contract.md](.claude/skills/shared/vault-contract.md) — the **format** of every note in
@@ -110,15 +117,8 @@ script, or dependency as if it exists; check first, and if it is missing, say so
   ADR — never assumed from this file, and never inferred from an example command.
 
 Once `/setup` has created it, application code lives in `app/` and every project command runs from
-there, never the root:
-
-```bash
-cd app && <the verify command /setup wired up>
-```
-
-Git hooks live in [.githooks/](.githooks/) and are wired by the install step `/setup` runs inside
-`app/`, which sets `core.hooksPath`. Husky is deliberately not used: it installs beside the manifest
-in `app/`, cannot find `.git` at the root, and would be a dependency that does nothing.
+there, never the root. Git hooks live in [.githooks/](.githooks/), wired with `core.hooksPath` —
+never Husky (see `.claude/skills/setup/references/git-hooks.md`).
 <!-- /tateru:before-setup -->
 
 ## Conventions

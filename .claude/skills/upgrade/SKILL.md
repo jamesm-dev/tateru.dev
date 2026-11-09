@@ -86,13 +86,18 @@ carry unreleased work:
 | Deleted upstream | Ask before deleting a file the user may still use |
 | New upstream | Add it |
 
+**A fresh-started project shares no history with tateru, and that is normal.** Its
+`.claude/TATERU_VERSION` names the version it started from, and `tateru/v<that version>` — fetched
+above — is the base, file by file. Nothing below is needed.
+
 No base tag (a project cloned before versioning, or the tag was never fetched): use the last
 commit the project shares with upstream, `git merge-base HEAD tateru/v<upstream version>`. A normal clone keeps
 tateru's history, so this finds the exact version it started from, and only the files the user
 really edited need a decision. Comparing against the target tag directly instead would flag every
 file upstream changed as a possible local edit — in testing, 19 questions for one real edit.
 
-No shared history at all (a "Use this template" copy): then, and only then, compare local against
+No base tag and no shared history (a copy from before versioning that was also re-initialised):
+then, and only then, compare local against
 the target tag directly, take files that are identical or missing, and ask about each one that
 differs.
 

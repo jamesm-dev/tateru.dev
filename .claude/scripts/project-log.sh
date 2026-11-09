@@ -7,31 +7,36 @@
 #   bash .claude/scripts/project-log.sh --format='%H %an %s'
 #
 # Excludes, whatever the remote is called:
-#   - everything up to .claude/TATERU_BASE, the commit the project began from
+#   - everything up to .claude/TATERU_BASE, the commit the project began from -
+#     only in a project that kept tateru's history; after a fresh start there is
+#     none to exclude, and no TATERU_BASE
 #   - tateru's release tags (refs/tags/tateru/*), which /upgrade fetches
 #   - the tateru remote's branches - found by URL, so an older project whose
 #     tateru remote is still "origin" is covered too
 #
-# Works from any directory in the repo. Exit 2 when TATERU_BASE is missing:
-# /setup writes it, from git merge-base with the tateru remote for a project
-# set up before it existed.
+# Works from any directory in the repo. Exit 2 when the history is still
+# tateru's and TATERU_BASE is missing: /setup writes it then, from git
+# merge-base with the tateru remote.
 set -u
 
 root=$(git rev-parse --show-toplevel 2>/dev/null) || { echo "project-log: not in a git repository" >&2; exit 1; }
 cd "$root" || exit 1
 
-if [ ! -f .claude/TATERU_BASE ]; then
-  echo "project-log: .claude/TATERU_BASE is missing; /setup writes it" >&2
+TATERU_ROOT="${TATERU_ROOT:-276b2bd07d70eb7ffe865bf51feca289bd1f1114}"
+base=""
+if [ -f .claude/TATERU_BASE ]; then
+  # Strip CR and LF: a Windows checkout may add a carriage return.
+  base=$(tr -d '\r\n' < .claude/TATERU_BASE)
+  git cat-file -e "$base^{commit}" 2>/dev/null || { echo "project-log: TATERU_BASE ($base) is not a commit here" >&2; exit 2; }
+elif git merge-base --is-ancestor "$TATERU_ROOT" HEAD 2>/dev/null; then
+  echo "project-log: this history is still tateru's and .claude/TATERU_BASE is missing; /setup writes it" >&2
   exit 2
 fi
-# Strip CR and LF: a Windows checkout may add a carriage return.
-base=$(tr -d '\r\n' < .claude/TATERU_BASE)
-git cat-file -e "$base^{commit}" 2>/dev/null || { echo "project-log: TATERU_BASE ($base) is not a commit here" >&2; exit 2; }
 
 up=$(git remote -v | awk '/jamesm-dev\/tateru\.dev/ { print $1; exit }')
 
-if [ -n "$up" ]; then
-  git log "$@" --all --not "$base" --glob='refs/tags/tateru/*' --glob="refs/remotes/$up/*" --
-else
-  git log "$@" --all --not "$base" --glob='refs/tags/tateru/*' --
-fi
+not=(--not)
+[ -n "$base" ] && not+=("$base")
+not+=(--glob='refs/tags/tateru/*')
+[ -n "$up" ] && not+=(--glob="refs/remotes/$up/*")
+git log "$@" --all "${not[@]}" --
