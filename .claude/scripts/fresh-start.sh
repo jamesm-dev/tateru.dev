@@ -63,16 +63,16 @@ if [ "${1:-}" = "--rename" ]; then
   target="$parent/$name"
   [ -e "$target" ] && { echo "fresh-start: $target already exists; pick another name" >&2; exit 1; }
   # bash keeps the script it runs open, and Windows will not rename a folder
-  # with an open file inside. So run the rename from a copy outside the folder.
+  # with an open file inside. So hand over to a copy outside the folder, with
+  # exec: a copy this one waited on would leave this one's file open.
   if [ -z "${FRESH_START_ROOT:-}" ]; then
     outside="$(mktemp -d 2>/dev/null || echo "${TMPDIR:-/tmp}/fresh-start.$$")"
     mkdir -p "$outside" && cp "$self" "$outside/fresh-start.sh" || exit 2
     cd "$parent" || exit 2
-    FRESH_START_ROOT="$root" bash "$outside/fresh-start.sh" --rename "$name"
-    rc=$?
-    rm -rf "$outside"
-    exit "$rc"
+    FRESH_START_ROOT="$root" FRESH_START_TMP="$outside" exec bash "$outside/fresh-start.sh" --rename "$name"
   fi
+  # This is the copy outside: tidy it away when done (Windows may refuse; it is a temp folder).
+  [ -n "${FRESH_START_TMP:-}" ] && trap 'rm -rf "$FRESH_START_TMP" 2>/dev/null' EXIT
   # Step out first: Windows will not rename a folder a program is working in.
   cd "$parent" || exit 2
   # Windows can also hold a brief lock on files just written (virus scanning,
