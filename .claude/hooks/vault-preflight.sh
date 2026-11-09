@@ -30,6 +30,12 @@ emit() {
   exit 0
 }
 
+# A clone that is still tateru's own copy gets the fresh start before anything else.
+if [ -f .claude/scripts/fresh-start.sh ]; then
+  why=$(bash .claude/scripts/fresh-start.sh --check 2>/dev/null | paste -sd ';' - | sed 's/;/; /g')
+  [ -n "$why" ] && add "[fresh start needed] This folder is still a copy of tateru: $why. Before anything else - before any command, plan or question about the project - do the fresh start in CLAUDE.md, Start with your own copy. Only skip it if the person is contributing to tateru itself."
+fi
+
 # Once /setup has created app/, the git hooks are what keep .management/ honest.
 # Unwired or non-executable hooks fail silently — it looks exactly like a project
 # where nobody commits — so say so here, where someone will read it.

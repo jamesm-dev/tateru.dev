@@ -40,10 +40,15 @@ cd my-project
 claude
 ```
 
-Then, in the session:
+Use your project's name instead of `my-project`. Then, in the session:
 
 ```
 /hooks          # once, so the hooks load
+```
+
+**First, tateru makes the folder yours.** A fresh clone still carries tateru's own git history and its link to tateru on GitHub, so before anything else Claude starts the project fresh: a new history of its own, every file kept where it is, and the folder renamed to your project if you didn't already. It asks before it does it. Then:
+
+```
 /brainstorm     # describe the thing you're thinking about
 ```
 
@@ -54,7 +59,7 @@ Follow where it takes you:
    ideas         a plan     it runs    it's live
 ```
 
-Your code lands in **`app/`**. Everything else in the repo is the workflow — rename the folder, rewrite the root README, and it's your project.
+Your code lands in **`app/`**. Everything else in the repo is the workflow — rewrite the root README, and it's your project. When you want it on GitHub, create an empty repository there and Claude will connect it.
 
 Never seen this repo before? Run **`/explain`** and it walks you through every command like you're new. Because in six months, you are.
 
@@ -249,13 +254,13 @@ claude mcp add github -s user -- npx -y @modelcontextprotocol/server-github
 
 Issues and PRs welcome. The workflow is opinionated on purpose — if a rule annoys you, open an issue and say why. The rules that survive an argument are the good ones.
 
-**Working on tateru itself**, not building an app with it? Run this once in your copy:
+**Working on tateru itself**, not building an app with it? Clone it, keep its history, and run this once in your copy, before anything else:
 
 ```bash
 git config tateru.maintainer true
 ```
 
-Without it, Claude treats the folder like anyone's project and will happily build an app in it — which would then ship to everyone who clones tateru. Releases are automatic: see "Releasing tateru" in `.claude/CHANGELOG.md`.
+Without it, Claude treats the folder like anyone's project: it starts it fresh, wiping tateru's history from your copy, and will happily build an app in it. Releases are automatic: see "Releasing tateru" in `.claude/CHANGELOG.md`.
 
 ## Author
 

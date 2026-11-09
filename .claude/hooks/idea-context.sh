@@ -28,5 +28,11 @@ d="Before acting, read the .idea/ files relevant to this prompt (and CLAUDE.md i
 
 msg="$a\n$b\n$c\n$d"
 
+# A clone that is still tateru's own copy gets the fresh start before anything else.
+if [ -f .claude/scripts/fresh-start.sh ]; then
+  why=$(bash .claude/scripts/fresh-start.sh --check 2>/dev/null | paste -sd ';' - | sed 's/;/; /g')
+  [ -n "$why" ] && msg="$msg\n""[fresh start needed] This folder is still a copy of tateru: $why. Before anything else - before any command, plan or question about the project - do the fresh start in CLAUDE.md, Start with your own copy. Only skip it if the person is contributing to tateru itself."
+fi
+
 printf '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"%s"},"suppressOutput":true}\n' "$msg"
 exit 0

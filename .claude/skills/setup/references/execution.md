@@ -117,43 +117,43 @@ Then check the phase's exit criteria one at a time, with evidence per criterion.
 Ensure the repo exists and `.gitignore` is right. Commit only if the user asks; if on the default
 branch, branch first.
 
-**On the first run, move tateru's own tags out of the project's way.** A plain `git clone` of tateru
-brings its release tags (`v0.1.0`, …) along, and the project's first `/ship` would collide with
-them, or mistake one for its own previous release. Move only the tags that **are** tateru's — the
-same name pointing at the same object as on tateru — so a project's own release is never touched:
-
-```bash
-git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
-  while read -r sha ref; do
-    t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
-    [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] || continue
-    git tag "tateru/$t" "$t" && git tag -d "$t"
-  done
-```
+**On the first run, the project's history must be its own.** `bash .claude/scripts/fresh-start.sh
+--check` must exit 0. A fresh start gives the project a new git history, so tateru's tags, its
+remote and its commits are simply not there, and nothing below needs moving. If it reports anything,
+stop and do the fresh start (`CLAUDE.md`, *Start with your own copy*) first.
 
 Then, still on the first run:
-
-- **Record where the project began**: `git rev-parse HEAD > .claude/TATERU_BASE`, before any
-  project commit, and commit it with the first project commit. It is a file, not a tag, so every
-  clone and teammate has it. Commit ingestion and the author check exclude everything up to it, so
-  tateru's own history never reads as the project's work.
-- **Rename the tateru remote** if a plain clone left it as `origin`: `git remote rename origin
-  tateru`, then `git config remote.tateru.tagOpt --no-tags`, so a fetch never brings bare `v*` tags
-  back. The project adds its own `origin` when it has a repository; `/upgrade` finds `tateru` by
-  URL either way.
 
 - **Check the scripts are executable in git.** A repository created or re-created on Windows
   (where `core.fileMode` is `false`) commits every script as `100644`, and git on Linux and macOS —
   CI included — then silently skips the hooks. `git ls-files -s .githooks .claude/hooks
   .claude/scripts` must show `100755` for each file; fix any that do not with
-  `git update-index --chmod=+x <file>` and include it in the first commit. `/upgrade` makes the
-  same check.
+  `git update-index --chmod=+x <file>` and include it in the first commit. `fresh-start.sh` and
+  `/upgrade` make the same check.
 
-Say what was moved, renamed, recorded and fixed. The moved tags are local; `/upgrade` reads the same
-`tateru/v*` names.
+**Only for a project that kept tateru's history** — one started before fresh starts, whose person
+chose to keep their own commits — the old steps still apply:
+
+- **Record where the project began**: `git rev-parse HEAD > .claude/TATERU_BASE`, committed, so
+  `project-log.sh` leaves tateru's history out. (It works this out itself after a fresh start.)
+- **Move tateru's tags out of the way**, only those that match tateru's exactly:
+
+  ```bash
+  git ls-remote --tags https://github.com/jamesm-dev/tateru.dev.git 'v*' |
+    while read -r sha ref; do
+      t=${ref#refs/tags/}; case "$t" in *'^{}') continue ;; esac
+      [ "$(git rev-parse -q --verify "refs/tags/$t")" = "$sha" ] || continue
+      git tag "tateru/$t" "$t" && git tag -d "$t"
+    done
+  ```
+
+- **Rename the tateru remote** if it is still `origin`: `git remote rename origin tateru`, then
+  `git config remote.tateru.tagOpt --no-tags`.
+
+Say what was checked and fixed.
 
 ## Windows notes
 
-This project runs on Windows. Prefer cross-platform scripts over shell-specific ones; avoid `&&`
+People run tateru on Windows, macOS and Linux. Prefer cross-platform scripts over shell-specific ones; avoid `&&`
 chains inside npm scripts where a cross-platform runner is the idiom; watch for path separators and
 CRLF settings in `.gitattributes`.

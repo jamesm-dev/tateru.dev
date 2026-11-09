@@ -196,6 +196,29 @@ git config core.hooksPath .githooks
 return_app
 check "the prompt hook reports the vault" "bash .claude/hooks/idea-context.sh </dev/null | grep -q 'SPECS.md'"
 
+echo "Fresh start"
+fs=.claude/scripts/fresh-start.sh
+check "a fresh project passes the fresh-start check" "bash $fs --check"
+check "project-log.sh needs no TATERU_BASE after a fresh start" "bash .claude/scripts/project-log.sh --format=%s | grep -q 'selftest snapshot'"
+# A copy that is still tateru's: named tateru.dev, linked to tateru, and (by
+# pointing TATERU_ROOT at its own first commit) carrying tateru's history.
+copy="$tmp/fresh/tateru.dev"
+mkdir -p "$tmp/fresh" && cp -R "$tmp/repo" "$copy"
+root_sha=$(git rev-list --max-parents=0 HEAD | tail -1)
+( cd "$copy" && git remote add origin https://github.com/jamesm-dev/tateru.dev.git )
+check "the check names all three reasons in tateru's own copy" "cd '$copy' && [ \"\$(TATERU_ROOT=$root_sha bash $fs --check | wc -l)\" -eq 3 ]"
+check "the prompt hook asks for the fresh start first" "cd '$copy' && CLAUDE_PROJECT_DIR='$copy' bash .claude/hooks/idea-context.sh </dev/null | grep -q 'fresh start needed'"
+check "the session hook asks for the fresh start first" "cd '$copy' && CLAUDE_PROJECT_DIR='$copy' bash .claude/hooks/vault-preflight.sh | grep -q 'fresh start needed'"
+check "fresh-start refuses to wipe the project's own commits without a yes" "cd '$copy' && ! TATERU_ROOT=$root_sha bash $fs >/dev/null 2>&1 && [ -n \"\$(git remote)\" ]"
+# --keep-own-commits-lost gets past the other guard, so only the maintainer one can stop it.
+check "the maintainer copy is never flagged or wiped" "cd '$copy' && git config tateru.maintainer true && bash $fs --check && ! TATERU_ROOT=$root_sha bash $fs --keep-own-commits-lost >/dev/null 2>&1 && [ -n \"\$(git remote)\" ] && git config --unset tateru.maintainer"
+check "fresh-start gives the copy a new history of its own" "cd '$copy' && TATERU_ROOT=$root_sha bash $fs --keep-own-commits-lost >/dev/null && [ \"\$(git rev-list --count HEAD)\" = 1 ] && [ -z \"\$(git remote)\" ] && [ -f CLAUDE.md ]"
+check "fresh-start marks every script executable in git" "cd '$copy' && ! git ls-files -s .githooks .claude/hooks .claude/scripts | grep -qv '^100755'"
+check "only the folder name is left to change" "cd '$copy' && [ \"\$(bash $fs --check)\" = 'the folder is still named tateru.dev' ]"
+check "renaming the folder clears the check" "cd '$copy' && bash $fs --rename my-recipe-app >/dev/null && cd '$tmp/fresh/my-recipe-app' && bash $fs --check"
+check "the hooks are quiet once the start is fresh" "cd '$tmp/fresh/my-recipe-app' && ! CLAUDE_PROJECT_DIR='$tmp/fresh/my-recipe-app' bash .claude/hooks/idea-context.sh </dev/null | grep -q 'fresh start needed'"
+check "CLAUDE.md makes the fresh start come first" "grep -q '^## Start with your own copy' CLAUDE.md"
+
 echo "Workflow contracts"
 check "phase status vocabulary includes verified in /shape, /setup and /ship" "grep -q 'verified' .claude/skills/shape/references/templates.md && grep -q 'only \`/ship\` sets \`done\`' .claude/skills/setup/SKILL.md && grep -q 'only \`/ship\` does this' .claude/skills/ship/SKILL.md"
 check "verified is a phase status in the vault contract and state.json schema" "grep -q 'verified' .claude/skills/shared/vault-contract.md && grep -q 'in-progress | verified | done' .claude/skills/setup/references/management.md"
@@ -213,8 +236,8 @@ check "board.db stays local: ignored with its WAL files" "git check-ignore -q .m
 for f in .claude/skills/*/SKILL.md .claude/commands/decide.md .claude/commands/explain.md .claude/agents/project-manager.md; do
   check "$f follows the plain-language contract" "grep -q 'plain-language.md' '$f'"
 done
-check "CLAUDE.md treats a clone as the person's own project" "grep -q \"^## This is the person's own project\" CLAUDE.md && grep -q 'tateru.maintainer' CLAUDE.md"
-check "/setup builds in the clone, without warning it is tateru's repository" "grep -q '^\*\*Build here.\*\*' .claude/skills/setup/SKILL.md"
+check "CLAUDE.md treats a clone as the person's own project" "grep -q 'build their own app with it' CLAUDE.md && grep -q 'tateru.maintainer' CLAUDE.md"
+check "/setup builds in the clone, after the fresh start" "grep -q '^\*\*Build here — after the fresh start.\*\*' .claude/skills/setup/SKILL.md"
 check "/setup's first run checks scripts are executable in git" "grep -q '100755' .claude/skills/setup/references/execution.md"
 check "no skill tells Claude to delete a vault note" "! grep -rniE 'delete(s)? the note' .claude/skills .claude/commands .claude/agents"
 if [ -d "$root/app" ]; then
